@@ -373,10 +373,40 @@ SELECT id, url, url_normalized, title, description, notes,
        web_archive_snapshot_url, favicon_file, preview_image_file, unread,
        is_archived, shared, date_added, date_modified, date_accessed, owner_id,
        latest_snapshot_id
-FROM bookmarks_bookmark WHERE owner_id = $1 ORDER BY id
+FROM bookmarks_bookmark WHERE owner_id = $1
 ''',
       [ownerId],
       const $BookmarkRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
+  Future<Result<List<BookmarkRow>, SqlxError>> withNormalizedUrls(int ownerId, List<String> normalizedUrls) {
+    return _db.fetchAll<BookmarkRow>(
+      r'''
+SELECT id, url, url_normalized, title, description, notes,
+       web_archive_snapshot_url, favicon_file, preview_image_file, unread,
+       is_archived, shared, date_added, date_modified, date_accessed, owner_id,
+       latest_snapshot_id
+FROM bookmarks_bookmark WHERE owner_id = $1 AND url_normalized = ANY($2)
+''',
+      [ownerId, normalizedUrls],
+      const $BookmarkRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
+  Future<Result<Unit, SqlxError>> importUpdate(int id, String url, String urlNormalized, DateTime dateAdded, DateTime dateModified, bool unread, bool shared, String title, String description, String notes) {
+    return _db.execute(
+      r'''
+UPDATE bookmarks_bookmark SET
+  url = $2, url_normalized = $3, date_added = $4, date_modified = $5,
+  unread = $6, shared = $7, title = $8, description = $9, notes = $10
+WHERE id = $1
+''',
+      [id, url, urlNormalized, dateAdded, dateModified, unread, shared, title, description, notes],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
     );
   }
 }

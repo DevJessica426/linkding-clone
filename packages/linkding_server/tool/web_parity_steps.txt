@@ -262,3 +262,17 @@ ANON /bookmarks/shared
 ANON /
 POST /settings/update update_global_settings=&landing_page=login&guest_profile_user=&enable_link_prefetch=
 ANON /settings
+
+# --- Import and export ---
+POST /settings/import map_private_flag=on
+GET /settings/general
+UPLOAD /settings/import map_private_flag=on import_file=bookmarks.html|text/html|<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n<DT><H3 ADD_DATE="1600000000">Folder</H3>\n<DL><p>\n<DT><A HREF="https://import1.example.org/" ADD_DATE="1600000000" LAST_MODIFIED="1600000100" PRIVATE="0" TOREAD="1" TAGS="imp,Two Words,linkding:bookmarks.archived">Import &amp; one</A>\n<DD>Desc &lt;one&gt;[linkding-notes]Note *one*[/linkding-notes]\n</DL><p>\n<DT><A HREF="https://import2.example.org/path" ADD_DATE="1600000001000" TAGS="imp">Two</A>\n<DT><A HREF="https://import2.example.org/path/">Duplicate</A>\n<DT><A HREF="not a url" ADD_DATE="1">Bad</A>\n<DT><A HREF="https://import3.example.org/" ADD_DATE="abc">Bad date</A>\n<DT><A HREF="https://import5.example.org/" ADD_DATE="1600000002000000" PRIVATE="1" TAGS="imp,IMP">Micro</A>\n<DT><A HREF="https://site3.example.org/path?q=3" TOREAD="0" TAGS="python,updated">Updated existing</A>\n<DD>new desc\n<DT><A HREF="https://import4.example.org/" TAGS="tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt,ok">Long tag</A>\n<DT><A HREF="https://import6.example.org/" PRIVATE>  </A>\n</DL><p>
+GET /settings/general
+GET /bookmarks?q=%23imp
+GET /bookmarks/archived?q=%23imp
+GET /bookmarks?q=import
+GET /bookmarks?q=%23updated
+UPLOAD /settings/import import_file=again.html|text/html|<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n<DT><H3 ADD_DATE="1600000000">Folder</H3>\n<DL><p>\n<DT><A HREF="https://import1.example.org/" ADD_DATE="1600000000" LAST_MODIFIED="1600000100" PRIVATE="0" TOREAD="1" TAGS="imp,Two Words,linkding:bookmarks.archived">Import &amp; one</A>\n<DD>Desc &lt;one&gt;[linkding-notes]Note *one*[/linkding-notes]\n</DL><p>\n<DT><A HREF="https://import2.example.org/path" ADD_DATE="1600000001000" TAGS="imp">Two</A>\n<DT><A HREF="https://import2.example.org/path/">Duplicate</A>\n<DT><A HREF="not a url" ADD_DATE="1">Bad</A>\n<DT><A HREF="https://import3.example.org/" ADD_DATE="abc">Bad date</A>\n<DT><A HREF="https://import5.example.org/" ADD_DATE="1600000002000000" PRIVATE="1" TAGS="imp,IMP">Micro</A>\n<DT><A HREF="https://site3.example.org/path?q=3" TOREAD="0" TAGS="python,updated">Updated existing</A>\n<DD>new desc\n<DT><A HREF="https://import4.example.org/" TAGS="tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt,ok">Long tag</A>\n<DT><A HREF="https://import6.example.org/" PRIVATE>  </A>\n</DL><p>
+GET /settings/general
+GET /tags
+GET /settings/export

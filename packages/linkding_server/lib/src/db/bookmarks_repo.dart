@@ -332,13 +332,49 @@ ORDER BY
     String sort,
   );
 
-  /// Every bookmark of an owner, oldest first, for the export.
+  /// Every bookmark of an owner, for the export, in table order as Django
+  /// lists a query without an ordering.
   @Query(r'''
 SELECT id, url, url_normalized, title, description, notes,
        web_archive_snapshot_url, favicon_file, preview_image_file, unread,
        is_archived, shared, date_added, date_modified, date_accessed, owner_id,
        latest_snapshot_id
-FROM bookmarks_bookmark WHERE owner_id = $1 ORDER BY id
+FROM bookmarks_bookmark WHERE owner_id = $1
 ''')
   Future<Result<List<BookmarkRow>, SqlxError>> allOwned(int ownerId);
+
+  /// The owner's bookmarks saved for any of [normalizedUrls], in table
+  /// order: the import's lookup of what it updates.
+  @Query(r'''
+SELECT id, url, url_normalized, title, description, notes,
+       web_archive_snapshot_url, favicon_file, preview_image_file, unread,
+       is_archived, shared, date_added, date_modified, date_accessed, owner_id,
+       latest_snapshot_id
+FROM bookmarks_bookmark WHERE owner_id = $1 AND url_normalized = ANY($2)
+''')
+  Future<Result<List<BookmarkRow>, SqlxError>> withNormalizedUrls(
+    int ownerId,
+    List<String> normalizedUrls,
+  );
+
+  /// The fields an import updates on a bookmark it already has; the
+  /// archived state is not among them, as in linkding.
+  @Query(r'''
+UPDATE bookmarks_bookmark SET
+  url = $2, url_normalized = $3, date_added = $4, date_modified = $5,
+  unread = $6, shared = $7, title = $8, description = $9, notes = $10
+WHERE id = $1
+''')
+  Future<Result<Unit, SqlxError>> importUpdate(
+    int id,
+    String url,
+    String urlNormalized,
+    DateTime dateAdded,
+    DateTime dateModified,
+    bool unread,
+    bool shared,
+    String title,
+    String description,
+    String notes,
+  );
 }

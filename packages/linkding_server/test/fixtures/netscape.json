@@ -1,0 +1,513 @@
+{
+ "documents": [
+  [
+   "",
+   []
+  ],
+  [
+   "<DL><p></DL><p>",
+   []
+  ],
+  [
+   "<DL><p>\n<DT><A HREF=\"https://a.example/\" ADD_DATE=\"1\" TAGS=\"x,y\">A</A>\n</DL><p>",
+   [
+    {
+     "href": "https://a.example/",
+     "href_normalized": "https://a.example",
+     "title": "A",
+     "description": "",
+     "notes": "",
+     "date_added": "1",
+     "date_modified": "",
+     "tag_names": [
+      "x",
+      "y"
+     ],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><p>\n<DT><A HREF=\"https://a.example/\">  Spaced title  </A>\n<DD>  Desc  \n<DT><A HREF=\"https://b.example/\">B</A>\n</DL>",
+   [
+    {
+     "href": "https://a.example/",
+     "href_normalized": "https://a.example",
+     "title": "Spaced title",
+     "description": "Desc",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    },
+    {
+     "href": "https://b.example/",
+     "href_normalized": "https://b.example",
+     "title": "B",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><dt><a href=\"https://lower.example/\" tags=\"One, two ,,Three\" toread=\"1\" private=\"0\">lower</a><dd>d</dl>",
+   [
+    {
+     "href": "https://lower.example/",
+     "href_normalized": "https://lower.example",
+     "title": "lower",
+     "description": "d",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [
+      "One",
+      "Three",
+      "two"
+     ],
+     "to_read": true,
+     "private": false,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://e.example/?a=1&amp;b=2\" TAGS=\"&lt;t&gt;\">T &amp; &copy; &#169; &notit;</A></DL>",
+   [
+    {
+     "href": "https://e.example/?a=1&b=2",
+     "href_normalized": "https://e.example?a=1&b=2",
+     "title": "T & © © ¬it;",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [
+      "<t>"
+     ],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://n.example/\">N</A><DD>before[linkding-notes]the notes[/linkding-notes]after</DL>",
+   [
+    {
+     "href": "https://n.example/",
+     "href_normalized": "https://n.example",
+     "title": "N",
+     "description": "before",
+     "notes": "the notes",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://n2.example/\">N</A><DD>[linkding-notes]only notes</DL>",
+   [
+    {
+     "href": "https://n2.example/",
+     "href_normalized": "https://n2.example",
+     "title": "N",
+     "description": "",
+     "notes": "only notes",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://p.example/\" PRIVATE>P</A><DT><A HREF=\"https://q.example/\" PRIVATE=\"0\">Q</A></DL>",
+   [
+    {
+     "href": "https://p.example/",
+     "href_normalized": "https://p.example",
+     "title": "P",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    },
+    {
+     "href": "https://q.example/",
+     "href_normalized": "https://q.example",
+     "title": "Q",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": false,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://arch.example/\" TAGS=\"linkding:bookmarks.archived,z\">Arch</A></DL>",
+   [
+    {
+     "href": "https://arch.example/",
+     "href_normalized": "https://arch.example",
+     "title": "Arch",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [
+      "z"
+     ],
+     "to_read": false,
+     "private": true,
+     "archived": true
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://arch2.example/\" TAGS=\"x-linkding:bookmarks.archived-y\">Arch2</A></DL>",
+   [
+    {
+     "href": "https://arch2.example/",
+     "href_normalized": "https://arch2.example",
+     "title": "Arch2",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [
+      "x-linkding:bookmarks.archived-y"
+     ],
+     "to_read": false,
+     "private": true,
+     "archived": true
+    }
+   ]
+  ],
+  [
+   "<DL><DT><H3>Folder</H3><DL><p><DT><A HREF=\"https://in.example/\">In</A></DL><p><DT><A HREF=\"https://out.example/\">Out</A></DL>",
+   [
+    {
+     "href": "https://in.example/",
+     "href_normalized": "https://in.example",
+     "title": "In",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    },
+    {
+     "href": "https://out.example/",
+     "href_normalized": "https://out.example",
+     "title": "Out",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://nested.example/\">Nested <b>bold</b> rest</A><DD>desc <br> more</DL>",
+   [
+    {
+     "href": "https://nested.example/",
+     "href_normalized": "https://nested.example",
+     "title": "Nested",
+     "description": "desc",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://nodt.example/\" TAGS=\"kept\">First</A><A HREF=\"https://second.example/\">Second</A></DL>",
+   [
+    {
+     "href": "https://second.example/",
+     "href_normalized": "https://second.example",
+     "title": "Second",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [
+      "kept"
+     ],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://empty.example/\"></A></DL>",
+   [
+    {
+     "href": "https://empty.example/",
+     "href_normalized": "https://empty.example",
+     "title": "",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A>no href</A></DL>",
+   [
+    {
+     "href": "",
+     "href_normalized": "",
+     "title": "no href",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<!-- comment --><DL><DT><A HREF=\"https://c.example/\" ADD_DATE=1600000000 LAST_MODIFIED='1600000001'>C</A></DL>",
+   [
+    {
+     "href": "https://c.example/",
+     "href_normalized": "https://c.example",
+     "title": "C",
+     "description": "",
+     "notes": "",
+     "date_added": "1600000000",
+     "date_modified": "1600000001",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://u.example/\" TITLE=\"attr title\">Text title</A></DL>",
+   [
+    {
+     "href": "https://u.example/",
+     "href_normalized": "https://u.example",
+     "title": "Text title",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://u2.example/\" TITLE=\"attr title\"></A></DL>",
+   [
+    {
+     "href": "https://u2.example/",
+     "href_normalized": "https://u2.example",
+     "title": "attr title",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://x.example/\">X</A>\n<DD>line one\nline two\n</DL>",
+   [
+    {
+     "href": "https://x.example/",
+     "href_normalized": "https://x.example",
+     "title": "X",
+     "description": "line one\nline two",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://a.example/\" TAGS=\"\">A</A><DT><A HREF=\"https://b.example/\">B</A></DL>",
+   [
+    {
+     "href": "https://a.example/",
+     "href_normalized": "https://a.example",
+     "title": "A",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    },
+    {
+     "href": "https://b.example/",
+     "href_normalized": "https://b.example",
+     "title": "B",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ],
+  [
+   "<DL><DT><A HREF=\"https://1.example/\">1 < 2</A></DL>",
+   [
+    {
+     "href": "https://1.example/",
+     "href_normalized": "https://1.example",
+     "title": "2",
+     "description": "",
+     "notes": "",
+     "date_added": "",
+     "date_modified": "",
+     "tag_names": [],
+     "to_read": false,
+     "private": true,
+     "archived": false
+    }
+   ]
+  ]
+ ],
+ "timestamps": [
+  [
+   "0",
+   "1970-01-01T00:00:00+00:00"
+  ],
+  [
+   "1",
+   "1970-01-01T00:00:01+00:00"
+  ],
+  [
+   "-1",
+   "1969-12-31T23:59:59+00:00"
+  ],
+  [
+   "1600000000",
+   "2020-09-13T12:26:40+00:00"
+  ],
+  [
+   "1600000000000",
+   "2020-09-13T12:26:40+00:00"
+  ],
+  [
+   "1600000000000000",
+   "2020-09-13T12:26:40+00:00"
+  ],
+  [
+   "1600000000000000000",
+   null
+  ],
+  [
+   "253402300799",
+   "9999-12-31T23:59:59+00:00"
+  ],
+  [
+   "253402300800",
+   "1978-01-11T21:31:40.800000+00:00"
+  ],
+  [
+   "-62135596800",
+   "0001-01-01T00:00:00+00:00"
+  ],
+  [
+   "-62135596801",
+   "1968-01-12T20:06:43.199000+00:00"
+  ],
+  [
+   "1_000",
+   "1970-01-01T00:16:40+00:00"
+  ],
+  [
+   " 42 ",
+   "1970-01-01T00:00:42+00:00"
+  ],
+  [
+   "+7",
+   "1970-01-01T00:00:07+00:00"
+  ],
+  [
+   "abc",
+   null
+  ],
+  [
+   "",
+   null
+  ],
+  [
+   "1.5",
+   null
+  ],
+  [
+   "99999999999999999999999",
+   null
+  ]
+ ]
+}

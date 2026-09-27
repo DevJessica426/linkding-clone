@@ -16,6 +16,7 @@ page differs. Steps, one per line:
                                 the redirect leads to is compared
     UPLOAD /bookmarks/action a=1 field=name.txt|text/plain|content
                                 the same as multipart/form-data, with a file
+                                (`\\n` in the content is a line break)
     SQL UPDATE ...              run on both databases, nothing compared
     # a comment
 
@@ -29,6 +30,7 @@ import http.cookiejar
 import re
 import subprocess
 import sys
+import time
 import urllib.parse
 import urllib.request
 
@@ -101,7 +103,21 @@ EXPECTED = [
     (re.compile(r"/feeds/[0-9a-f]{40}/"), "/feeds/<key>/"),
     (re.compile(r'value="[0-9a-f]{40}"'), 'value="<key>"'),
     (re.compile(r"http://localhost:909[01]/"), "<base>/"),
+    # An API token's creation time, to the minute.
+    (re.compile(r"<td>[A-Z][a-z]{2} \d{2}, \d{4} \d{2}:\d{2}</td>"), "<td><created></td>"),
 ]
+
+
+def _recent(match):
+    """A Netscape export's timestamp from the last day, saved at a slightly
+    different second on each server."""
+    value = int(match.group(2))
+    if abs(time.time() - value) < 86400:
+        return f'{match.group(1)}="<now>"'
+    return match.group(0)
+
+
+EXPECTED.append((re.compile(r'(ADD_DATE|LAST_MODIFIED)="(\d+)"'), _recent))
 
 
 def normalize(document):
@@ -164,8 +180,30 @@ def multipart(fields, files):
     return "".join(out).encode(), f"multipart/form-data; boundary={boundary}"
 
 
+def _export_entries(document):
+    """A Netscape export with its bookmarks sorted. linkding exports them in
+    table order (no ORDER BY), which depends on how often each row was
+    updated rather than on anything a user did, so only the set counts."""
+    if not document.startswith("<!DOCTYPE NETSCAPE-Bookmark-file-1>"):
+        return document
+    lines = document.split("\n\r")
+    head, entries, tail = [], [], []
+    for line in lines:
+        if line.startswith("<DT>"):
+            entries.append([line])
+        elif line.startswith("<DD>") and entries:
+            entries[-1].append(line)
+        elif entries:
+            tail.append(line)
+        else:
+            head.append(line)
+    entries.sort()
+    return "\n\r".join(head + [l for e in entries for l in e] + tail)
+
+
 def compare(label, ref, clone, results):
     (rs, ru, rb), (cs, cu, cb) = results
+    rb, cb = _export_entries(rb), _export_entries(cb)
     ru = ru.replace(ref.base, "")
     cu = cu.replace(clone.base, "")
     # The reference runs Django's development server, whose error pages are
@@ -216,9 +254,15 @@ def main():
             path, _, body = rest.partition(" ")
             form = files = None
             if kind == "UPLOAD":
-                body, _, file_spec = body.partition(" ")
+                # Form fields first, unless the step has only the file.
+                first = body.split(" ", 1)[0]
+                if "|" in first:
+                    body, file_spec = "", body
+                else:
+                    body, _, file_spec = body.partition(" ")
                 field, _, spec = file_spec.partition("=")
-                files = {field: tuple(spec.split("|", 2))}
+                name, content_type, content = spec.split("|", 2)
+                files = {field: (name, content_type, content.replace("\\n", "\n"))}
             if kind in ("POST", "UPLOAD"):
                 form = urllib.parse.parse_qs(body, keep_blank_values=True)
             clients = (anon_ref, anon_clone) if kind == "ANON" else (ref, clone)

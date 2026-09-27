@@ -16,6 +16,7 @@ import 'web/bookmark_form.dart';
 import 'web/bookmark_views.dart';
 import 'web/bundle_views.dart';
 import 'web/context.dart';
+import 'web/import_export.dart';
 import 'web/settings_views.dart';
 import 'web/tag_views.dart';
 
@@ -58,6 +59,7 @@ Router buildApp({
   final tags = TagViews(web);
   final bundles = BundleViews(web);
   final settings = SettingsViews(web);
+  final transfer = ImportExportViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -95,6 +97,8 @@ Router buildApp({
       '/settings/integrations/delete-api-token',
       any(settings.deleteApiToken),
     )
+    ..route('/settings/import', any(transfer.import))
+    ..route('/settings/export', any(transfer.export))
     ..route('/assets/{id|[0-9]+}', any(files.view))
     ..route('/assets/{id|[0-9]+}/read', any(files.read))
     ..mount('/static', staticFiles('${config.webRoot}/static'))
