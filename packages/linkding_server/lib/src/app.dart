@@ -14,6 +14,7 @@ import 'web/asset_views.dart';
 import 'web/auth_views.dart';
 import 'web/bookmark_form.dart';
 import 'web/bookmark_views.dart';
+import 'web/bundle_views.dart';
 import 'web/context.dart';
 import 'web/tag_views.dart';
 
@@ -54,6 +55,7 @@ Router buildApp({
   final files = AssetViews(web);
   final forms = BookmarkFormViews(web);
   final tags = TagViews(web);
+  final bundles = BundleViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -74,6 +76,11 @@ Router buildApp({
     ..route('/tags/new', any(tags.create))
     ..route('/tags/{id|[0-9]+}/edit', any(tags.edit))
     ..route('/tags/merge', any(tags.merge))
+    ..route('/bundles', any(bundles.index))
+    ..route('/bundles/action', any(bundles.action))
+    ..route('/bundles/new', any(bundles.create))
+    ..route('/bundles/{id|[0-9]+}/edit', any(bundles.edit))
+    ..route('/bundles/preview', any(bundles.preview))
     ..route('/assets/{id|[0-9]+}', any(files.view))
     ..route('/assets/{id|[0-9]+}/read', any(files.read))
     ..mount('/static', staticFiles('${config.webRoot}/static'))

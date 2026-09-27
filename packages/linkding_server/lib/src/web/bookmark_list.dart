@@ -217,6 +217,8 @@ final class ListPage {
     required this.selectedBundleId,
     required this.users,
     required this.details,
+    this.isPreview = false,
+    this.paginationFrame = '_top',
   });
 
   final ListKind kind;
@@ -236,6 +238,12 @@ final class ListPage {
   /// Owners with shared bookmarks matching the search, on the shared page.
   final List<String>? users;
   final Details? details;
+
+  /// The bundle editor's preview: the bookmarks without their actions.
+  final bool isPreview;
+
+  /// The Turbo frame the pagination links load into.
+  final String paginationFrame;
 }
 
 /// `BookmarkDetailsContext`.
@@ -471,7 +479,7 @@ String bookmarkList(PageContext c, ListPage p) {
 $items
     </ul>
     <div class="bookmark-pagination${profile.stickyPagination ? ' sticky' : ''}">
-${pagination(c, p.page)}
+${pagination(c, p.page, frame: p.paginationFrame)}
     </div>
   </section>''';
   }
@@ -559,7 +567,7 @@ ${tags.isEmpty ? '' : '                <div class="tags">\n                  $ta
                      title="$snapshotTitle"
                      target="$target"
                      rel="noopener">${e(displayDate)}</a>'''}
-                <span>|</span>''';
+                ${p.isPreview ? '' : '<span>|</span>'}''';
 
   final showNotesButton = b.notes.isNotEmpty && !profile.permanentNotes;
   final showMarkAsRead = isEditable && b.unread;
@@ -667,16 +675,27 @@ ${showNotesButton ? '''
               <div class="preview-image placeholder">
                 <div class="img" /></div>''';
 
+  final actions =
+      '''
+${profile.displayViewBookmarkAction ? '''
+                  <a href="${e(links.details(b.id))}"
+                     class="view-action"
+                     data-turbo-action="replace"
+                     data-turbo-frame="details-modal">View</a>''' : ''}
+$ownerActions
+$extra''';
+
   return '''
         <li data-bookmark-id="${b.id}"
             role="listitem"
             ${classes.isEmpty ? '' : 'class="$classes"'}>
           <div class="content">
             <div class="title">
+${p.isPreview ? '' : '''
                 <label class="form-checkbox bulk-edit-checkbox">
                   <input type="checkbox" name="bookmark_id" value="${b.id}">
                   <i class="form-icon"></i>
-                </label>$favicon
+                </label>'''}$favicon
               <a href="${e(b.url)}"
                  target="$target"
                  rel="noopener">
@@ -688,13 +707,7 @@ $description
 $notes
             <div class="actions">
 $date
-${profile.displayViewBookmarkAction ? '''
-                  <a href="${e(links.details(b.id))}"
-                     class="view-action"
-                     data-turbo-action="replace"
-                     data-turbo-frame="details-modal">View</a>''' : ''}
-$ownerActions
-$extra
+${p.isPreview ? '' : actions}
             </div>
           </div>
 $preview
@@ -702,7 +715,7 @@ $preview
 }
 
 /// `shared/pagination.html` for the list's page.
-String pagination(PageContext c, Page<Object?> page) {
+String pagination(PageContext c, Page<Object?> page, {String frame = '_top'}) {
   final base = c.path;
   final params = QueryParams.parse(c.request.requestedUri.query)
     ..remove('page')
@@ -717,7 +730,7 @@ String pagination(PageContext c, Page<Object?> page) {
     <li class="page-item">
       <a href="${link(page.number - 1)}"
          tabindex="-1"
-         data-turbo-frame="_top">Previous</a>
+         data-turbo-frame="$frame">Previous</a>
     </li>'''
       : '''
     <li class="page-item disabled">
@@ -728,7 +741,7 @@ String pagination(PageContext c, Page<Object?> page) {
     <li class="page-item">
       <a href="${link(page.number + 1)}"
          tabindex="-1"
-         data-turbo-frame="_top">Next</a>
+         data-turbo-frame="$frame">Next</a>
     </li>'''
       : '''
     <li class="page-item disabled">
@@ -743,7 +756,7 @@ String pagination(PageContext c, Page<Object?> page) {
       </li>'''
           : '''
       <li class="page-item ${n == page.number ? 'active' : ''}">
-        <a href="${link(n)}" data-turbo-frame="_top">$n</a>
+        <a href="${link(n)}" data-turbo-frame="$frame">$n</a>
       </li>''',
   ].join('\n');
   return '''

@@ -1,5 +1,6 @@
 # Pages compared by tool/html_parity.py, after web_parity_seed.sql.
-# Left out: `?details=abc`, which linkding answers with a 500.
+# Left out: `?details=abc`, and a bundle form with an unknown filter
+# value, which linkding answers with a 500.
 
 # --- Lists, searches, paging ---
 GET /bookmarks
@@ -208,3 +209,33 @@ POST /tags?sort=count-desc delete_tag=1007
 POST /tags delete_tag=99999
 POST /tags search=x
 GET /tags
+
+# --- Bundles ---
+GET /bundles
+GET /bundles/new
+GET /bundles/new?q=filler+%23python+!unread
+GET /bundles/1000/edit
+GET /bundles/99999/edit
+GET /bundles/preview
+GET /bundles/preview?any_tags=python&filter_unread=yes&page=2
+GET /bundles/preview?search=nomatchatall
+ANON /bundles
+ANON /bundles/preview
+POST /bundles/new name=&search=
+POST /bundles/new name=%20Mine%20&search=filler&any_tags=python+rust&filter_unread=yes&filter_shared=off&save=
+GET /bundles
+GET /bundles
+POST /bundles/1000/edit name=Edited+bundle&search=&any_tags=python&all_tags=&excluded_tags=&filter_unread=&filter_shared=no
+GET /bundles/1000/edit
+GET /bookmarks?bundle=1000
+POST /bundles/1000/edit name=
+POST /bundles/action move_bundle=1000&move_position=0
+GET /bundles
+POST /bundles/action move_bundle=1000&move_position=-1
+GET /bundles
+POST /bundles/action move_bundle=1000&move_position=99
+GET /bundles
+POST /bundles/action remove_bundle=1000
+POST /bundles/action remove_bundle=99999
+GET /bundles/action
+GET /bookmarks
