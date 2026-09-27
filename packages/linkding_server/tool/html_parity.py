@@ -25,6 +25,7 @@ A step may start with `FRAME=<id>` (a Turbo frame request) and `STREAM`
 """
 
 import difflib
+import email.utils
 import html.parser
 import http.cookiejar
 import re
@@ -118,6 +119,22 @@ def _recent(match):
 
 
 EXPECTED.append((re.compile(r'(ADD_DATE|LAST_MODIFIED)="(\d+)"'), _recent))
+
+
+def _recent_feed_date(match):
+    """A feed's date from the last day: a bookmark the parity run added,
+    at a slightly different second on each server, or an empty feed's
+    build time."""
+    value = email.utils.parsedate_to_datetime(match.group(0)).timestamp()
+    if abs(time.time() - value) < 86400:
+        return "<now>"
+    return match.group(0)
+
+
+EXPECTED.append((
+    re.compile(r"[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} \+0000"),
+    _recent_feed_date,
+))
 
 
 def normalize(document):

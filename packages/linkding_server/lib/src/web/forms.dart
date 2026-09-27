@@ -40,13 +40,16 @@ String radioInput(String name, int index, String value, bool checked) =>
 /// references, `aria-invalid`, the tag's extra attributes, `required` and
 /// the id. A value of `true` is an attribute without a value. A select
 /// whose first option has a value gets no `required` attribute
-/// ([requiredAttribute] false), as Django leaves it off.
+/// ([requiredAttribute] false), as Django leaves it off. A field with a
+/// Django `help_text` ([djangoHelpText]) refers to it unless the tag
+/// already set a reference.
 Map<String, Object> fieldAttributes(
   String name, {
   Map<String, Object> widget = const {},
   bool required = false,
   bool requiredAttribute = true,
   bool hasHelp = false,
+  bool djangoHelpText = false,
   List<String> errors = const [],
   Map<String, Object> extra = const {},
 }) {
@@ -65,6 +68,9 @@ Map<String, Object> fieldAttributes(
   );
   if (required && requiredAttribute) attrs['required'] = true;
   if (errors.isNotEmpty) attrs['aria-invalid'] = 'true';
+  if (djangoHelpText && !attrs.containsKey('aria-describedby')) {
+    attrs['aria-describedby'] = 'id_${name}_helptext';
+  }
   attrs['id'] = 'id_$name';
   return attrs;
 }

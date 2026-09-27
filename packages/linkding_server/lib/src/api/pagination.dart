@@ -1,3 +1,4 @@
+import '../compat/django.dart';
 import '../compat/pyurl.dart';
 
 /// DRF's `replace_query_param`: [url] with [key] set to [value] and the
@@ -44,10 +45,10 @@ final class LimitOffset {
   /// number or negative becomes 0.
   factory LimitOffset.fromQuery(Map<String, String> query) {
     var limit = defaultLimit;
-    final rawLimit = _pythonInt(query['limit']);
+    final rawLimit = pythonInt(query['limit']);
     if (rawLimit != null && rawLimit > 0) limit = rawLimit;
     var offset = 0;
-    final rawOffset = _pythonInt(query['offset']);
+    final rawOffset = pythonInt(query['offset']);
     if (rawOffset != null && rawOffset >= 0) offset = rawOffset;
     return LimitOffset(limit, offset);
   }
@@ -74,13 +75,4 @@ final class LimitOffset {
     if (offset - limit <= 0) return removeQueryParam(withLimit, 'offset');
     return replaceQueryParam(withLimit, 'offset', '${offset - limit}');
   }
-}
-
-/// Python's `int(str)`: surrounding whitespace and `_` between digits
-/// allowed, a sign allowed.
-int? _pythonInt(String? value) {
-  if (value == null) return null;
-  final trimmed = value.trim();
-  if (!RegExp(r'^[+-]?\d+(?:_\d+)*$').hasMatch(trimmed)) return null;
-  return int.tryParse(trimmed.replaceAll('_', ''));
 }

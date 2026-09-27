@@ -16,3 +16,4 @@ build/
 #                         without the CLI; `dust check` keeps it honest
 #   .dust_sql/            Dust's query metadata, which lets `dust check --db
 #                         --offline` validate SQL without a database
+__pycache__/

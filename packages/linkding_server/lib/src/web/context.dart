@@ -151,6 +151,13 @@ final class PageContext {
 
   Map<String, String> get query => request.requestedUri.queryParameters;
 
+  /// The scheme and host the visitor asked for, as Django's
+  /// `build_absolute_uri` starts an absolute URL.
+  String get baseUrl {
+    final uri = request.requestedUri;
+    return '${uri.scheme}://${request.headers['host'] ?? uri.authority}';
+  }
+
   /// An HTML response for this request, setting the CSRF cookie when the
   /// browser did not have one yet.
   Response html(
@@ -166,6 +173,25 @@ final class PageContext {
       'x-frame-options': 'DENY',
       'referrer-policy': 'same-origin',
       'set-cookie': ?_csrf.setCookie,
+      ...headers,
+    },
+  );
+
+  /// A response that is not a page, with the headers Django's middleware
+  /// adds to every response.
+  Response text(
+    String body, {
+    required String contentType,
+    int status = 200,
+    Map<String, Object> headers = const {},
+  }) => Response(
+    status,
+    body: body,
+    headers: {
+      HttpHeaders.contentTypeHeader: contentType,
+      'vary': 'Cookie',
+      'x-frame-options': 'DENY',
+      'referrer-policy': 'same-origin',
       ...headers,
     },
   );
@@ -255,6 +281,17 @@ String turboReplace(String target, String content, {String method = ''}) =>
 Response turboStream(PageContext c, List<String> streams) =>
     c.html(streams.join('\n'), headers: {'content-type': turboStreamType});
 
+/// Django's page for an error in the application: where linkding fails with
+/// an exception, the clone answers the same way.
+Response serverErrorPage() => Response(
+  500,
+  body:
+      '\n<!doctype html>\n<html lang="en">\n<head>\n  <title>Server Error (500)'
+      '</title>\n</head>\n<body>\n  <h1>Server Error (500)</h1><p></p>\n'
+      '</body>\n</html>\n',
+  headers: {'content-type': 'text/html; charset=utf-8'},
+);
+
 /// Django's page for a request that is not allowed: `PermissionDenied`.
 Response forbiddenPage() => Response(
   403,
@@ -264,9 +301,10 @@ Response forbiddenPage() => Response(
   headers: {'content-type': 'text/html; charset=utf-8'},
 );
 
-/// Django's `redirect_to_login`: `/login/?next=<path>`.
+/// Django's `redirect_to_login` to linkding's `LOGIN_URL`:
+/// `/login?next=<path>`, which then gains its slash.
 Response redirectToLogin(PageContext c) =>
-    c.redirect('/login/?next=${q(c.fullPath)}');
+    c.redirect('/login?next=${q(c.fullPath)}');
 
 /// `{% static %}` with linkding's cache-busting version parameter where
 /// linkding uses one.

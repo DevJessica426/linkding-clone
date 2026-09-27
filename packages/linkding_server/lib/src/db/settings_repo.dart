@@ -51,10 +51,12 @@ VALUES ($1, $2, false, $3)
     int ownerId,
   );
 
+  /// Marks one of the owner's toasts as seen; null when it is not theirs.
   @Query(r'''
 UPDATE bookmarks_toast SET acknowledged = true WHERE id = $1 AND owner_id = $2
+RETURNING id
 ''')
-  Future<Result<Unit, SqlxError>> acknowledge(int id, int ownerId);
+  Future<Result<int?, SqlxError>> acknowledge(int id, int ownerId);
 
   // --- One-time messages, by session ---
 

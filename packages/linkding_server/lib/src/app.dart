@@ -16,8 +16,10 @@ import 'web/bookmark_form.dart';
 import 'web/bookmark_views.dart';
 import 'web/bundle_views.dart';
 import 'web/context.dart';
+import 'web/feeds.dart';
 import 'web/import_export.dart';
 import 'web/settings_views.dart';
+import 'web/site_views.dart';
 import 'web/tag_views.dart';
 
 /// The whole application: the REST API under `/api`, the health check, and
@@ -60,6 +62,8 @@ Router buildApp({
   final bundles = BundleViews(web);
   final settings = SettingsViews(web);
   final transfer = ImportExportViews(web);
+  final feeds = FeedViews(web);
+  final site = SiteViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -67,6 +71,10 @@ Router buildApp({
     ..route('/login', any(_appendSlash))
     ..route('/logout/', any(auth.logout))
     ..route('/logout', any(_appendSlash))
+    ..route('/change-password/', any(auth.changePassword))
+    ..route('/change-password', any(_appendSlash))
+    ..route('/password-change-done/', any(auth.passwordChangeDone))
+    ..route('/password-change-done', any(_appendSlash))
     ..route('/bookmarks', any(lists.index))
     ..route('/bookmarks/action', any(lists.indexAction))
     ..route('/bookmarks/archived', any(lists.archived))
@@ -101,6 +109,14 @@ Router buildApp({
     ..route('/settings/export', any(transfer.export))
     ..route('/assets/{id|[0-9]+}', any(files.view))
     ..route('/assets/{id|[0-9]+}/read', any(files.read))
+    ..route('/toasts/acknowledge', any(site.acknowledgeToast))
+    ..route('/feeds/shared', any(feeds.publicShared))
+    ..route('/feeds/{key}/all', any(feeds.all))
+    ..route('/feeds/{key}/unread', any(feeds.unread))
+    ..route('/feeds/{key}/shared', any(feeds.shared))
+    ..route('/manifest.json', any(site.manifest))
+    ..route('/custom_css', any(site.customCss))
+    ..route('/opensearch.xml', any(site.opensearch))
     ..mount('/static', staticFiles('${config.webRoot}/static'))
     ..route('/api/', any(api.root))
     ..route('/api', any(LinkdingApi.appendSlash))

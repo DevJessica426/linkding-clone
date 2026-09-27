@@ -79,6 +79,23 @@ final class Sessions {
     return '${_cookie(sessionCookie, key, age)}; HttpOnly';
   }
 
+  /// Django's `update_session_auth_hash` after [userId] changed their
+  /// password: the request's session continues under a new key, and every
+  /// other session of the user ends. Returns the `Set-Cookie` value.
+  Future<String?> keepAfterPasswordChange(Request request, int userId) async {
+    final key = requestCookies(request)[sessionCookie];
+    if (key == null) return null;
+    final users = UsersRepo(db);
+    final renewed = _random(32, _alphabet);
+    (await users.renewSession(
+      key,
+      renewed,
+      DateTime.now().toUtc().add(age),
+    )).orThrow;
+    (await users.deleteOtherSessions(userId, renewed)).orThrow;
+    return '${_cookie(sessionCookie, renewed, age)}; HttpOnly';
+  }
+
   /// Ends the request's session; returns the `Set-Cookie` value clearing it.
   Future<String> end(Request request) async {
     final key = requestCookies(request)[sessionCookie];

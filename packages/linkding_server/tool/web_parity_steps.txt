@@ -276,3 +276,66 @@ UPLOAD /settings/import import_file=again.html|text/html|<!DOCTYPE NETSCAPE-Book
 GET /settings/general
 GET /tags
 GET /settings/export
+
+# --- Feeds (with a fixed key), manifest, OpenSearch, custom CSS ---
+SQL UPDATE bookmarks_feedtoken SET key = '000000000000000000000000000000000000feed' WHERE user_id = (SELECT id FROM auth_user WHERE username = 'admin')
+ANON /feeds/000000000000000000000000000000000000feed/all
+ANON /feeds/000000000000000000000000000000000000feed/all?limit=3
+ANON /feeds/000000000000000000000000000000000000feed/all?limit=
+ANON /feeds/000000000000000000000000000000000000feed/all?limit=0
+ANON /feeds/000000000000000000000000000000000000feed/all?limit=%201_0
+ANON /feeds/000000000000000000000000000000000000feed/all?limit=x
+ANON /feeds/000000000000000000000000000000000000feed/all?limit=-1
+ANON /feeds/000000000000000000000000000000000000feed/all?q=%23python&limit=5
+ANON /feeds/000000000000000000000000000000000000feed/all?q=(%23python
+ANON /feeds/000000000000000000000000000000000000feed/all?unread=yes&shared=no
+ANON /feeds/000000000000000000000000000000000000feed/all?bundle=1000
+GET /feeds/000000000000000000000000000000000000feed/all?bundle=1000
+GET /feeds/000000000000000000000000000000000000feed/all?bundle=999
+GET /feeds/000000000000000000000000000000000000feed/all?bundle=x
+ANON /feeds/000000000000000000000000000000000000feed/unread
+ANON /feeds/000000000000000000000000000000000000feed/unread?q=filler
+ANON /feeds/000000000000000000000000000000000000feed/shared
+ANON /feeds/000000000000000000000000000000000000feed/shared?user=Zed
+ANON /feeds/000000000000000000000000000000000000feed/shared?user=other&q=%23python
+ANON /feeds/000000000000000000000000000000000000feed/shared?user=nobody
+ANON /feeds/shared
+ANON /feeds/shared?user=Zed
+ANON /feeds/shared?q=shared
+ANON /feeds/bogus/all
+ANON /feeds/000000000000000000000000000000000000feed/all/
+ANON /manifest.json
+GET /manifest.json
+ANON /opensearch.xml
+ANON /custom_css
+GET /custom_css
+
+# --- Toasts ---
+SQL INSERT INTO bookmarks_toast (id, key, message, acknowledged, owner_id) SELECT 900, 'parity', 'A toast <for> parity', false, id FROM auth_user WHERE username = 'admin'
+GET /bookmarks
+POST /toasts/acknowledge?return_url=/bookmarks/archived toast=900
+POST /toasts/acknowledge?return_url=//evil.example toast=900
+POST /toasts/acknowledge toast=901
+POST /toasts/acknowledge toast=x
+POST /toasts/acknowledge toast=
+ANON /toasts/acknowledge
+
+# --- The root, keeping the query ---
+GET /?q=%23python&sort=title_asc
+GET /?q=a+b&q=%23python&x=%2F&empty
+ANON /?q=a+b&q=c&x=%2F
+
+# --- Password change (last: it changes the admin's password) ---
+ANON /change-password/
+ANON /change-password
+ANON /password-change-done/
+GET /change-password
+GET /change-password/
+POST /change-password/ old_password=&new_password1=&new_password2=
+POST /change-password/ old_password=wrong&new_password1=a&new_password2=b
+POST /change-password/ old_password=admin12345&new_password1=admin&new_password2=admin
+POST /change-password/ old_password=admin12345&new_password1=12345678901&new_password2=12345678901
+POST /change-password/ old_password=wrong&new_password1=Parity-pass-2026&new_password2=Parity-pass-2026
+POST /change-password/ old_password=admin12345&new_password1=Parity-pass-2026&new_password2=Parity-pass-2026
+GET /bookmarks
+GET /password-change-done/

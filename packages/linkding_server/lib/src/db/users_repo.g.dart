@@ -371,6 +371,19 @@ VALUES ($1, $2, $3)
   }
 
   @override
+  Future<Result<Unit, SqlxError>> renewSession(String key, String newKey, DateTime expires) {
+    return _db.execute(
+      r'''
+UPDATE clone_session SET session_key = $2, expire_date = $3
+WHERE session_key = $1
+''',
+      [key, newKey, expires],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
+  }
+
+  @override
   Future<Result<Unit, SqlxError>> deleteOtherSessions(int userId, String keep) {
     return _db.execute(
       r'''DELETE FROM clone_session WHERE user_id = $1 AND session_key <> $2''',

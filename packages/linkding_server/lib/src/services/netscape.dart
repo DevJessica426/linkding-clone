@@ -191,14 +191,13 @@ Future<ImportResult> importNetscape(
   };
 
   var cache = await tagCache();
-  final now = DateTime.now().toUtc();
   for (final bookmark in parsed) {
     for (final name in bookmark.tagNames) {
       if (name.runes.length > 64) continue;
       if (cache.containsKey(name.toLowerCase())) continue;
       cache[name.toLowerCase()] = (await tags.insert(
         name,
-        now,
+        DateTime.now().toUtc(),
         ownerId,
       )).orThrow;
     }
@@ -226,7 +225,7 @@ Future<ImportResult> importNetscape(
       final saved = existing
           .where((b) => b.urlNormalized == bookmark.hrefNormalized)
           .firstOrNull;
-      final copied = _copy(bookmark, saved, mapPrivateFlag, now);
+      final copied = _copy(bookmark, saved, mapPrivateFlag);
       if (copied == null ||
           !_valid(copied, disableUrlValidation: disableUrlValidation)) {
         result.failed++;
@@ -304,16 +303,12 @@ typedef _Copied = ({
 });
 
 /// `_copy_bookmark_data` onto [saved] or a new bookmark; null when a date
-/// cannot be read.
-_Copied? _copy(
-  NetscapeBookmark b,
-  BookmarkRow? saved,
-  bool mapPrivateFlag,
-  DateTime now,
-) {
+/// cannot be read. A bookmark without a date is added now, each at its own
+/// moment.
+_Copied? _copy(NetscapeBookmark b, BookmarkRow? saved, bool mapPrivateFlag) {
   final added = (b.dateAdded ?? '').isNotEmpty
       ? parseTimestamp(b.dateAdded!)
-      : now;
+      : DateTime.now().toUtc();
   if (added == null) return null;
   final modified = (b.dateModified ?? '').isNotEmpty
       ? parseTimestamp(b.dateModified!)

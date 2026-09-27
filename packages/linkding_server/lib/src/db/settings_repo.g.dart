@@ -85,14 +85,13 @@ VALUES ($1, $2, false, $3)
   }
 
   @override
-  Future<Result<Unit, SqlxError>> acknowledge(int id, int ownerId) {
-    return _db.execute(
+  Future<Result<int?, SqlxError>> acknowledge(int id, int ownerId) {
+    return _db.fetchScalar<int?>(
       r'''
 UPDATE bookmarks_toast SET acknowledged = true WHERE id = $1 AND owner_id = $2
+RETURNING id
 ''',
       [id, ownerId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
     );
   }
 
