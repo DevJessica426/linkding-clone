@@ -34,6 +34,28 @@ final class Web {
   final AssetService assets;
   final WebsiteMetadataLoader metadata;
 
+  /// Queues a one-time message for the visitor's next page that shows
+  /// messages: Django's `messages.success` and friends.
+  Future<void> addMessage(
+    PageContext c,
+    String message, {
+    String level = 'success',
+    String extraTags = '',
+  }) async {
+    final key = requestCookies(c.request)[sessionCookie];
+    if (key == null || !c.isAuthenticated) return;
+    (await SettingsRepo(
+      database.connection,
+    ).addMessage(key, level, message, extraTags)).orThrow;
+  }
+
+  /// The visitor's waiting messages, which are shown once.
+  Future<List<MessageRow>> takeMessages(PageContext c) async {
+    final key = requestCookies(c.request)[sessionCookie];
+    if (key == null || !c.isAuthenticated) return const [];
+    return (await SettingsRepo(database.connection).takeMessages(key)).orThrow;
+  }
+
   /// Everything a page needs to know about who is asking.
   Future<PageContext> context(Request request) async {
     final user = await sessions.user(request);
@@ -187,6 +209,23 @@ Response notFoundPage() => Response(
       'found on this server.</p>\n</body>\n</html>\n',
   headers: {'content-type': 'text/html; charset=utf-8'},
 );
+
+/// The media type of a Turbo Stream response.
+const turboStreamType = 'text/vnd.turbo-stream.html';
+
+/// linkding's `turbo.update`: [content] as the new inside of [target].
+String turboUpdate(String target, String content, {String method = ''}) =>
+    '<turbo-stream action="update"${method.isEmpty ? '' : ' method="$method"'} '
+    'target="$target"><template>$content</template></turbo-stream>';
+
+/// linkding's `turbo.replace`: [content] in place of [target].
+String turboReplace(String target, String content, {String method = ''}) =>
+    '<turbo-stream action="replace"${method.isEmpty ? '' : ' method="$method"'} '
+    'target="$target"><template>$content</template></turbo-stream>';
+
+/// linkding's `turbo.stream`: several stream elements in one response.
+Response turboStream(PageContext c, List<String> streams) =>
+    c.html(streams.join('\n'), headers: {'content-type': turboStreamType});
 
 /// Django's `redirect_to_login`: `/login/?next=<path>`.
 Response redirectToLogin(PageContext c) =>

@@ -98,3 +98,11 @@ INSERT INTO bookmarks_bookmarkbundle (
   date_created, date_modified, owner_id, filter_unread, filter_shared)
 VALUES (1000, 'Pythonic & <co>', '', 'python rust', '', '日本', 9,
         '2024-03-01T00:00:00Z', '2024-03-01T00:00:00Z', 1, 'off', 'off');
+
+-- The API parity run auto-tags one bookmark with two new tags at once.
+-- linkding collects auto tags in a Python set, so which of the two it
+-- creates first (and gives the lower id) changes from run to run with
+-- Python's hash seed. The tags page shows those ids, so the pair goes.
+DELETE FROM bookmarks_bookmark_tags WHERE tag_id IN (
+  SELECT id FROM bookmarks_tag WHERE name IN ('second', 'two'));
+DELETE FROM bookmarks_tag WHERE name IN ('second', 'two');

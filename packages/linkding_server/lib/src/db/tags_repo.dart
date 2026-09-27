@@ -90,23 +90,32 @@ WHERE owner_id = $1 ORDER BY id
 ''')
   Future<Result<List<TagRow>, SqlxError>> all(int ownerId);
 
-  /// The tags page: names matching [search] (empty matches all), with how
-  /// many bookmarks use each, optionally only unused ones.
+  /// The tags page: the owner's tags with how many bookmarks use each,
+  /// those whose name matches [pattern] (a `LIKE` pattern, compared
+  /// ignoring case; empty for all), optionally only unused ones. [sort] is
+  /// `name-asc`, `name-desc`, `count-asc` or `count-desc`; counts tie by
+  /// name.
   @Query(r'''
-SELECT t.id, t.name, t.date_added,
-       (SELECT count(*)::integer FROM bookmarks_bookmark_tags bt
-        WHERE bt.tag_id = t.id) AS bookmark_count
-FROM bookmarks_tag t
-WHERE t.owner_id = $1
-  AND ($2 = '' OR UPPER(t.name::text) LIKE '%' || UPPER($2) || '%')
-  AND (NOT $3 OR NOT EXISTS (
-        SELECT 1 FROM bookmarks_bookmark_tags bt WHERE bt.tag_id = t.id))
-ORDER BY lower(t.name), t.id
+SELECT id, name, date_added, bookmark_count FROM (
+  SELECT t.id, t.name, t.date_added,
+         (SELECT count(*)::integer FROM bookmarks_bookmark_tags bt
+          WHERE bt.tag_id = t.id) AS bookmark_count
+  FROM bookmarks_tag t
+  WHERE t.owner_id = $1
+) t
+WHERE ($2 = '' OR UPPER(t.name::text) LIKE UPPER($2))
+  AND (NOT $3::boolean OR t.bookmark_count = 0)
+ORDER BY
+  CASE WHEN $4::text = 'name-desc' THEN t.name END DESC,
+  CASE WHEN $4 = 'count-asc' THEN t.bookmark_count END ASC,
+  CASE WHEN $4 = 'count-desc' THEN t.bookmark_count END DESC,
+  t.name
 ''')
-  Future<Result<List<TagUsageRow>, SqlxError>> usage(
+  Future<Result<List<TagUsageRow>, SqlxError>> listing(
     int ownerId,
-    String search,
+    String pattern,
     bool unusedOnly,
+    String sort,
   );
 
   @Query(r'UPDATE bookmarks_tag SET name = $3 WHERE id = $1 AND owner_id = $2')

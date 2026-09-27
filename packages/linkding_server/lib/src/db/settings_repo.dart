@@ -55,4 +55,27 @@ VALUES ($1, $2, false, $3)
 UPDATE bookmarks_toast SET acknowledged = true WHERE id = $1 AND owner_id = $2
 ''')
   Future<Result<Unit, SqlxError>> acknowledge(int id, int ownerId);
+
+  // --- One-time messages, by session ---
+
+  @Query(r'''
+INSERT INTO clone_message (session_key, level, message, extra_tags)
+VALUES ($1, $2, $3, $4)
+''')
+  Future<Result<Unit, SqlxError>> addMessage(
+    String sessionKey,
+    String level,
+    String message,
+    String extraTags,
+  );
+
+  /// The session's messages, oldest first, removed as they are read.
+  @Query(r'''
+WITH taken AS (
+  DELETE FROM clone_message WHERE session_key = $1
+  RETURNING id, level, message, extra_tags
+)
+SELECT level, message, extra_tags FROM taken ORDER BY id
+''')
+  Future<Result<List<MessageRow>, SqlxError>> takeMessages(String sessionKey);
 }

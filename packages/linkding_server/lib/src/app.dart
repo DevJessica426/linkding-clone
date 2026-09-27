@@ -15,6 +15,7 @@ import 'web/auth_views.dart';
 import 'web/bookmark_form.dart';
 import 'web/bookmark_views.dart';
 import 'web/context.dart';
+import 'web/tag_views.dart';
 
 /// The whole application: the REST API under `/api`, the health check, and
 /// (added by the web interface) every page.
@@ -52,6 +53,7 @@ Router buildApp({
   final lists = BookmarkViews(web);
   final files = AssetViews(web);
   final forms = BookmarkFormViews(web);
+  final tags = TagViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -68,6 +70,10 @@ Router buildApp({
     ..route('/bookmarks/new', any(forms.create))
     ..route('/bookmarks/close', any(forms.close))
     ..route('/bookmarks/{id|[0-9]+}/edit', any(forms.edit))
+    ..route('/tags', any(tags.index))
+    ..route('/tags/new', any(tags.create))
+    ..route('/tags/{id|[0-9]+}/edit', any(tags.edit))
+    ..route('/tags/merge', any(tags.merge))
     ..route('/assets/{id|[0-9]+}', any(files.view))
     ..route('/assets/{id|[0-9]+}/read', any(files.read))
     ..mount('/static', staticFiles('${config.webRoot}/static'))

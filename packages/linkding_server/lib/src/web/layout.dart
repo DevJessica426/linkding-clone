@@ -1,4 +1,5 @@
 import '../config.dart';
+import '../db/rows.dart';
 import 'context.dart';
 import 'html.dart';
 
@@ -11,6 +12,35 @@ String layout(
   String overlays = '',
   String? rssFeedUrl,
 }) {
+  return '''
+<!DOCTYPE html>
+<html lang="en" data-api-base-url="/api/">
+${head(c, title: title, rssFeedUrl: rssFeedUrl)}
+  <body>
+    <header class="container">
+${_toasts(c)}      <div class="d-flex justify-between">
+        <a href="/" class="app-link d-flex align-center">
+          <img class="app-logo" src="${static('logo.png')}" alt="Application logo">
+          <span class="app-name">LINKDING</span>
+        </a>
+        <nav>
+${c.isAuthenticated ? _navMenu(c) : '            <a href="/login/" class="btn btn-link">Login</a>'}
+        </nav>
+      </div>
+    </header>
+    <div class="content container">
+$content
+    </div>
+    <div class="modals">
+$overlays
+    </div>
+  </body>
+</html>
+''';
+}
+
+/// `shared/head.html`.
+String head(PageContext c, {required String title, String? rssFeedUrl}) {
   final theme = c.profile.row.theme;
   final themeLinks = switch (theme) {
     'light' =>
@@ -55,8 +85,6 @@ String layout(
       : '\n  <link rel="alternate" type="application/rss+xml" href="${e(rssFeedUrl)}" />';
 
   return '''
-<!DOCTYPE html>
-<html lang="en" data-api-base-url="/api/">
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="${static('favicon.ico')}" sizes="48x48">
@@ -85,29 +113,25 @@ String layout(
 $themeLinks$customCss
   <meta name="turbo-cache-control" content="no-preview">$prefetch$rss
   <script src="${static('bundle.js')}?v=$linkdingVersion"></script>
-</head>
+</head>''';
+}
+
+/// `shared/top_frame.html`: a page holding only [frame], for a Turbo frame
+/// request that also changes the address of the page.
+String topFrame(
+  PageContext c, {
+  required String title,
+  required String frame,
+  String? rssFeedUrl,
+}) =>
+    '''
+<html lang="en">
+${head(c, title: title, rssFeedUrl: rssFeedUrl)}
   <body>
-    <header class="container">
-${_toasts(c)}      <div class="d-flex justify-between">
-        <a href="/" class="app-link d-flex align-center">
-          <img class="app-logo" src="${static('logo.png')}" alt="Application logo">
-          <span class="app-name">LINKDING</span>
-        </a>
-        <nav>
-${c.isAuthenticated ? _navMenu(c) : '            <a href="/login/" class="btn btn-link">Login</a>'}
-        </nav>
-      </div>
-    </header>
-    <div class="content container">
-$content
-    </div>
-    <div class="modals">
-$overlays
-    </div>
+    $frame
   </body>
 </html>
 ''';
-}
 
 String _toasts(PageContext c) {
   if (c.toasts.isEmpty) return '';
@@ -187,3 +211,11 @@ String _navMenu(PageContext c) {
     '</ul> </ld-dropdown> </div> ',
   ].join(' ');
 }
+
+/// `shared/messages.html`.
+String messageList(List<MessageRow> messages) => messages.isEmpty
+    ? ''
+    : '''
+  <div class="message-list">
+    ${messages.map((m) => '<div class="toast toast-${e(m.tags)}" role="alert">${e(m.message)}</div>').join()}
+  </div>''';

@@ -63,15 +63,28 @@ final class BookmarkViews {
       kind,
       QueryParams.parse(request.requestedUri.query),
     );
+    final title = page.details != null
+        ? 'Bookmark details - Linkding'
+        : '${kind.title} - Linkding';
+    final rssFeedUrl = kind == ListKind.shared ? '/feeds/shared' : null;
+    // Opening the details from the list loads only the modal's frame.
+    if (request.headers['turbo-frame'] == 'details-modal') {
+      return c.html(
+        topFrame(
+          c,
+          title: title,
+          frame: detailsModal(c, page),
+          rssFeedUrl: rssFeedUrl,
+        ),
+      );
+    }
     return c.html(
       layout(
         c,
-        title: page.details != null
-            ? 'Bookmark details - Linkding'
-            : '${kind.title} - Linkding',
+        title: title,
         content: bookmarkPageContent(c, page),
         overlays: detailsModal(c, page),
-        rssFeedUrl: kind == ListKind.shared ? '/feeds/shared' : null,
+        rssFeedUrl: rssFeedUrl,
       ),
     );
   }
@@ -246,7 +259,30 @@ final class BookmarkViews {
       );
     }
     final response = await _handle(c, kind, user.id, form);
-    return response ?? c.redirect(_withQuery(kind.indexUrl, c));
+    if (response != null) return response;
+    final acceptsStream = (request.headers['accept'] ?? '').contains(
+      turboStreamType,
+    );
+    if (acceptsStream && form['disable_turbo'] != 'true') {
+      return _listUpdate(c, kind);
+    }
+    return c.redirect(_withQuery(kind.indexUrl, c));
+  }
+
+  /// `render_bookmarks_update`: after an action, the list, the tag cloud
+  /// and the details modal as Turbo Stream updates, for the page to swap
+  /// in without reloading.
+  Future<Response> _listUpdate(PageContext c, ListKind kind) async {
+    final page = await _page(
+      c,
+      kind,
+      QueryParams.parse(c.request.requestedUri.query),
+    );
+    return turboStream(c, [
+      turboUpdate('bookmark-list-container', bookmarkList(c, page)),
+      turboUpdate('tag-cloud-container', tagCloud(page)),
+      turboReplace('details-modal', detailsModal(c, page), method: 'morph'),
+    ]);
   }
 
   /// `handle_action`: one button of the list or the details view, or a

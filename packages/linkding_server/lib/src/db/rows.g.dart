@@ -461,6 +461,40 @@ extension $ToastRowQuery on QueryAs<ToastRow> {
       fetchAllWith(db, _$ToastRowFromRow);
 }
 
+MessageRow _$MessageRowFromRow(Row row) {
+  return MessageRow(
+    level: row.read<String>('level'),
+    message: row.read<String>('message'),
+    extraTags: row.read<String>('extra_tags'),
+  );
+}
+
+/// Row deserializer for [MessageRow].
+final class $MessageRowRowDeserializer implements RowDeserializer<MessageRow> {
+  const $MessageRowRowDeserializer();
+
+  @override
+  MessageRow deserialize(Row row) => _$MessageRowFromRow(row);
+}
+
+/// Typed row query terminals for [MessageRow].
+///
+/// Resolved from the static type of the receiver, so a row type with no
+/// `FromRow` has no terminals and the call does not compile.
+extension $MessageRowQuery on QueryAs<MessageRow> {
+  /// Fetches exactly one row.
+  Future<Result<MessageRow, SqlxError>> fetchOne(Executor db) =>
+      fetchOneWith(db, _$MessageRowFromRow);
+
+  /// Fetches zero or one row.
+  Future<Result<MessageRow?, SqlxError>> fetchOptional(Executor db) =>
+      fetchOptionalWith(db, _$MessageRowFromRow);
+
+  /// Fetches every row.
+  Future<Result<List<MessageRow>, SqlxError>> fetchAll(Executor db) =>
+      fetchAllWith(db, _$MessageRowFromRow);
+}
+
 IdRow _$IdRowFromRow(Row row) {
   return IdRow(id: row.read<int>('id'));
 }

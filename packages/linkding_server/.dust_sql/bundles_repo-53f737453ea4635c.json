@@ -4,7 +4,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "0f5af39b18007bde",
       "sql": "\nSELECT id, name, search, any_tags, all_tags, excluded_tags, filter_unread,\n       filter_shared, \"order\", date_created, date_modified, owner_id\nFROM bookmarks_bookmarkbundle WHERE owner_id = $1\nORDER BY \"order\", id\n",
       "user_parameter_count": 1,
@@ -29,7 +29,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "112ed909b3bf0fd6",
       "sql": "\nINSERT INTO bookmarks_bookmarkbundle (\n  name, search, any_tags, all_tags, excluded_tags, \"order\", date_created,\n  date_modified, owner_id, filter_shared, filter_unread)\nVALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8, $9, $10)\nRETURNING id, name, search, any_tags, all_tags, excluded_tags, filter_unread,\n          filter_shared, \"order\", date_created, date_modified, owner_id\n",
       "user_parameter_count": 10,
@@ -54,7 +54,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "164965e6823c00f0",
       "sql": "\nUPDATE bookmarks_bookmarkbundle b SET \"order\" = r.position\nFROM (\n  SELECT id, (row_number() OVER (ORDER BY \"order\", id) - 1)::integer AS position\n  FROM bookmarks_bookmarkbundle WHERE owner_id = $1\n) r\nWHERE b.id = r.id AND b.\"order\" <> r.position\n",
       "user_parameter_count": 1,
@@ -66,7 +66,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "194e899812faa9c5",
       "sql": "\nDELETE FROM bookmarks_bookmarkbundle WHERE id = $1 AND owner_id = $2\n",
       "user_parameter_count": 2,
@@ -78,7 +78,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "6c3c1d1d2fdd5895",
       "sql": "\nSELECT count(*)::integer FROM bookmarks_bookmarkbundle WHERE owner_id = $1\n",
       "user_parameter_count": 1,
@@ -92,7 +92,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "74d4f88b3e7aff1b",
       "sql": "\nSELECT id, name, search, any_tags, all_tags, excluded_tags, filter_unread,\n       filter_shared, \"order\", date_created, date_modified, owner_id\nFROM bookmarks_bookmarkbundle WHERE id = $1 AND owner_id = $2\n",
       "user_parameter_count": 2,
@@ -117,7 +117,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "9c52c441e6100089",
       "sql": "\nUPDATE bookmarks_bookmarkbundle SET \"order\" = $2 WHERE id = $1\n",
       "user_parameter_count": 2,
@@ -129,7 +129,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "d62bffd4bb9e1ef9",
       "sql": "\nUPDATE bookmarks_bookmarkbundle SET\n  name = $2, search = $3, any_tags = $4, all_tags = $5, excluded_tags = $6,\n  \"order\" = $7, date_modified = $8, filter_shared = $9, filter_unread = $10\nWHERE id = $1\nRETURNING id, name, search, any_tags, all_tags, excluded_tags, filter_unread,\n          filter_shared, \"order\", date_created, date_modified, owner_id\n",
       "user_parameter_count": 10,
@@ -154,7 +154,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "ebf6f57ed860f4d6",
       "sql": "\nSELECT (COALESCE(MAX(\"order\"), -1) + 1)::integer AS next\nFROM bookmarks_bookmarkbundle WHERE owner_id = $1\n",
       "user_parameter_count": 1,
@@ -168,7 +168,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "9bc2e0a1b66c0373",
+      "schema_hash": "6b3e88eae2c6ed25",
       "sql_hash": "ecdaabe42cf45f85",
       "sql": "\nSELECT id, name, search, any_tags, all_tags, excluded_tags, filter_unread,\n       filter_shared, \"order\", date_created, date_modified, owner_id\nFROM bookmarks_bookmarkbundle WHERE owner_id = $1\nORDER BY \"order\", id\nLIMIT $2 OFFSET $3\n",
       "user_parameter_count": 3,

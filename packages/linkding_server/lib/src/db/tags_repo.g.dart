@@ -125,20 +125,25 @@ WHERE owner_id = $1 ORDER BY id
   }
 
   @override
-  Future<Result<List<TagUsageRow>, SqlxError>> usage(int ownerId, String search, bool unusedOnly) {
+  Future<Result<List<TagUsageRow>, SqlxError>> listing(int ownerId, String pattern, bool unusedOnly, String sort) {
     return _db.fetchAll<TagUsageRow>(
       r'''
-SELECT t.id, t.name, t.date_added,
-       (SELECT count(*)::integer FROM bookmarks_bookmark_tags bt
-        WHERE bt.tag_id = t.id) AS bookmark_count
-FROM bookmarks_tag t
-WHERE t.owner_id = $1
-  AND ($2 = '' OR UPPER(t.name::text) LIKE '%' || UPPER($2) || '%')
-  AND (NOT $3 OR NOT EXISTS (
-        SELECT 1 FROM bookmarks_bookmark_tags bt WHERE bt.tag_id = t.id))
-ORDER BY lower(t.name), t.id
+SELECT id, name, date_added, bookmark_count FROM (
+  SELECT t.id, t.name, t.date_added,
+         (SELECT count(*)::integer FROM bookmarks_bookmark_tags bt
+          WHERE bt.tag_id = t.id) AS bookmark_count
+  FROM bookmarks_tag t
+  WHERE t.owner_id = $1
+) t
+WHERE ($2 = '' OR UPPER(t.name::text) LIKE UPPER($2))
+  AND (NOT $3::boolean OR t.bookmark_count = 0)
+ORDER BY
+  CASE WHEN $4::text = 'name-desc' THEN t.name END DESC,
+  CASE WHEN $4 = 'count-asc' THEN t.bookmark_count END ASC,
+  CASE WHEN $4 = 'count-desc' THEN t.bookmark_count END DESC,
+  t.name
 ''',
-      [ownerId, search, unusedOnly],
+      [ownerId, pattern, unusedOnly, sort],
       const $TagUsageRowRowDeserializer().deserialize,
     );
   }

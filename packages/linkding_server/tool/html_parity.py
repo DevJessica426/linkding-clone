@@ -18,6 +18,9 @@ page differs. Steps, one per line:
                                 the same as multipart/form-data, with a file
     SQL UPDATE ...              run on both databases, nothing compared
     # a comment
+
+A step may start with `FRAME=<id>` (a Turbo frame request) and `STREAM`
+(accepting a Turbo Stream answer), as linkding's page scripts send them.
 """
 
 import difflib
@@ -119,9 +122,9 @@ class Client:
                 return cookie.value
         return ""
 
-    def request(self, path, form=None, files=None):
+    def request(self, path, form=None, files=None, headers=None):
         data = None
-        headers = {}
+        headers = dict(headers or {})
         if form is not None:
             form = {**form, "csrfmiddlewaretoken": [self.csrf()]}
             if files is None:
@@ -190,7 +193,17 @@ def main():
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            kind, _, rest = line.partition(" ")
+            headers = {}
+            while True:
+                kind, _, rest = line.partition(" ")
+                if kind.startswith("FRAME="):
+                    headers["Turbo-Frame"] = kind.removeprefix("FRAME=")
+                elif kind == "STREAM":
+                    headers["Accept"] = "text/vnd.turbo-stream.html, text/html"
+                else:
+                    break
+                line = rest
+            label = line if not headers else f"{' '.join(f'{k}={v}' for k, v in headers.items())} {line}"
             if kind == "SQL":
                 for db in (ref_db, clone_db):
                     subprocess.run(["psql", db, "-qAtc", rest], check=True,
@@ -205,9 +218,9 @@ def main():
             if kind in ("POST", "UPLOAD"):
                 form = urllib.parse.parse_qs(body, keep_blank_values=True)
             clients = (anon_ref, anon_clone) if kind == "ANON" else (ref, clone)
-            results = [c.request(path, form, files) for c in clients]
+            results = [c.request(path, form, files, headers) for c in clients]
             pages += 1
-            if not compare(line, *clients, results):
+            if not compare(label, *clients, results):
                 failed += 1
     print(f"{pages - failed} of {pages} pages match")
     sys.exit(1 if failed else 0)

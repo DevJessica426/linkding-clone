@@ -42,6 +42,15 @@ GET /bookmarks/shared?q=%23python
 GET /bookmarks/shared?q=%23python&user=other
 GET /bookmarks/archived?q=%23python&sort=title_asc
 
+# --- Turbo: the details frame, and list updates after an action ---
+FRAME=details-modal GET /bookmarks?details=1010
+FRAME=details-modal GET /bookmarks/shared?details=1102
+FRAME=details-modal GET /bookmarks?details=999999
+STREAM POST /bookmarks/action?q=filler&page=2 mark_as_read=1004
+STREAM POST /bookmarks/action?details=1012 update_state=1012&unread=on
+STREAM POST /bookmarks/action?details=1012 update_state=1012&unread=on&disable_turbo=true
+STREAM POST /bookmarks/archived/action?q=%23python unarchive=1009
+
 # --- Details ---
 GET /bookmarks?details=1005
 GET /bookmarks?details=1010
@@ -161,3 +170,41 @@ POST /bookmarks/shared/action unshare=1102
 POST /bookmarks/action bulk_execute=&bulk_action=bulk_read&bookmark_id=1002&bookmark_id=1003
 GET /bookmarks
 GET /bookmarks/action?q=x
+
+# --- Tags ---
+GET /tags
+GET /tags?search=PY
+GET /tags?search=_
+GET /tags?search=%25&unused=true
+GET /tags?unused=true
+GET /tags?sort=count-desc
+GET /tags?sort=count-asc&page=1
+GET /tags?sort=name-desc
+GET /tags?sort=
+GET /tags/new
+GET /tags/1000/edit?search=py&sort=count-asc
+GET /tags/1001/edit
+GET /tags/99999/edit
+GET /tags/merge
+ANON /tags
+ANON /tags/new
+POST /tags/new name=
+POST /tags/new name=PYTHON
+POST /tags/new name=%20brand%20new%20tag%20
+GET /tags
+POST /tags/new name=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+POST /tags/1000/edit?search=py name=Python
+POST /tags/1000/edit name=rust
+POST /tags/1000/edit?sort=name-desc name=%20
+POST /tags/merge target_tag=&merge_tags=
+POST /tags/merge target_tag=a+b&merge_tags=x
+POST /tags/merge target_tag=nope&merge_tags=rust
+POST /tags/merge target_tag=rust&merge_tags=RUST
+POST /tags/merge target_tag=rust&merge_tags=nope+%C3%89mile
+POST /tags/merge target_tag=Rust&merge_tags=%C3%A9mile+%E6%97%A5%E6%9C%AC
+GET /tags
+GET /bookmarks?q=%23rust
+POST /tags?sort=count-desc delete_tag=1007
+POST /tags delete_tag=99999
+POST /tags search=x
+GET /tags

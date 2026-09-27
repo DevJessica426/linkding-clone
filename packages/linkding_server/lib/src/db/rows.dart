@@ -325,6 +325,25 @@ final class ToastRow {
   final int ownerId;
 }
 
+/// A one-time message waiting to be shown.
+@Derive([FromRow()])
+@Sqlx(renameAll: SqlxRename.snakeCase)
+final class MessageRow {
+  const MessageRow({
+    required this.level,
+    required this.message,
+    required this.extraTags,
+  });
+
+  /// `success`, `error`, ...
+  final String level;
+  final String message;
+  final String extraTags;
+
+  /// Django's `message.tags`: the extra tags, then the level.
+  String get tags => [extraTags, level].where((t) => t.isNotEmpty).join(' ');
+}
+
 // Dust DAOs return rows or a single value, not a list of plain values, so a
 // one-column list needs a one-field row type.
 

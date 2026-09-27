@@ -95,4 +95,32 @@ UPDATE bookmarks_toast SET acknowledged = true WHERE id = $1 AND owner_id = $2
       (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
     );
   }
+
+  @override
+  Future<Result<Unit, SqlxError>> addMessage(String sessionKey, String level, String message, String extraTags) {
+    return _db.execute(
+      r'''
+INSERT INTO clone_message (session_key, level, message, extra_tags)
+VALUES ($1, $2, $3, $4)
+''',
+      [sessionKey, level, message, extraTags],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
+  }
+
+  @override
+  Future<Result<List<MessageRow>, SqlxError>> takeMessages(String sessionKey) {
+    return _db.fetchAll<MessageRow>(
+      r'''
+WITH taken AS (
+  DELETE FROM clone_message WHERE session_key = $1
+  RETURNING id, level, message, extra_tags
+)
+SELECT level, message, extra_tags FROM taken ORDER BY id
+''',
+      [sessionKey],
+      const $MessageRowRowDeserializer().deserialize,
+    );
+  }
 }
