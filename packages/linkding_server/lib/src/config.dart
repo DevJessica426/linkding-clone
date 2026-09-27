@@ -21,6 +21,7 @@ final class ServerConfig {
     this.sessionCookieAge = const Duration(seconds: 1209600),
     this.passwordIterations = 1200000,
     this.enableMetadataScraping = true,
+    this.disableAssetUpload = false,
   });
 
   factory ServerConfig.fromEnvironment([Map<String, String>? environment]) {
@@ -65,6 +66,7 @@ final class ServerConfig {
       ),
       passwordIterations:
           int.tryParse(env['LD_PASSWORD_ITERATIONS'] ?? '') ?? 1200000,
+      disableAssetUpload: flag('LD_DISABLE_ASSET_UPLOAD'),
     );
   }
 
@@ -99,6 +101,9 @@ final class ServerConfig {
 
   /// Whether empty titles and descriptions are filled in from the page.
   final bool enableMetadataScraping;
+
+  /// Turns off uploading files to bookmarks, on the pages and in the API.
+  final bool disableAssetUpload;
 
   String get redactedDatabaseUrl => databaseUrl.replaceFirstMapped(
     RegExp(r'://([^:/@]+):[^@]*@'),

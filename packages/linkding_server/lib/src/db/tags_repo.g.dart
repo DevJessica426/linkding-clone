@@ -33,6 +33,40 @@ LIMIT 1
   }
 
   @override
+  Future<Result<List<TagRow>, SqlxError>> withNames(int ownerId, List<String> names) {
+    return _db.fetchAll<TagRow>(
+      r'''
+SELECT id, name, date_added, owner_id FROM bookmarks_tag
+WHERE owner_id = $1
+  AND UPPER(name::text) IN (SELECT UPPER(n) FROM unnest($2::text[]) AS n)
+ORDER BY id
+''',
+      [ownerId, names],
+      const $TagRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
+  Future<Result<List<TagRow>, SqlxError>> sharedNamed(int? ownerId, bool publicOnly, List<String> names) {
+    return _db.fetchAll<TagRow>(
+      r'''
+SELECT DISTINCT t.id, t.name, t.date_added, t.owner_id
+FROM bookmarks_tag t
+JOIN bookmarks_bookmark_tags bt ON bt.tag_id = t.id
+JOIN bookmarks_bookmark b ON b.id = bt.bookmark_id
+JOIN bookmarks_userprofile p ON p.user_id = b.owner_id
+WHERE b.shared AND p.enable_sharing
+  AND (NOT $2::boolean OR p.enable_public_sharing)
+  AND ($1::integer IS NULL OR b.owner_id = $1)
+  AND UPPER(t.name::text) IN (SELECT UPPER(n) FROM unnest($3::text[]) AS n)
+ORDER BY t.id
+''',
+      [ownerId, publicOnly, names],
+      const $TagRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
   Future<Result<TagRow, SqlxError>> insert(String name, DateTime dateAdded, int ownerId) {
     return _db.fetchOne<TagRow>(
       r'''

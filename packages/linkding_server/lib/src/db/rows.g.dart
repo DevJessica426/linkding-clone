@@ -169,6 +169,7 @@ extension $BookmarkRowQuery on QueryAs<BookmarkRow> {
 BookmarkTagRow _$BookmarkTagRowFromRow(Row row) {
   return BookmarkTagRow(
     bookmarkId: row.read<int>('bookmark_id'),
+    tagId: row.read<int>('tag_id'),
     name: row.read<String>('name'),
   );
 }
@@ -197,6 +198,47 @@ extension $BookmarkTagRowQuery on QueryAs<BookmarkTagRow> {
   /// Fetches every row.
   Future<Result<List<BookmarkTagRow>, SqlxError>> fetchAll(Executor db) =>
       fetchAllWith(db, _$BookmarkTagRowFromRow);
+}
+
+AssetRow _$AssetRowFromRow(Row row) {
+  return AssetRow(
+    id: row.read<int>('id'),
+    dateCreated: row.readDateTime('date_created'),
+    file: row.read<String>('file'),
+    fileSize: row.readNullable<int>('file_size'),
+    assetType: row.read<String>('asset_type'),
+    contentType: row.read<String>('content_type'),
+    displayName: row.read<String>('display_name'),
+    status: row.read<String>('status'),
+    gzip: row.readBool('gzip'),
+    bookmarkId: row.read<int>('bookmark_id'),
+  );
+}
+
+/// Row deserializer for [AssetRow].
+final class $AssetRowRowDeserializer implements RowDeserializer<AssetRow> {
+  const $AssetRowRowDeserializer();
+
+  @override
+  AssetRow deserialize(Row row) => _$AssetRowFromRow(row);
+}
+
+/// Typed row query terminals for [AssetRow].
+///
+/// Resolved from the static type of the receiver, so a row type with no
+/// `FromRow` has no terminals and the call does not compile.
+extension $AssetRowQuery on QueryAs<AssetRow> {
+  /// Fetches exactly one row.
+  Future<Result<AssetRow, SqlxError>> fetchOne(Executor db) =>
+      fetchOneWith(db, _$AssetRowFromRow);
+
+  /// Fetches zero or one row.
+  Future<Result<AssetRow?, SqlxError>> fetchOptional(Executor db) =>
+      fetchOptionalWith(db, _$AssetRowFromRow);
+
+  /// Fetches every row.
+  Future<Result<List<AssetRow>, SqlxError>> fetchAll(Executor db) =>
+      fetchAllWith(db, _$AssetRowFromRow);
 }
 
 TagRow _$TagRowFromRow(Row row) {

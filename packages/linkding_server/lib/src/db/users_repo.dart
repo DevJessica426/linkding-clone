@@ -71,6 +71,9 @@ RETURNING id, password, last_login, is_superuser, username, first_name,
   )
   Future<Result<List<UserNameRow>, SqlxError>> activeUsers();
 
+  @Query(r'SELECT id, username FROM auth_user WHERE id = ANY($1) ORDER BY id')
+  Future<Result<List<UserNameRow>, SqlxError>> names(List<int> ids);
+
   // --- Profiles ---
 
   @Query(r'''

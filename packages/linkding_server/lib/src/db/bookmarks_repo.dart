@@ -4,8 +4,8 @@ import 'rows.dart';
 
 part 'bookmarks_repo.g.dart';
 
-/// Every fixed query about bookmarks. Searching is dynamic SQL and lives in
-/// `BookmarkSearchQuery`.
+/// Every query about bookmarks. A search reads one list with [list], and
+/// `BookmarkSearchQuery` applies the search expression to it.
 ///
 /// linkding's foreign keys do not cascade (Django emulates cascades in
 /// Python), so deleting a bookmark removes its tag links and assets in the
@@ -131,15 +131,26 @@ RETURNING file
 ''')
   Future<Result<List<FileRow>, SqlxError>> delete(int id, int ownerId);
 
-  /// Tag names for a page of bookmarks.
+  /// The tags of a page of bookmarks.
   @Query(r'''
-SELECT bt.bookmark_id, t.name
+SELECT bt.bookmark_id, t.id AS tag_id, t.name
 FROM bookmarks_bookmark_tags bt JOIN bookmarks_tag t ON t.id = bt.tag_id
 WHERE bt.bookmark_id = ANY($1)
+ORDER BY t.id
 ''')
   Future<Result<List<BookmarkTagRow>, SqlxError>> tagNames(
     List<int> bookmarkIds,
   );
+
+  /// A bookmark's snapshots and uploads, as `bookmarkasset_set.all()`
+  /// lists them.
+  @Query(r'''
+SELECT id, date_created, file, file_size, asset_type, content_type,
+       display_name, status, gzip, bookmark_id
+FROM bookmarks_bookmarkasset WHERE bookmark_id = $1
+ORDER BY id
+''')
+  Future<Result<List<AssetRow>, SqlxError>> assets(int bookmarkId);
 
   /// Removes the links to tags not in [tagIds]; `tags.set()`, first half.
   @Query(r'''
@@ -192,6 +203,20 @@ WHERE owner_id = $1 AND id = ANY($2)
     List<int> ids,
     bool shared,
     DateTime now,
+  );
+
+  /// The status checkboxes of the details view, and the single unshare and
+  /// mark-as-read buttons: saved without touching `date_modified`.
+  @Query(r'''
+UPDATE bookmarks_bookmark SET is_archived = $3, unread = $4, shared = $5
+WHERE id = $1 AND owner_id = $2
+''')
+  Future<Result<Unit, SqlxError>> setState(
+    int id,
+    int ownerId,
+    bool isArchived,
+    bool unread,
+    bool shared,
   );
 
   /// Marks a bookmark read by opening it: no change to `date_modified`.

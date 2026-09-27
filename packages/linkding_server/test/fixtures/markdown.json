@@ -1,0 +1,578 @@
+[
+ {
+  "input": "",
+  "html": ""
+ },
+ {
+  "input": "plain",
+  "html": "<p>plain</p>"
+ },
+ {
+  "input": "two\nlines",
+  "html": "<p>two<br>\nlines</p>"
+ },
+ {
+  "input": "three\nshort\nlines",
+  "html": "<p>three<br>\nshort<br>\nlines</p>"
+ },
+ {
+  "input": "para one\n\npara two",
+  "html": "<p>para one</p>\n<p>para two</p>"
+ },
+ {
+  "input": "trailing spaces  \nhard break",
+  "html": "<p>trailing spaces<br>\nhard break</p>"
+ },
+ {
+  "input": "*em* and **strong** and _under_ and __double__",
+  "html": "<p><em>em</em> and <strong>strong</strong> and <em>under</em> and <strong>double</strong></p>"
+ },
+ {
+  "input": "snake_case_word and 2*3*4",
+  "html": "<p>snake_case_word and 2<em>3</em>4</p>"
+ },
+ {
+  "input": "`code` and ``co`de``",
+  "html": "<p><code>code</code> and <code>co`de</code></p>"
+ },
+ {
+  "input": "# Heading\ntext",
+  "html": "<h1>Heading</h1>\n<p>text</p>"
+ },
+ {
+  "input": "## Heading 2\n\n### Heading 3",
+  "html": "<h2>Heading 2</h2>\n<h3>Heading 3</h3>"
+ },
+ {
+  "input": "Heading\n=======",
+  "html": "<h1>Heading</h1>"
+ },
+ {
+  "input": "Sub\n---",
+  "html": "<h2>Sub</h2>"
+ },
+ {
+  "input": "- one\n- two\n- three",
+  "html": "<ul>\n<li>one</li>\n<li>two</li>\n<li>three</li>\n</ul>"
+ },
+ {
+  "input": "* star\n* list",
+  "html": "<ul>\n<li>star</li>\n<li>list</li>\n</ul>"
+ },
+ {
+  "input": "1. first\n2. second",
+  "html": "<ol>\n<li>first</li>\n<li>second</li>\n</ol>"
+ },
+ {
+  "input": "text\n- not a list without blank line",
+  "html": "<p>text<br>\n- not a list without blank line</p>"
+ },
+ {
+  "input": "text\n\n- list after blank",
+  "html": "<p>text</p>\n<ul>\n<li>list after blank</li>\n</ul>"
+ },
+ {
+  "input": "- item\n\n    continued paragraph",
+  "html": "<ul>\n<li>\n<p>item</p>\n<p>continued paragraph</p>\n</li>\n</ul>"
+ },
+ {
+  "input": "- outer\n    - inner",
+  "html": "<ul>\n<li>outer<ul>\n<li>inner</li>\n</ul>\n</li>\n</ul>"
+ },
+ {
+  "input": "> quote\n> more",
+  "html": "<blockquote>\n<p>quote<br>\nmore</p>\n</blockquote>"
+ },
+ {
+  "input": "> quote\n\nafter",
+  "html": "<blockquote>\n<p>quote</p>\n</blockquote>\n<p>after</p>"
+ },
+ {
+  "input": "```\nfenced\ncode\n```",
+  "html": "<pre><code>fenced\ncode\n</code></pre>"
+ },
+ {
+  "input": "```python\ndef f():\n    return 1\n```",
+  "html": "<pre><code>def f():\n    return 1\n</code></pre>"
+ },
+ {
+  "input": "~~~\ntilde fence\n~~~",
+  "html": "<pre><code>tilde fence\n</code></pre>"
+ },
+ {
+  "input": "    indented code\n    block",
+  "html": "<pre><code>indented code\nblock\n</code></pre>"
+ },
+ {
+  "input": "---",
+  "html": "<hr>"
+ },
+ {
+  "input": "a\n\n***\n\nb",
+  "html": "<p>a</p>\n<hr>\n<p>b</p>"
+ },
+ {
+  "input": "[link](https://example.com)",
+  "html": "<p><a href=\"https://example.com\" rel=\"nofollow\">link</a></p>"
+ },
+ {
+  "input": "[link](https://example.com \"title\")",
+  "html": "<p><a href=\"https://example.com\" title=\"title\" rel=\"nofollow\">link</a></p>"
+ },
+ {
+  "input": "[js](javascript:alert(1))",
+  "html": "<p><a>js</a></p>"
+ },
+ {
+  "input": "![img](https://example.com/a.png)",
+  "html": "<p><img alt=\"img\" src=\"https://example.com/a.png\"></p>"
+ },
+ {
+  "input": "<https://example.com/auto>",
+  "html": "<p><a href=\"https://example.com/auto\" rel=\"nofollow\">https://example.com/auto</a></p>"
+ },
+ {
+  "input": "https://example.com/bare",
+  "html": "<p><a href=\"https://example.com/bare\" rel=\"nofollow\">https://example.com/bare</a></p>"
+ },
+ {
+  "input": "see http://example.com/http and www.example.com/www",
+  "html": "<p>see <a href=\"http://example.com/http\" rel=\"nofollow\">http://example.com/http</a> and <a href=\"https://www.example.com/www\" rel=\"nofollow\">www.example.com/www</a></p>"
+ },
+ {
+  "input": "example.com without scheme",
+  "html": "<p><a href=\"https://example.com\" rel=\"nofollow\">example.com</a> without scheme</p>"
+ },
+ {
+  "input": "mail me@example.com",
+  "html": "<p>mail me@example.com</p>"
+ },
+ {
+  "input": "<script>alert(1)</script>",
+  "html": "&lt;script&gt;alert(1)&lt;/script&gt;"
+ },
+ {
+  "input": "<b>bold html</b> <i>i</i>",
+  "html": "<p><b>bold html</b> <i>i</i></p>"
+ },
+ {
+  "input": "<div onclick=\"x\">div</div>",
+  "html": "<div>div</div>"
+ },
+ {
+  "input": "<iframe src=\"https://evil\"></iframe>",
+  "html": "&lt;iframe src=\"https://evil\"&gt;&lt;/iframe&gt;"
+ },
+ {
+  "input": "a < b & c > d",
+  "html": "<p>a &lt; b &amp; c &gt; d</p>"
+ },
+ {
+  "input": "&amp; &copy; &#169;",
+  "html": "<p>&amp; &copy; &#169;</p>"
+ },
+ {
+  "input": "line with \\*escaped\\* stars",
+  "html": "<p>line with *escaped* stars</p>"
+ },
+ {
+  "input": "Some *notes* for 5\nsecond line https://example.com/x\n\n- item\n- `code`",
+  "html": "<p>Some <em>notes</em> for 5<br>\nsecond line <a href=\"https://example.com/x\" rel=\"nofollow\">https://example.com/x</a></p>\n<ul>\n<li>item</li>\n<li><code>code</code></li>\n</ul>"
+ },
+ {
+  "input": "tab\tseparated",
+  "html": "<p>tab separated</p>"
+ },
+ {
+  "input": "unicode: 日本語 émile ✓",
+  "html": "<p>unicode: 日本語 émile ✓</p>"
+ },
+ {
+  "input": "https://example.com/path_(with)_parens",
+  "html": "<p><a href=\"https://example.com/path_(with)_parens\" rel=\"nofollow\">https://example.com/path_(with)_parens</a></p>"
+ },
+ {
+  "input": "https://example.com/end.",
+  "html": "<p><a href=\"https://example.com/end\" rel=\"nofollow\">https://example.com/end</a>.</p>"
+ },
+ {
+  "input": "(https://example.com/in-parens)",
+  "html": "<p>(<a href=\"https://example.com/in-parens\" rel=\"nofollow\">https://example.com/in-parens</a>)</p>"
+ },
+ {
+  "input": "**bold with [link](https://x.example)**",
+  "html": "<p><strong>bold with <a href=\"https://x.example\" rel=\"nofollow\">link</a></strong></p>"
+ },
+ {
+  "input": "table | not\n--- | ---\na | b",
+  "html": "<p>table | not<br>\n--- | ---<br>\na | b</p>"
+ },
+ {
+  "input": "1) paren list\n2) second",
+  "html": "<p>1) paren list<br>\n2) second</p>"
+ },
+ {
+  "input": "+ plus\n+ list",
+  "html": "<ul>\n<li>plus</li>\n<li>list</li>\n</ul>"
+ },
+ {
+  "input": "text  \n",
+  "html": "<p>text  </p>"
+ },
+ {
+  "input": "\n\nleading blank lines",
+  "html": "<p>leading blank lines</p>"
+ },
+ {
+  "input": "ends with newline\n",
+  "html": "<p>ends with newline</p>"
+ },
+ {
+  "input": "html comment <!-- hidden --> after",
+  "html": "<p>html comment  after</p>"
+ },
+ {
+  "input": "<p>raw paragraph</p>",
+  "html": "<p>raw paragraph</p>"
+ },
+ {
+  "input": "<a href=\"https://ok\" onclick=\"x\">a</a>",
+  "html": "<p><a href=\"https://ok\" rel=\"nofollow\">a</a></p>"
+ },
+ {
+  "input": "<img src=\"https://example.com/i.png\" onerror=\"x\">",
+  "html": "<p><img src=\"https://example.com/i.png\"></p>"
+ },
+ {
+  "input": "Setext\n===\nfollowed",
+  "html": "<h1>Setext</h1>\n<p>followed</p>"
+ },
+ {
+  "input": "* a\n\n* b",
+  "html": "<ul>\n<li>\n<p>a</p>\n</li>\n<li>\n<p>b</p>\n</li>\n</ul>"
+ },
+ {
+  "input": "10. ten\n11. eleven",
+  "html": "<ol>\n<li>ten</li>\n<li>eleven</li>\n</ol>"
+ },
+ {
+  "input": "`c` \n\n <b> word *em* 1. n",
+  "html": "<p><code>c</code> </p>\n<p><b> word <em>em</em> 1. n</b></p>"
+ },
+ {
+  "input": "\n **b**",
+  "html": "<p><strong>b</strong></p>"
+ },
+ {
+  "input": "    ind",
+  "html": "<pre><code>ind\n</code></pre>"
+ },
+ {
+  "input": "word *em* \n\n \n\n",
+  "html": "<p>word <em>em</em> </p>"
+ },
+ {
+  "input": "https://x.example/p *em*",
+  "html": "<p>https://x.example/p <em>em</em></p>"
+ },
+ {
+  "input": "word 1. n **b** *em* https://x.example/p <b> <b>",
+  "html": "<p>word 1. n <strong>b</strong> <em>em</em> https://x.example/p <b> <b></b></b></p>"
+ },
+ {
+  "input": "**b**",
+  "html": "<p><strong>b</strong></p>"
+ },
+ {
+  "input": "word https://x.example/p word > q 1. n `c` - li",
+  "html": "<p>word https://x.example/p word &gt; q 1. n <code>c</code> - li</p>"
+ },
+ {
+  "input": "`c` > q *em* **b** - li > q 1. n",
+  "html": "<p><code>c</code> &gt; q <em>em</em> <strong>b</strong> - li &gt; q 1. n</p>"
+ },
+ {
+  "input": "*em* **b** **b**",
+  "html": "<p><em>em</em> <strong>b</strong> <strong>b</strong></p>"
+ },
+ {
+  "input": "\n *em* > q &",
+  "html": "<p><em>em</em> &gt; q &amp;</p>"
+ },
+ {
+  "input": "**b** word",
+  "html": "<p><strong>b</strong> word</p>"
+ },
+ {
+  "input": "# h <b> > q \n\n",
+  "html": "<h1>h <b> &gt; q</b></h1>"
+ },
+ {
+  "input": "# h **b**     ind # h \n - li",
+  "html": "<h1>h <strong>b</strong>     ind # h</h1>\n<ul>\n<li>li</li>\n</ul>"
+ },
+ {
+  "input": "_u_ `c` & _u_",
+  "html": "<p><em>u</em> <code>c</code> &amp; <em>u</em></p>"
+ },
+ {
+  "input": "*em* **b** - li > q",
+  "html": "<p><em>em</em> <strong>b</strong> - li &gt; q</p>"
+ },
+ {
+  "input": "    ind \n & # h - li **b** *em* *em*",
+  "html": "<pre><code>ind\n</code></pre>\n<p>&amp; # h - li <strong>b</strong> <em>em</em> <em>em</em></p>"
+ },
+ {
+  "input": "`c` _u_ \n `c`     ind # h \n\n",
+  "html": "<p><code>c</code> <em>u</em> <br>\n<code>c</code>     ind # h </p>"
+ },
+ {
+  "input": "<b>",
+  "html": "<p><b></b></p>"
+ },
+ {
+  "input": "_u_ > q",
+  "html": "<p><em>u</em> &gt; q</p>"
+ },
+ {
+  "input": "\n & \n **b** # h **b**",
+  "html": "<p>&amp; <br>\n<strong>b</strong> # h <strong>b</strong></p>"
+ },
+ {
+  "input": "*em* 1. n *em* - li # h & <b> *em*",
+  "html": "<p><em>em</em> 1. n <em>em</em> - li # h &amp; <b> <em>em</em></b></p>"
+ },
+ {
+  "input": "&",
+  "html": "<p>&amp;</p>"
+ },
+ {
+  "input": "<b> **b** <b> 1. n # h",
+  "html": "<p><b> <strong>b</strong> <b> 1. n # h</b></b></p>"
+ },
+ {
+  "input": "& \n\n     ind <b> \n",
+  "html": "<p>&amp; </p>\n<pre><code> ind &lt;b&gt;\n</code></pre>"
+ },
+ {
+  "input": "# h",
+  "html": "<h1>h</h1>"
+ },
+ {
+  "input": "`c` **b** *em* # h word https://x.example/p",
+  "html": "<p><code>c</code> <strong>b</strong> <em>em</em> # h word https://x.example/p</p>"
+ },
+ {
+  "input": "`c` & https://x.example/p \n\n \n\n",
+  "html": "<p><code>c</code> &amp; https://x.example/p </p>"
+ },
+ {
+  "input": "*em* `c` # h \n\n > q - li     ind `c`",
+  "html": "<p><em>em</em> <code>c</code> # h </p>\n<blockquote>\n<p>q - li     ind <code>c</code></p>\n</blockquote>"
+ },
+ {
+  "input": "1. n > q - li & \n\n \n <b>",
+  "html": "<ol>\n<li>n &gt; q - li &amp; </li>\n</ol>\n<p><b></b></p>"
+ },
+ {
+  "input": "https://x.example/p `c` *em* `c` `c` https://x.example/p <b>",
+  "html": "<p>https://x.example/p <code>c</code> <em>em</em> <code>c</code> <code>c</code> https://x.example/p <b></b></p>"
+ },
+ {
+  "input": "word # h 1. n **b**",
+  "html": "<p>word # h 1. n <strong>b</strong></p>"
+ },
+ {
+  "input": "- li - li word",
+  "html": "<ul>\n<li>li - li word</li>\n</ul>"
+ },
+ {
+  "input": "\n\n > q \n",
+  "html": "<blockquote>\n<p>q </p>\n</blockquote>"
+ },
+ {
+  "input": "`c` & 1. n > q **b** <b>",
+  "html": "<p><code>c</code> &amp; 1. n &gt; q <strong>b</strong> <b></b></p>"
+ },
+ {
+  "input": "# h",
+  "html": "<h1>h</h1>"
+ },
+ {
+  "input": "\n\n \n\n \n\n *em* # h <b> \n\n",
+  "html": "<p><em>em</em> # h <b> </b></p>"
+ },
+ {
+  "input": "https://x.example/p",
+  "html": "<p>https://x.example/p</p>"
+ },
+ {
+  "input": "https://x.example/p # h",
+  "html": "<p>https://x.example/p # h</p>"
+ },
+ {
+  "input": "*em* \n **b**",
+  "html": "<p><em>em</em> <br>\n<strong>b</strong></p>"
+ },
+ {
+  "input": "*em*",
+  "html": "<p><em>em</em></p>"
+ },
+ {
+  "input": "**b**",
+  "html": "<p><strong>b</strong></p>"
+ },
+ {
+  "input": "> q *em* \n",
+  "html": "<blockquote>\n<p>q <em>em</em> </p>\n</blockquote>"
+ },
+ {
+  "input": "*em*",
+  "html": "<p><em>em</em></p>"
+ },
+ {
+  "input": "**b** \n\n `c` <b>",
+  "html": "<p><strong>b</strong> </p>\n<p><code>c</code> <b></b></p>"
+ },
+ {
+  "input": "\n **b** \n # h *em*",
+  "html": "<p><strong>b</strong> <br>\n # h <em>em</em></p>"
+ },
+ {
+  "input": "1. n # h",
+  "html": "<ol>\n<li>n # h</li>\n</ol>"
+ },
+ {
+  "input": "# h # h - li *em* `c` *em* & \n",
+  "html": "<h1>h # h - li <em>em</em> <code>c</code> <em>em</em> &amp;</h1>"
+ },
+ {
+  "input": "# h 1. n & `c` > q",
+  "html": "<h1>h 1. n &amp; <code>c</code> &gt; q</h1>"
+ },
+ {
+  "input": "https://x.example/p",
+  "html": "<p>https://x.example/p</p>"
+ },
+ {
+  "input": "`c` & > q     ind word _u_",
+  "html": "<p><code>c</code> &amp; &gt; q     ind word <em>u</em></p>"
+ },
+ {
+  "input": "<b> 1. n *em* & 1. n",
+  "html": "<p><b> 1. n <em>em</em> &amp; 1. n</b></p>"
+ },
+ {
+  "input": "> q \n     ind `c` \n",
+  "html": "<blockquote>\n<p>q <br>\n     ind <code>c</code> </p>\n</blockquote>"
+ },
+ {
+  "input": "> q > q _u_ > q",
+  "html": "<blockquote>\n<p>q &gt; q <em>u</em> &gt; q</p>\n</blockquote>"
+ },
+ {
+  "input": "<b> https://x.example/p **b** _u_ _u_ _u_",
+  "html": "<p><b> https://x.example/p <strong>b</strong> <em>u</em> <em>u</em> <em>u</em></b></p>"
+ },
+ {
+  "input": "_u_ https://x.example/p 1. n \n\n",
+  "html": "<p><em>u</em> https://x.example/p 1. n </p>"
+ },
+ {
+  "input": "https://x.example/p > q # h \n",
+  "html": "<p>https://x.example/p &gt; q # h </p>"
+ },
+ {
+  "input": "word",
+  "html": "<p>word</p>"
+ },
+ {
+  "input": "# h - li https://x.example/p & **b**",
+  "html": "<h1>h - li https://x.example/p &amp; <strong>b</strong></h1>"
+ },
+ {
+  "input": "# h _u_     ind & \n \n",
+  "html": "<h1>h <em>u</em>     ind &amp;</h1>"
+ },
+ {
+  "input": "https://x.example/p *em*",
+  "html": "<p>https://x.example/p <em>em</em></p>"
+ },
+ {
+  "input": "# h https://x.example/p \n https://x.example/p",
+  "html": "<h1>h https://x.example/p</h1>\n<p>https://x.example/p</p>"
+ },
+ {
+  "input": "**b**     ind **b** 1. n word # h     ind <b>",
+  "html": "<p><strong>b</strong>     ind <strong>b</strong> 1. n word # h     ind <b></b></p>"
+ },
+ {
+  "input": "_u_ <b> *em* 1. n <b> *em*",
+  "html": "<p><em>u</em> <b> <em>em</em> 1. n <b> <em>em</em></b></b></p>"
+ },
+ {
+  "input": "_u_ & _u_ https://x.example/p # h     ind `c`",
+  "html": "<p><em>u</em> &amp; <em>u</em> https://x.example/p # h     ind <code>c</code></p>"
+ },
+ {
+  "input": "_u_ <b> \n *em* _u_ & \n\n",
+  "html": "<p><em>u</em> <b> <br>\n<em>em</em> <em>u</em> &amp; </b></p>"
+ },
+ {
+  "input": "\n\n & *em* & `c` `c` `c` word",
+  "html": "<p>&amp; <em>em</em> &amp; <code>c</code> <code>c</code> <code>c</code> word</p>"
+ },
+ {
+  "input": "**b**     ind # h",
+  "html": "<p><strong>b</strong>     ind # h</p>"
+ },
+ {
+  "input": "**b** 1. n **b**",
+  "html": "<p><strong>b</strong> 1. n <strong>b</strong></p>"
+ },
+ {
+  "input": "<b>     ind \n `c` > q > q `c` word",
+  "html": "<p><b>     ind <br>\n<code>c</code> &gt; q &gt; q <code>c</code> word</b></p>"
+ },
+ {
+  "input": "_u_",
+  "html": "<p><em>u</em></p>"
+ },
+ {
+  "input": "> q &",
+  "html": "<blockquote>\n<p>q &amp;</p>\n</blockquote>"
+ },
+ {
+  "input": "\n\n 1. n https://x.example/p",
+  "html": "<ol>\n<li>n https://x.example/p</li>\n</ol>"
+ },
+ {
+  "input": "word - li https://x.example/p - li",
+  "html": "<p>word - li https://x.example/p - li</p>"
+ },
+ {
+  "input": "_u_ **b** \n - li",
+  "html": "<p><em>u</em> <strong>b</strong> <br>\n - li</p>"
+ },
+ {
+  "input": "1. n `c` word     ind & \n     ind",
+  "html": "<ol>\n<li>n <code>c</code> word     ind &amp; <br>\n     ind</li>\n</ol>"
+ },
+ {
+  "input": "<b> **b** 1. n     ind > q \n\n 1. n     ind",
+  "html": "<p><b> <strong>b</strong> 1. n     ind &gt; q </b></p><b>\n<ol>\n<li>n     ind</li>\n</ol></b>"
+ },
+ {
+  "input": "> q `c` > q",
+  "html": "<blockquote>\n<p>q <code>c</code> &gt; q</p>\n</blockquote>"
+ },
+ {
+  "input": "1. n",
+  "html": "<ol>\n<li>n</li>\n</ol>"
+ },
+ {
+  "input": "_u_ `c` **b** word _u_ _u_ `c` `c`",
+  "html": "<p><em>u</em> <code>c</code> <strong>b</strong> word <em>u</em> <em>u</em> <code>c</code> <code>c</code></p>"
+ }
+]

@@ -83,10 +83,15 @@ final class BookmarkSearch {
   final Map<String, String> defaults;
 }
 
-/// A bookmark with its tag names, as the search sees it.
+/// A bookmark with its tags, as the search sees it.
 final class Candidate {
-  const Candidate(this.row, this.tags);
+  Candidate(this.row, this.tagRows)
+    : tags = [for (final tag in tagRows) tag.name];
+
   final BookmarkRow row;
+  final List<BookmarkTagRow> tagRows;
+
+  /// The tag names, for matching.
   final List<String> tags;
 }
 
@@ -118,12 +123,12 @@ final class BookmarkSearchQuery {
       search.sort,
     )).orThrow;
 
-    final tagsById = <int, List<String>>{};
+    final tagsById = <int, List<BookmarkTagRow>>{};
     if (rows.isNotEmpty) {
       final tagRows = (await repo.tagNames([for (final r in rows) r.id]))
           .orThrow;
       for (final tag in tagRows) {
-        (tagsById[tag.bookmarkId] ??= []).add(tag.name);
+        (tagsById[tag.bookmarkId] ??= []).add(tag);
       }
     }
     final candidates = [

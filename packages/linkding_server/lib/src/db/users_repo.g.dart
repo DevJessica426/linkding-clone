@@ -153,6 +153,15 @@ RETURNING id, password, last_login, is_superuser, username, first_name,
   }
 
   @override
+  Future<Result<List<UserNameRow>, SqlxError>> names(List<int> ids) {
+    return _db.fetchAll<UserNameRow>(
+      r'''SELECT id, username FROM auth_user WHERE id = ANY($1) ORDER BY id''',
+      [ids],
+      const $UserNameRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
   Future<Result<ProfileRow?, SqlxError>> profile(int userId) {
     return _db.fetchOptional<ProfileRow>(
       r'''

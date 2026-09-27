@@ -142,12 +142,27 @@ RETURNING file
   Future<Result<List<BookmarkTagRow>, SqlxError>> tagNames(List<int> bookmarkIds) {
     return _db.fetchAll<BookmarkTagRow>(
       r'''
-SELECT bt.bookmark_id, t.name
+SELECT bt.bookmark_id, t.id AS tag_id, t.name
 FROM bookmarks_bookmark_tags bt JOIN bookmarks_tag t ON t.id = bt.tag_id
 WHERE bt.bookmark_id = ANY($1)
+ORDER BY t.id
 ''',
       [bookmarkIds],
       const $BookmarkTagRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
+  Future<Result<List<AssetRow>, SqlxError>> assets(int bookmarkId) {
+    return _db.fetchAll<AssetRow>(
+      r'''
+SELECT id, date_created, file, file_size, asset_type, content_type,
+       display_name, status, gzip, bookmark_id
+FROM bookmarks_bookmarkasset WHERE bookmark_id = $1
+ORDER BY id
+''',
+      [bookmarkId],
+      const $AssetRowRowDeserializer().deserialize,
     );
   }
 
@@ -212,6 +227,19 @@ UPDATE bookmarks_bookmark SET shared = $3, date_modified = $4
 WHERE owner_id = $1 AND id = ANY($2)
 ''',
       [ownerId, ids, shared, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
+  }
+
+  @override
+  Future<Result<Unit, SqlxError>> setState(int id, int ownerId, bool isArchived, bool unread, bool shared) {
+    return _db.execute(
+      r'''
+UPDATE bookmarks_bookmark SET is_archived = $3, unread = $4, shared = $5
+WHERE id = $1 AND owner_id = $2
+''',
+      [id, ownerId, isArchived, unread, shared],
     ).then(
       (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
     );

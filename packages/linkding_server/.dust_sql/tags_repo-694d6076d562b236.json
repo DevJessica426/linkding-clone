@@ -5,11 +5,45 @@
       "driver": "postgres",
       "migrations": "./migrations",
       "schema_hash": "9bc2e0a1b66c0373",
+      "sql_hash": "1fd24b18880640a5",
+      "sql": "\nSELECT DISTINCT t.id, t.name, t.date_added, t.owner_id\nFROM bookmarks_tag t\nJOIN bookmarks_bookmark_tags bt ON bt.tag_id = t.id\nJOIN bookmarks_bookmark b ON b.id = bt.bookmark_id\nJOIN bookmarks_userprofile p ON p.user_id = b.owner_id\nWHERE b.shared AND p.enable_sharing\n  AND (NOT $2::boolean OR p.enable_public_sharing)\n  AND ($1::integer IS NULL OR b.owner_id = $1)\n  AND UPPER(t.name::text) IN (SELECT UPPER(n) FROM unnest($3::text[]) AS n)\nORDER BY t.id\n",
+      "user_parameter_count": 3,
+      "expanded_parameter_count": 3,
+      "fetch_mode": "all",
+      "row_type": "TagRow",
+      "columns": [
+        "id",
+        "name",
+        "date_added",
+        "owner_id"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "9bc2e0a1b66c0373",
       "sql_hash": "285b9a16594c9175",
       "sql": "\nINSERT INTO bookmarks_tag (name, date_added, owner_id) VALUES ($1, $2, $3)\nRETURNING id, name, date_added, owner_id\n",
       "user_parameter_count": 3,
       "expanded_parameter_count": 3,
       "fetch_mode": "one",
+      "row_type": "TagRow",
+      "columns": [
+        "id",
+        "name",
+        "date_added",
+        "owner_id"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "9bc2e0a1b66c0373",
+      "sql_hash": "4b91ba8fc7b0d7bf",
+      "sql": "\nSELECT id, name, date_added, owner_id FROM bookmarks_tag\nWHERE owner_id = $1\n  AND UPPER(name::text) IN (SELECT UPPER(n) FROM unnest($2::text[]) AS n)\nORDER BY id\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "all",
       "row_type": "TagRow",
       "columns": [
         "id",

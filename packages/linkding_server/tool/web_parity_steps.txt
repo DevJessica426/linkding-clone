@@ -1,0 +1,121 @@
+# Pages compared by tool/html_parity.py, after web_parity_seed.sql.
+# Left out: `?details=abc`, which linkding answers with a 500.
+
+# --- Lists, searches, paging ---
+GET /bookmarks
+GET /bookmarks?page=2
+GET /bookmarks?page=3
+GET /bookmarks?page=99
+GET /bookmarks?page=0
+GET /bookmarks?page=x
+GET /bookmarks/archived
+GET /bookmarks/shared
+GET /bookmarks/shared?user=other
+GET /bookmarks/shared?user=Zed
+GET /bookmarks/shared?user=nobody
+GET /bookmarks?q=%23python
+GET /bookmarks?q=%23PYTHON+%23rust
+GET /bookmarks?q=%23python+or+%23rust
+GET /bookmarks?q=%23python+or+%23rust&page=2
+GET /bookmarks?q=filler+not+%23python
+GET /bookmarks?q=!untagged
+GET /bookmarks?q=!unread
+GET /bookmarks?q=!nothing
+GET /bookmarks?q=%23nonexistent
+GET /bookmarks?q=(%23python
+GET /bookmarks?q=and
+GET /bookmarks?q=%23%E6%97%A5%E6%9C%AC
+GET /bookmarks?q=%23a%26b%3Cc%3E
+GET /bookmarks?sort=title_asc
+GET /bookmarks?sort=title_desc&page=2
+GET /bookmarks?sort=added_asc&shared=yes
+GET /bookmarks?sort=modified_desc&unread=no
+GET /bookmarks?unread=yes&shared=no&q=filler
+GET /bookmarks?sort=bogus
+GET /bookmarks?bundle=1000
+GET /bookmarks?bundle=1000&q=filler
+GET /bookmarks?bundle=999
+GET /bookmarks?modified_since=2026-01-01
+GET /bookmarks?added_since=2026-06-01T00:00:00Z&q=%23python
+GET /bookmarks?q=a&q=%23python&page=1&page=2
+GET /bookmarks/shared?q=%23python
+GET /bookmarks/shared?q=%23python&user=other
+GET /bookmarks/archived?q=%23python&sort=title_asc
+
+# --- Details ---
+GET /bookmarks?details=1005
+GET /bookmarks?details=1010
+GET /bookmarks?details=1011
+GET /bookmarks?details=1102&q=%23python
+GET /bookmarks/shared?details=1102
+GET /bookmarks/shared?details=1103
+GET /bookmarks?details=999999
+GET /bookmarks/archived?details=1009
+
+# --- Visitors ---
+ANON /bookmarks/shared
+ANON /bookmarks/shared?user=Zed
+ANON /bookmarks/shared?details=1102
+ANON /bookmarks/shared?details=1101
+ANON /bookmarks
+ANON /bookmarks/archived?q=x
+
+# --- Profile settings ---
+SQL UPDATE bookmarks_userprofile SET items_per_page = 10, display_url = true, bookmark_description_display = 'separate', bookmark_description_max_lines = 3, bookmark_date_display = 'absolute', bookmark_link_target = '_self' WHERE user_id = 1
+GET /bookmarks
+GET /bookmarks?page=3
+GET /bookmarks?page=5&q=filler
+GET /bookmarks?details=1010
+SQL UPDATE bookmarks_userprofile SET permanent_notes = true, tag_grouping = 'disabled', enable_sharing = true, bookmark_date_display = 'hidden', sticky_pagination = true, collapse_side_panel = true WHERE user_id = 1
+GET /bookmarks
+GET /bookmarks?q=%23python
+GET /bookmarks/shared
+SQL UPDATE bookmarks_userprofile SET display_view_bookmark_action = false, display_edit_bookmark_action = false, display_archive_bookmark_action = false, display_remove_bookmark_action = false, hide_bundles = true, theme = 'dark' WHERE user_id = 1
+GET /bookmarks
+SQL UPDATE bookmarks_userprofile SET tag_search = 'lax', theme = 'light', enable_favicons = true WHERE user_id = 1
+GET /bookmarks?q=python
+GET /bookmarks?q=python+%23rust
+SQL UPDATE bookmarks_userprofile SET legacy_search = true WHERE user_id = 1
+GET /bookmarks?q=python+%23rust
+GET /bookmarks?q=%23python+or+%23rust
+GET /bookmarks?q=(
+SQL UPDATE bookmarks_userprofile SET legacy_search = false, tag_search = 'strict', search_preferences = '{"sort": "title_asc", "unread": "yes"}' WHERE user_id = 1
+GET /bookmarks
+GET /bookmarks?sort=added_desc
+GET /bookmarks?unread=off&q=x
+SQL UPDATE bookmarks_userprofile SET search_preferences = '{}', display_view_bookmark_action = true, display_edit_bookmark_action = true, display_archive_bookmark_action = true, display_remove_bookmark_action = true, hide_bundles = false, items_per_page = 30, enable_favicons = false, permanent_notes = false, collapse_side_panel = false, sticky_pagination = false, bookmark_date_display = 'relative', bookmark_description_display = 'inline', display_url = false, tag_grouping = 'alphabetical', theme = 'auto', bookmark_link_target = '_blank' WHERE user_id = 1
+
+# --- Search preferences form ---
+POST /bookmarks sort=title_desc&shared=off&unread=yes&q=filler&apply=
+POST /bookmarks/archived sort=added_desc&shared=off&unread=off&apply=
+POST /bookmarks/shared sort=title_asc&user=other&apply=
+POST /bookmarks sort=modified_asc&shared=yes&unread=off&save=
+GET /bookmarks
+POST /bookmarks sort=added_desc&shared=off&unread=off&save=
+
+# --- Actions ---
+POST /bookmarks/action?q=filler archive=1001
+POST /bookmarks/archived/action unarchive=1001
+POST /bookmarks/action mark_as_read=1004
+POST /bookmarks/action unshare=1006
+POST /bookmarks/action?details=1012 update_state=1012&unread=on&shared=on
+POST /bookmarks/action?details=1012 update_state=1012&is_archived=on
+GET /bookmarks/archived
+POST /bookmarks/action remove=1013
+POST /bookmarks/action remove=1102
+POST /bookmarks/action archive=999999
+POST /bookmarks/action bulk_execute=&bulk_action=bulk_tag&bulk_tag_string=bulk+new&bookmark_id=1002&bookmark_id=1003
+GET /bookmarks?q=%23bulk
+POST /bookmarks/action bulk_execute=&bulk_action=bulk_untag&bulk_tag_string=new&bookmark_id=1002
+POST /bookmarks/action bulk_execute=&bulk_action=bulk_unread&bookmark_id=1002&bookmark_id=1003&bookmark_id=1101
+POST /bookmarks/action bulk_execute=&bulk_action=bulk_share&bookmark_id=1002
+POST /bookmarks/action?q=%23rust bulk_execute=&bulk_action=bulk_archive&bulk_select_across=on
+GET /bookmarks/archived
+POST /bookmarks/archived/action bulk_execute=&bulk_action=bulk_unarchive&bulk_select_across=on
+POST /bookmarks/action?q=%23a%26b%3Cc%3E bulk_execute=&bulk_action=bulk_delete&bulk_select_across=on
+GET /bookmarks
+POST /bookmarks/shared/action bulk_execute=&bulk_action=bulk_archive&bookmark_id=1002
+POST /bookmarks/shared/action unshare=1102
+POST /bookmarks/action bulk_execute=&bulk_action=bulk_read&bookmark_id=1002&bookmark_id=1003
+GET /bookmarks
+GET /bookmarks/action?q=x

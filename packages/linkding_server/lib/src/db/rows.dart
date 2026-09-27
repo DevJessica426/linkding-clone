@@ -163,10 +163,44 @@ final class BookmarkRow {
 @Derive([FromRow()])
 @Sqlx(renameAll: SqlxRename.snakeCase)
 final class BookmarkTagRow {
-  const BookmarkTagRow({required this.bookmarkId, required this.name});
+  const BookmarkTagRow({
+    required this.bookmarkId,
+    required this.tagId,
+    required this.name,
+  });
 
   final int bookmarkId;
+  final int tagId;
   final String name;
+}
+
+/// `bookmarks_bookmarkasset`: a snapshot or an uploaded file.
+@Derive([FromRow()])
+@Sqlx(renameAll: SqlxRename.snakeCase)
+final class AssetRow {
+  const AssetRow({
+    required this.id,
+    required this.dateCreated,
+    required this.file,
+    required this.fileSize,
+    required this.assetType,
+    required this.contentType,
+    required this.displayName,
+    required this.status,
+    required this.gzip,
+    required this.bookmarkId,
+  });
+
+  final int id;
+  final DateTime dateCreated;
+  final String file;
+  final int? fileSize;
+  final String assetType;
+  final String contentType;
+  final String displayName;
+  final String status;
+  final bool gzip;
+  final int bookmarkId;
 }
 
 /// `bookmarks_tag`.
