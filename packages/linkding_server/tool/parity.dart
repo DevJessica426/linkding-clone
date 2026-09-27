@@ -31,7 +31,18 @@ final class Step {
     this.raw,
     this.contentType,
     this.auth = Auth.token,
-  });
+  }) : sql = null;
+
+  /// Runs [sql] on each server's own database; both use linkding's schema,
+  /// so one statement changes the same thing in each.
+  const Step.sql(this.name, this.sql)
+    : method = 'SQL',
+      path = '',
+      json = null,
+      form = null,
+      raw = null,
+      contentType = null,
+      auth = Auth.none;
 
   final String name;
   final String method;
@@ -41,6 +52,7 @@ final class Step {
   final String? raw;
   final String? contentType;
   final Auth auth;
+  final String? sql;
 }
 
 enum Auth { token, bearer, none, badToken, emptyToken }
@@ -52,6 +64,7 @@ const _patch = 'PATCH';
 const _delete = 'DELETE';
 
 const _noScrape = '?disable_scraping';
+const _pages = 'http://localhost:9099';
 
 /// The API surface, in an order where later steps build on earlier ones.
 final steps = <Step>[
@@ -551,21 +564,206 @@ final steps = <Step>[
   ),
   const Step('delete', _delete, '/api/bookmarks/2/'),
   const Step('delete again', _delete, '/api/bookmarks/2/'),
+
+  // Reading pages: a local site, which both servers may reach because
+  // LD_ALLOWED_INTERNAL_HOSTS=localhost; 127.0.0.1 stays blocked.
+  for (final page in [
+    'page.html',
+    'og.html',
+    'title-only.html',
+    'meta-without-content.html',
+    'empty-title.html',
+    'unicode.html',
+    'missing.html',
+  ])
+    Step(
+      'check reads $page',
+      _get,
+      '/api/bookmarks/check/?url=${Uri.encodeComponent('$_pages/$page')}',
+    ),
+  Step(
+    'check a blocked internal address',
+    _get,
+    '/api/bookmarks/check/?url=${Uri.encodeComponent('http://127.0.0.1:9099/page.html')}',
+  ),
+  const Step(
+    'create fills title and description from the page',
+    _post,
+    '/api/bookmarks/',
+    json: {'url': '$_pages/page.html'},
+  ),
+  const Step(
+    'create keeps a given title, fills the description',
+    _post,
+    '/api/bookmarks/',
+    json: {'url': '$_pages/og.html', 'title': 'Mine'},
+  ),
+  const Step(
+    'create from a page with unicode',
+    _post,
+    '/api/bookmarks/',
+    json: {'url': '$_pages/unicode.html', 'description': 'given'},
+  ),
+  const Step(
+    'create from a blocked address',
+    _post,
+    '/api/bookmarks/',
+    json: {'url': 'http://127.0.0.1:9099/title-only.html'},
+  ),
+
+  // Auto-tagging rules.
+  const Step.sql('set auto-tagging rules', r'''
+UPDATE bookmarks_userprofile SET auto_tagging_rules =
+E'# a comment\nexample.invalid auto\nfiller.example.invalid/2 two second  # trailing\nlocalhost:9099 local\nexample.org/?lang=en english\n'
+'''),
+  const Step(
+    'check applies rules',
+    _get,
+    '/api/bookmarks/check/?url=https%3A%2F%2Fx.example.invalid%2F',
+  ),
+  const Step(
+    'check with a path rule',
+    _get,
+    '/api/bookmarks/check/?url=https%3A%2F%2Ffiller.example.invalid%2F2%2Fmore',
+  ),
+  const Step(
+    'check with a query rule',
+    _get,
+    '/api/bookmarks/check/?url=https%3A%2F%2Fexample.org%2F%3Flang%3Den%26x%3D1',
+  ),
+  const Step(
+    'create gets automatic tags',
+    _post,
+    '/api/bookmarks/$_noScrape',
+    json: {
+      'url': 'https://auto.example.invalid/',
+      'tag_names': ['Auto', 'mine'],
+    },
+  ),
+  const Step(
+    'PATCH applies rules too',
+    _patch,
+    '/api/bookmarks/9/',
+    json: {'title': 'Filler 5 again'},
+  ),
+  const Step.sql('a rule that breaks every rule', r'''
+UPDATE bookmarks_userprofile SET auto_tagging_rules = E'example.invalid auto\n.co.uk broken\n'
+'''),
+  const Step(
+    'check with a broken rule',
+    _get,
+    '/api/bookmarks/check/?url=https%3A%2F%2Fx.example.invalid%2F',
+  ),
+  const Step(
+    'create with a broken rule',
+    _post,
+    '/api/bookmarks/$_noScrape',
+    json: {'url': 'https://broken-rule.example.invalid/'},
+  ),
+  const Step.sql(
+    'clear rules',
+    "UPDATE bookmarks_userprofile SET auto_tagging_rules = ''",
+  ),
+
+  // Lax tag search and legacy search.
+  const Step.sql(
+    'lax tag search',
+    "UPDATE bookmarks_userprofile SET tag_search = 'lax'",
+  ),
+  for (final q in [
+    'even',
+    'EVEN',
+    'three',
+    'not%20even',
+    'auto%20or%20three',
+    '%23even',
+  ])
+    Step('lax q=$q', _get, '/api/bookmarks/?q=$q'),
+  const Step('profile shows lax', _get, '/api/user/profile/'),
+  const Step.sql(
+    'legacy search',
+    'UPDATE bookmarks_userprofile SET legacy_search = true',
+  ),
+  for (final q in [
+    'rome%20or%20athens',
+    'even',
+    '%23even%20!unread',
+    '!untagged',
+    'not',
+    '(rome',
+  ])
+    Step('legacy q=$q', _get, '/api/bookmarks/?q=$q'),
+  const Step.sql(
+    'back to strict, new search',
+    "UPDATE bookmarks_userprofile SET tag_search = 'strict', legacy_search = false",
+  ),
+
+  // Sharing.
+  const Step(
+    'share one more',
+    _patch,
+    '/api/bookmarks/5/',
+    json: {'shared': true},
+  ),
+  const Step(
+    'shared list before sharing is enabled',
+    _get,
+    '/api/bookmarks/shared/',
+  ),
+  const Step.sql(
+    'enable sharing',
+    'UPDATE bookmarks_userprofile SET enable_sharing = true',
+  ),
+  const Step('shared list signed in', _get, '/api/bookmarks/shared/'),
+  const Step(
+    'shared list anonymous, not public',
+    _get,
+    '/api/bookmarks/shared/',
+    auth: Auth.none,
+  ),
+  const Step.sql(
+    'enable public sharing',
+    'UPDATE bookmarks_userprofile SET enable_public_sharing = true',
+  ),
+  const Step(
+    'shared list anonymous, public',
+    _get,
+    '/api/bookmarks/shared/',
+    auth: Auth.none,
+  ),
+  const Step(
+    'shared list of admin',
+    _get,
+    '/api/bookmarks/shared/?user=admin',
+    auth: Auth.none,
+  ),
+  const Step(
+    'shared list searched',
+    _get,
+    '/api/bookmarks/shared/?q=%23pad',
+    auth: Auth.none,
+  ),
+  const Step(
+    'shared list filtered',
+    _get,
+    '/api/bookmarks/shared/?unread=yes&limit=1',
+  ),
+  const Step('profile shows sharing', _get, '/api/user/profile/'),
   const Step('HEAD a list', 'HEAD', '/api/bookmarks/'),
   const Step('final state', _get, '/api/bookmarks/?limit=100'),
 ];
 
 Future<void> main(List<String> args) async {
   if (args.length != 2) {
-    stderr.writeln('usage: parity.dart <base>=<token> <base>=<token>');
+    stderr.writeln(
+      'usage: parity.dart <base>=<token>=<database url> '
+      '<base>=<token>=<database url>',
+    );
     exit(2);
   }
-  final [reference, clone] = [
-    for (final arg in args)
-      (arg.substring(0, arg.indexOf('=')), arg.substring(arg.indexOf('=') + 1)),
-  ];
-  final left = await _run(reference.$1, reference.$2);
-  final right = await _run(clone.$1, clone.$2);
+  final [reference, clone] = [for (final arg in args) arg.split('=')];
+  final left = await _run(reference[0], reference[1], reference[2]);
+  final right = await _run(clone[0], clone[1], clone[2]);
 
   var failures = 0;
   for (var i = 0; i < steps.length; i++) {
@@ -585,10 +783,21 @@ Future<void> main(List<String> args) async {
   exitCode = failures == 0 ? 0 : 1;
 }
 
-Future<List<Object?>> _run(String base, String token) async {
+Future<List<Object?>> _run(String base, String token, String database) async {
   final client = http.Client();
   final results = <Object?>[];
   for (final step in steps) {
+    if (step.sql case final sql?) {
+      final result = await Process.run('psql', [
+        database,
+        '-v',
+        'ON_ERROR_STOP=1',
+        '-qc',
+        sql,
+      ]);
+      results.add(result.exitCode == 0 ? 'ok' : 'failed: ${result.stderr}');
+      continue;
+    }
     final request = http.Request(step.method, Uri.parse('$base${step.path}'))
       ..followRedirects = false;
     switch (step.auth) {

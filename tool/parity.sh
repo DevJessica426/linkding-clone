@@ -32,6 +32,12 @@ wait_for() {
 
 stop $REF_PORT
 stop $CLONE_PORT
+stop 9099
+# The pages metadata scraping reads. Both servers may reach localhost, and
+# only localhost: requests to 127.0.0.1 must be refused as internal.
+export LD_ALLOWED_INTERNAL_HOSTS=localhost
+(cd "$ROOT/packages/linkding_server/tool/parity_pages" &&
+  nohup python3 -m http.server 9099 --bind 127.0.0.1 > "$LOGS/pages.log" 2>&1 &)
 for db in linkding_ref linkding_clone; do
   psql "$PG/postgres" -qc "DROP DATABASE IF EXISTS $db" -qc "CREATE DATABASE $db" 2>/dev/null
 done
@@ -70,5 +76,5 @@ wait_for $REF_PORT
 
 cd "$ROOT/packages/linkding_server"
 dart run tool/parity.dart \
-  "http://localhost:$REF_PORT=$(cat "$LOGS/ref_token")" \
-  "http://localhost:$CLONE_PORT=$(cat "$LOGS/clone_token")"
+  "http://localhost:$REF_PORT=$(cat "$LOGS/ref_token")=$PG/linkding_ref" \
+  "http://localhost:$CLONE_PORT=$(cat "$LOGS/clone_token")=$PG/linkding_clone"
