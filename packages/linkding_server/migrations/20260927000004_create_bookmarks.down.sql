@@ -1,0 +1,4 @@
+DROP TABLE bookmarks_bookmark_tags;
+ALTER TABLE bookmarks_bookmark DROP CONSTRAINT bookmarks_bookmark_latest_snapshot_id_ed3c8c2b_fk_bookmarks;
+DROP TABLE bookmarks_bookmarkasset;
+DROP TABLE bookmarks_bookmark;
