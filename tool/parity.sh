@@ -60,6 +60,9 @@ print(ApiToken.objects.create(user=User.objects.get(username='admin'), name='par
     > "$LOGS/linkding.log" 2>&1 &
 )
 
+echo "building the clone's page script"
+"$ROOT/tool/build_web.sh"
+
 echo "starting the clone on :$CLONE_PORT"
 (
   cd "$ROOT"

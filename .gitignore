@@ -1,6 +1,8 @@
 # Dart
 .dart_tool/
 build/
+# Built by tool/build_web.sh
+/packages/linkding_server/web/static/bundle.js
 *.js.deps
 *.js.map
 
