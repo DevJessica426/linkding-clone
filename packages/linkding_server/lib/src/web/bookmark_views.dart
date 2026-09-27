@@ -6,6 +6,7 @@ import 'package:dust_server/server.dart';
 import 'package:linkding_shared/linkding_shared.dart';
 
 import '../auth/sessions.dart';
+import '../compat/form_data.dart';
 import '../compat/pyurl.dart';
 import '../core/profile.dart';
 import '../db/assets_repo.dart';
@@ -16,10 +17,10 @@ import '../db/tags_repo.dart';
 import '../db/users_repo.dart';
 import '../services/errors.dart';
 import '../services/search.dart';
+import 'access.dart';
 import 'bookmark_list.dart';
 import 'context.dart';
 import 'format.dart';
-import 'forms.dart';
 import 'layout.dart';
 import 'query_params.dart';
 
@@ -177,7 +178,7 @@ final class BookmarkViews {
   Future<Details?> _details(PageContext c, String? id) async {
     final bookmarkId = int.tryParse(id ?? '');
     if (bookmarkId == null) return null;
-    final bookmark = await _readable(c, bookmarkId);
+    final bookmark = await readableBookmark(_db, c, bookmarkId);
     if (bookmark == null) return null;
     final tags = (await BookmarksRepo(_db).tagNames([bookmark.id])).orThrow;
     return Details(
@@ -187,20 +188,6 @@ final class BookmarkViews {
       isEditable: bookmark.ownerId == c.user?.id,
       uploadsEnabled: !web.config.disableAssetUpload,
     );
-  }
-
-  /// `access.bookmark_read`: the owner's, or shared by an owner who shares
-  /// with users (for signed-in visitors) or publicly.
-  Future<BookmarkRow?> _readable(PageContext c, int id) async {
-    final bookmark = (await BookmarksRepo(_db).byId(id)).orThrow;
-    if (bookmark == null) return null;
-    if (bookmark.ownerId == c.user?.id) return bookmark;
-    if (!bookmark.shared) return null;
-    final owner = (await UsersRepo(_db).profile(bookmark.ownerId)).orThrow;
-    if (owner == null) return null;
-    final visible =
-        (c.isAuthenticated && owner.enableSharing) || owner.enablePublicSharing;
-    return visible ? bookmark : null;
   }
 
   /// `search_action`: applies the search preferences form, saving them as

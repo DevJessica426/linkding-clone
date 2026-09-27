@@ -52,6 +52,22 @@ GET /bookmarks/shared?details=1103
 GET /bookmarks?details=999999
 GET /bookmarks/archived?details=1009
 
+# --- Assets (added by the API parity run to bookmark 900) ---
+GET /bookmarks?details=900
+GET /assets/1
+GET /assets/2
+GET /assets/4
+GET /assets/4/read
+GET /assets/3
+GET /assets/abc
+ANON /assets/1
+POST /bookmarks/action?details=900 upload_asset=900
+UPLOAD /bookmarks/action?details=900 upload_asset=900 upload_asset_file=web notes.md|text/markdown|# From the page
+GET /assets/6
+POST /bookmarks/action?details=900 remove_asset=2
+POST /bookmarks/action?details=900 remove_asset=999
+GET /bookmarks?details=900
+
 # --- Visitors ---
 ANON /bookmarks/shared
 ANON /bookmarks/shared?user=Zed

@@ -6,6 +6,7 @@ import '../config.dart';
 import '../core/auto_tagging.dart';
 import '../core/profile.dart';
 import '../core/urls.dart';
+import '../db/assets_repo.dart';
 import '../db/bookmarks_repo.dart';
 import '../db/bundles_repo.dart';
 import '../db/database.dart';
@@ -13,6 +14,7 @@ import '../db/rows.dart';
 import '../db/settings_repo.dart';
 import '../db/tags_repo.dart';
 import '../db/users_repo.dart';
+import '../services/assets.dart';
 import '../services/bookmarks.dart';
 import '../services/errors.dart';
 import '../services/search.dart';
@@ -29,6 +31,7 @@ final class LinkdingApi {
   LinkdingApi({
     required this.database,
     required this.bookmarks,
+    required this.assets,
     required this.metadata,
     required this.sessions,
     required this.config,
@@ -36,6 +39,7 @@ final class LinkdingApi {
 
   final LinkdingDatabase database;
   final BookmarkService bookmarks;
+  final AssetService assets;
   final WebsiteMetadataLoader metadata;
   final Sessions sessions;
   final ServerConfig config;
@@ -43,6 +47,9 @@ final class LinkdingApi {
   // One path segment without a dot, as DRF's router matches ids. The slash is
   // written as `\x2f`: dust_server never matches a pattern containing `/`.
   static const _id = r'{id|[^.\x2f]+}';
+
+  /// Django's `<int:bookmark_id>` in the nested asset routes.
+  static const _bookmarkId = r'{bookmark_id|[0-9]+}';
 
   /// Every route, each with the slash-less form redirecting to it as
   /// Django's `APPEND_SLASH` does.
@@ -52,6 +59,7 @@ final class LinkdingApi {
       '/bookmarks/archived/': {'GET': _listArchived},
       '/bookmarks/shared/': {'GET': _listShared},
       '/bookmarks/check/': {'GET': _check},
+      '/bookmarks/singlefile/': {'POST': _singlefile},
       '/bookmarks/$_id/': {
         'GET': _retrieve,
         'PUT': (r, u) => _update(r, u!, partial: false),
@@ -60,6 +68,13 @@ final class LinkdingApi {
       },
       '/bookmarks/$_id/archive/': {'POST': (r, u) => _archive(r, u!, true)},
       '/bookmarks/$_id/unarchive/': {'POST': (r, u) => _archive(r, u!, false)},
+      '/bookmarks/$_bookmarkId/assets/': {'GET': _listAssets},
+      '/bookmarks/$_bookmarkId/assets/upload/': {'POST': _uploadAsset},
+      '/bookmarks/$_bookmarkId/assets/$_id/': {
+        'GET': _retrieveAsset,
+        'DELETE': _deleteAsset,
+      },
+      '/bookmarks/$_bookmarkId/assets/$_id/download/': {'GET': _downloadAsset},
       '/tags/': {'GET': _listTags, 'POST': _createTag},
       '/tags/$_id/': {'GET': _retrieveTag, 'DELETE': _deleteTag},
       '/bundles/': {'GET': _listBundles, 'POST': _createBundle},
@@ -524,6 +539,132 @@ final class LinkdingApi {
     final tag = await _ownedTag(request, user!);
     (await TagsRepo(database.connection).delete(tag.id, user.id)).orThrow;
     return Response(204);
+  }
+
+  // --- Assets ---
+
+  static Map<String, Object?> _assetJson(AssetRow row) => BookmarkAsset(
+    id: row.id,
+    bookmark: row.bookmarkId,
+    dateCreated: row.dateCreated,
+    fileSize: row.fileSize,
+    assetType: row.assetType,
+    contentType: row.contentType,
+    displayName: row.displayName,
+    status: row.status,
+  ).toJson();
+
+  static final _uploadDisabled = ApiException(403, const {
+    'error': 'Asset upload is disabled.',
+  });
+
+  /// `access.bookmark_write` for the nested asset routes, which answers
+  /// Django's own 404 message rather than DRF's.
+  Future<BookmarkRow> _assetBookmark(Request request, UserRow user) async {
+    final id = int.tryParse(await request.path<String>('bookmark_id'));
+    final row = id == null || id > 2147483647
+        ? null
+        : (await BookmarksRepo(database.connection).owned(id, user.id)).orThrow;
+    if (row == null) throw ApiException.detail(404, 'Bookmark does not exist');
+    return row;
+  }
+
+  Future<AssetRow> _ownedAsset(Request request, UserRow user) async {
+    final bookmark = await _assetBookmark(request, user);
+    final id = await _pathId(request, 'BookmarkAsset');
+    final row = (await AssetsRepo(
+      database.connection,
+    ).ofBookmark(id, bookmark.id, user.id)).orThrow;
+    if (row == null) throw ApiException.noMatch('BookmarkAsset');
+    return row;
+  }
+
+  Future<Response> _listAssets(Request request, UserRow? user) async {
+    final bookmark = await _assetBookmark(request, user!);
+    final page = LimitOffset.fromQuery(request.requestedUri.queryParameters);
+    final rows = (await BookmarksRepo(database.connection).assets(bookmark.id))
+        .orThrow;
+    final url = request.requestedUri.toString();
+    return apiJson({
+      'count': rows.length,
+      'next': page.next(url, rows.length),
+      'previous': page.previous(url),
+      'results': [
+        for (final row in rows.skip(page.offset).take(page.limit))
+          _assetJson(row),
+      ],
+    });
+  }
+
+  Future<Response> _retrieveAsset(Request request, UserRow? user) async =>
+      apiJson(_assetJson(await _ownedAsset(request, user!)));
+
+  Future<Response> _deleteAsset(Request request, UserRow? user) async {
+    await assets.remove(await _ownedAsset(request, user!));
+    return Response(204);
+  }
+
+  /// The file, unzipped, to save under the asset's name.
+  Future<Response> _downloadAsset(Request request, UserRow? user) async {
+    final asset = await _ownedAsset(request, user!);
+    final content = await assets.read(asset);
+    if (content == null) {
+      throw ApiException.detail(404, 'Asset file does not exist');
+    }
+    return Response(
+      200,
+      body: content,
+      headers: {
+        'content-type': asset.contentType,
+        'content-disposition':
+            'attachment; filename="${AssetService.downloadName(asset)}"',
+      },
+    );
+  }
+
+  /// `POST /api/bookmarks/<id>/assets/upload/` with the file as `file`.
+  Future<Response> _uploadAsset(Request request, UserRow? user) async {
+    if (config.disableAssetUpload) throw _uploadDisabled;
+    final bookmark = await _assetBookmark(request, user!);
+    final file = (await readRequestBody(request)).files['file'];
+    if (file == null) {
+      throw ApiException(400, const {'error': 'No file provided.'});
+    }
+    final asset = await assets.upload(
+      bookmark,
+      file.name,
+      file.contentType,
+      file.bytes,
+    );
+    return apiJson(_assetJson(asset), status: 201);
+  }
+
+  /// `POST /api/bookmarks/singlefile/`: the browser extension's saved copy
+  /// of a page, as the latest snapshot of that URL's bookmark, which is
+  /// created when there is none.
+  Future<Response> _singlefile(Request request, UserRow? user) async {
+    if (config.disableAssetUpload) throw _uploadDisabled;
+    // `request.POST` and `request.FILES`: empty for a JSON body.
+    final body = await readRequestBody(request);
+    final url = body.form?['url']?.last;
+    final file = body.files['file'];
+    if (url == null || url.isEmpty || file == null) {
+      throw ApiException(400, const {
+        'error': "Both 'url' and 'file' parameters are required.",
+      });
+    }
+    var bookmark = (await BookmarksRepo(
+      database.connection,
+    ).existing(user!.id, normalizeUrl(url), url)).orThrow;
+    bookmark ??= await bookmarks.create(
+      BookmarkDraft(url: url),
+      '',
+      user.id,
+      await _profileOf(user.id),
+      scrape: config.enableMetadataScraping,
+    );
+    await assets.uploadSnapshot(bookmark, file.bytes);
+    return apiJson({'message': 'Snapshot uploaded successfully.'}, status: 201);
   }
 
   // --- Bundles ---

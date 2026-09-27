@@ -26,6 +26,21 @@ WHERE a.id = $1 AND b.owner_id = $2
 ''')
   Future<Result<AssetRow?, SqlxError>> owned(int id, int ownerId);
 
+  /// An asset of one of the owner's bookmarks, looked up through that
+  /// bookmark, as the API's nested asset routes do.
+  @Query(r'''
+SELECT a.id, a.date_created, a.file, a.file_size, a.asset_type,
+       a.content_type, a.display_name, a.status, a.gzip, a.bookmark_id
+FROM bookmarks_bookmarkasset a
+JOIN bookmarks_bookmark b ON b.id = a.bookmark_id
+WHERE a.id = $1 AND a.bookmark_id = $2 AND b.owner_id = $3
+''')
+  Future<Result<AssetRow?, SqlxError>> ofBookmark(
+    int id,
+    int bookmarkId,
+    int ownerId,
+  );
+
   @Query(r'''
 INSERT INTO bookmarks_bookmarkasset (
   date_created, file, file_size, asset_type, content_type, display_name,
@@ -67,6 +82,17 @@ UPDATE bookmarks_bookmark b SET
 WHERE b.id = (SELECT bookmark_id FROM gone)
 ''')
   Future<Result<Unit, SqlxError>> delete(int id, DateTime now);
+
+  /// Points a bookmark at its newest snapshot, and marks it modified.
+  @Query(r'''
+UPDATE bookmarks_bookmark SET latest_snapshot_id = $2, date_modified = $3
+WHERE id = $1
+''')
+  Future<Result<Unit, SqlxError>> setLatestSnapshot(
+    int bookmarkId,
+    int assetId,
+    DateTime now,
+  );
 
   @Query(r'UPDATE bookmarks_bookmark SET date_modified = $2 WHERE id = $1')
   Future<Result<Unit, SqlxError>> touchBookmark(int bookmarkId, DateTime now);

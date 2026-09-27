@@ -7,8 +7,11 @@ library;
 import 'dart:convert';
 
 import 'package:dust_server/server.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 import '../compat/django.dart';
+import '../compat/form_data.dart';
 import '../compat/pyurl.dart';
 
 /// A JSON response as linkding sends it: compact UTF-8.
@@ -70,11 +73,14 @@ final class ApiException implements Exception {
 
 /// A request body: a JSON value, or form fields where a key can repeat.
 final class RequestBody {
-  const RequestBody.json(this.json) : form = null;
-  const RequestBody.form(this.form) : json = null;
+  const RequestBody.json(this.json) : form = null, files = const {};
+  const RequestBody.form(this.form, [this.files = const {}]) : json = null;
 
   final Object? json;
   final Map<String, List<String>>? form;
+
+  /// The files of a multipart body: `request.FILES`.
+  final Map<String, FormFile> files;
 
   bool get isForm => form != null;
 }
@@ -109,41 +115,28 @@ Future<RequestBody> readRequestBody(Request request) async {
         ),
       );
     case 'multipart/form-data':
-      return RequestBody.form(_multipartFields(contentType, bytes));
+      final boundary = MediaType.parse(contentType).parameters['boundary'];
+      if (boundary == null) {
+        throw ApiException.detail(
+          400,
+          'Multipart form parse error - Invalid boundary in multipart: None',
+        );
+      }
+      try {
+        final form = await parseMultipart(boundary, Stream.value(bytes));
+        return RequestBody.form(form.fields, form.files);
+      } on MimeMultipartException catch (error) {
+        throw ApiException.detail(
+          400,
+          'Multipart form parse error - ${error.message}',
+        );
+      }
     default:
       throw ApiException.detail(
         415,
         'Unsupported media type "$contentType" in request.',
       );
   }
-}
-
-Map<String, List<String>> _multipartFields(
-  String contentType,
-  List<int> bytes,
-) {
-  final boundary = RegExp(r'boundary="?([^";]+)"?').firstMatch(contentType)?[1];
-  if (boundary == null) {
-    throw ApiException.detail(
-      400,
-      'Multipart form parse error - Invalid boundary in multipart: None',
-    );
-  }
-  final text = latin1.decode(bytes);
-  final fields = <String, List<String>>{};
-  for (final part in text.split('--$boundary')) {
-    final split = part.indexOf('\r\n\r\n');
-    if (split < 0) continue;
-    final head = part.substring(0, split);
-    final name = RegExp(r'name="([^"]*)"').firstMatch(head)?[1];
-    if (name == null || head.contains('filename=')) continue;
-    var value = part.substring(split + 4);
-    if (value.endsWith('\r\n')) value = value.substring(0, value.length - 2);
-    (fields[name] ??= []).add(
-      utf8.decode(latin1.encode(value), allowMalformed: true),
-    );
-  }
-  return fields;
 }
 
 /// The object a JSON body must be, or linkding's error for anything else.

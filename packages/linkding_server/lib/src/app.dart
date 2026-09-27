@@ -10,6 +10,7 @@ import 'db/settings_repo.dart';
 import 'services/assets.dart';
 import 'services/bookmarks.dart';
 import 'services/website_loader.dart';
+import 'web/asset_views.dart';
 import 'web/auth_views.dart';
 import 'web/bookmark_views.dart';
 import 'web/context.dart';
@@ -28,9 +29,11 @@ Router buildApp({
     metadata,
     assetDir: '${config.dataDir}/assets',
   );
+  final assets = AssetService(database.connection, '${config.dataDir}/assets');
   final api = LinkdingApi(
     database: database,
     bookmarks: bookmarks,
+    assets: assets,
     metadata: metadata,
     sessions: sessions,
     config: config,
@@ -41,11 +44,12 @@ Router buildApp({
     config: config,
     sessions: sessions,
     bookmarks: bookmarks,
-    assets: AssetService(database.connection, '${config.dataDir}/assets'),
+    assets: assets,
     metadata: metadata,
   );
   final auth = AuthViews(web);
   final lists = BookmarkViews(web);
+  final files = AssetViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -59,6 +63,8 @@ Router buildApp({
     ..route('/bookmarks/archived/action', any(lists.archivedAction))
     ..route('/bookmarks/shared', any(lists.shared))
     ..route('/bookmarks/shared/action', any(lists.sharedAction))
+    ..route('/assets/{id|[0-9]+}', any(files.view))
+    ..route('/assets/{id|[0-9]+}/read', any(files.read))
     ..mount('/static', staticFiles('${config.webRoot}/static'))
     ..route('/api/', any(api.root))
     ..route('/api', any(LinkdingApi.appendSlash))

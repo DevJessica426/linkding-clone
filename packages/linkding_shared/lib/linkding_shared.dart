@@ -7,6 +7,7 @@ export 'package:dust_dart/serde.dart';
 
 export 'src/api/linkding_api.dart';
 export 'src/api/linkding_client.dart';
+export 'src/models/asset.dart';
 export 'src/models/bookmark.dart';
 export 'src/models/bundle.dart';
 export 'src/models/inputs.dart';

@@ -47,6 +47,21 @@ WHERE a.id = $1 AND b.owner_id = $2
   }
 
   @override
+  Future<Result<AssetRow?, SqlxError>> ofBookmark(int id, int bookmarkId, int ownerId) {
+    return _db.fetchOptional<AssetRow>(
+      r'''
+SELECT a.id, a.date_created, a.file, a.file_size, a.asset_type,
+       a.content_type, a.display_name, a.status, a.gzip, a.bookmark_id
+FROM bookmarks_bookmarkasset a
+JOIN bookmarks_bookmark b ON b.id = a.bookmark_id
+WHERE a.id = $1 AND a.bookmark_id = $2 AND b.owner_id = $3
+''',
+      [id, bookmarkId, ownerId],
+      const $AssetRowRowDeserializer().deserialize,
+    );
+  }
+
+  @override
   Future<Result<AssetRow, SqlxError>> insert(DateTime dateCreated, String file, int? fileSize, String assetType, String contentType, String displayName, String status, bool gzip, int bookmarkId) {
     return _db.fetchOne<AssetRow>(
       r'''
@@ -83,6 +98,19 @@ UPDATE bookmarks_bookmark b SET
 WHERE b.id = (SELECT bookmark_id FROM gone)
 ''',
       [id, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
+  }
+
+  @override
+  Future<Result<Unit, SqlxError>> setLatestSnapshot(int bookmarkId, int assetId, DateTime now) {
+    return _db.execute(
+      r'''
+UPDATE bookmarks_bookmark SET latest_snapshot_id = $2, date_modified = $3
+WHERE id = $1
+''',
+      [bookmarkId, assetId, now],
     ).then(
       (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
     );

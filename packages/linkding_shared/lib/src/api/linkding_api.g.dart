@@ -484,6 +484,154 @@ final class _$LinkdingApi implements LinkdingApi {
   }
 
   @override
+  Future<BookmarkAssetPage> assets(
+    int bookmarkId, {
+    int? limit,
+    int? offset,
+  }) async {
+    final _queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
+    if (limit != null) _queryParameters['limit'] = limit;
+    if (offset != null) _queryParameters['offset'] = offset;
+    final Object? _data = null;
+    final _options = Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+      contentType: null,
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+      _setStreamType<BookmarkAssetPage>(
+        _options
+            .compose(
+              _dio.options,
+              '/bookmarks/' + Uri.encodeComponent(bookmarkId.toString()) + '/assets/',
+              queryParameters: _queryParameters,
+              data: _data,
+              cancelToken: null,
+              onSendProgress: null,
+              onReceiveProgress: null,
+            )
+            .copyWith(
+              baseUrl: _combineBaseUrls(
+                _dio.options.baseUrl,
+                _baseUrl,
+              ),
+            ),
+      ),
+    );
+    return BookmarkAssetPage.fromJson(_result.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<BookmarkAsset> asset(int bookmarkId, int id) async {
+    final _queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
+    final Object? _data = null;
+    final _options = Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+      contentType: null,
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+      _setStreamType<BookmarkAsset>(
+        _options
+            .compose(
+              _dio.options,
+              '/bookmarks/' + Uri.encodeComponent(bookmarkId.toString()) + '/assets/' + Uri.encodeComponent(id.toString()) + '/',
+              queryParameters: _queryParameters,
+              data: _data,
+              cancelToken: null,
+              onSendProgress: null,
+              onReceiveProgress: null,
+            )
+            .copyWith(
+              baseUrl: _combineBaseUrls(
+                _dio.options.baseUrl,
+                _baseUrl,
+              ),
+            ),
+      ),
+    );
+    return BookmarkAsset.fromJson(_result.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<BookmarkAsset> uploadAsset(int bookmarkId, MultipartFile file) async {
+    final _queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
+    final _data = FormData.fromMap(<String, dynamic>{
+      'file': file,
+    });
+    final _options = Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'multipart/form-data',
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+      _setStreamType<BookmarkAsset>(
+        _options
+            .compose(
+              _dio.options,
+              '/bookmarks/' + Uri.encodeComponent(bookmarkId.toString()) + '/assets/upload/',
+              queryParameters: _queryParameters,
+              data: _data,
+              cancelToken: null,
+              onSendProgress: null,
+              onReceiveProgress: null,
+            )
+            .copyWith(
+              baseUrl: _combineBaseUrls(
+                _dio.options.baseUrl,
+                _baseUrl,
+              ),
+            ),
+      ),
+    );
+    return BookmarkAsset.fromJson(_result.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> deleteAsset(int bookmarkId, int id) async {
+    final _queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
+    final Object? _data = null;
+    final _options = Options(
+      method: 'DELETE',
+      headers: _headers,
+      extra: _extra,
+      contentType: null,
+    );
+    await _dio.fetch<void>(
+      _setStreamType<void>(
+        _options
+            .compose(
+              _dio.options,
+              '/bookmarks/' + Uri.encodeComponent(bookmarkId.toString()) + '/assets/' + Uri.encodeComponent(id.toString()) + '/',
+              queryParameters: _queryParameters,
+              data: _data,
+              cancelToken: null,
+              onSendProgress: null,
+              onReceiveProgress: null,
+            )
+            .copyWith(
+              baseUrl: _combineBaseUrls(
+                _dio.options.baseUrl,
+                _baseUrl,
+              ),
+            ),
+      ),
+    );
+    return;
+  }
+
+  @override
   Future<TagPage> tags({int? limit, int? offset}) async {
     final _queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};

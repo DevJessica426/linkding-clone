@@ -1,5 +1,6 @@
 import 'package:dust_dart/http.dart';
 
+import '../models/asset.dart';
 import '../models/bookmark.dart';
 import '../models/bundle.dart';
 import '../models/inputs.dart';
@@ -86,6 +87,29 @@ abstract interface class LinkdingApi {
 
   @DELETE('/bookmarks/{id}/')
   Future<void> deleteBookmark(@Path() int id);
+
+  // --- Assets ---
+
+  @GET('/bookmarks/{bookmarkId}/assets/')
+  Future<BookmarkAssetPage> assets(
+    @Path() int bookmarkId, {
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+  });
+
+  @GET('/bookmarks/{bookmarkId}/assets/{id}/')
+  Future<BookmarkAsset> asset(@Path() int bookmarkId, @Path() int id);
+
+  /// Attaches a file to a bookmark; stored gzipped unless it already is.
+  @POST('/bookmarks/{bookmarkId}/assets/upload/')
+  @MultiPart()
+  Future<BookmarkAsset> uploadAsset(
+    @Path() int bookmarkId,
+    @Part('file') MultipartFile file,
+  );
+
+  @DELETE('/bookmarks/{bookmarkId}/assets/{id}/')
+  Future<void> deleteAsset(@Path() int bookmarkId, @Path() int id);
 
   // --- Tags ---
 

@@ -14,6 +14,8 @@ page differs. Steps, one per line:
     POST /bookmarks/action archive=3&x=y
                                 a form, with the CSRF token added; the page
                                 the redirect leads to is compared
+    UPLOAD /bookmarks/action a=1 field=name.txt|text/plain|content
+                                the same as multipart/form-data, with a file
     SQL UPDATE ...              run on both databases, nothing compared
     # a comment
 """
@@ -83,9 +85,12 @@ class Tokens(html.parser.HTMLParser):
 
 # What differs on purpose, and data that differs between the two databases
 # rather than in how a page is made: linkding's development-only reload
-# script, the Django admin site the clone does not have, and the second a
-# bookmark was saved, which appears in fallback Wayback Machine links.
+# script, the Django admin site the clone does not have, the second a
+# bookmark was saved, which appears in fallback Wayback Machine links, and
+# the size of a gzipped asset, which depends on the zlib build (the API
+# parity run checks sizes to within two bytes).
 EXPECTED = [
+    (re.compile(r'<span class="filesize">[^<]*</span>'), '<span class="filesize"><size></span>'),
     (re.compile(r'<script src="/static/live-reload.js"></script>'), ""),
     (re.compile(r'<li class="menu-item">\s*<a href="/admin/"[^>]*>Admin</a>\s*</li>'), ""),
     (re.compile(r"web\.archive\.org/web/\d{14}/"), "web.archive.org/web/<time>/"),
@@ -114,12 +119,16 @@ class Client:
                 return cookie.value
         return ""
 
-    def request(self, path, form=None):
+    def request(self, path, form=None, files=None):
         data = None
+        headers = {}
         if form is not None:
-            form = {**form, "csrfmiddlewaretoken": self.csrf()}
-            data = urllib.parse.urlencode(form, doseq=True).encode()
-        req = urllib.request.Request(self.base + path, data=data)
+            form = {**form, "csrfmiddlewaretoken": [self.csrf()]}
+            if files is None:
+                data = urllib.parse.urlencode(form, doseq=True).encode()
+            else:
+                data, headers["Content-Type"] = multipart(form, files)
+        req = urllib.request.Request(self.base + path, data=data, headers=headers)
         if data is not None:
             req.add_header("Referer", self.base + path)
         try:
@@ -131,6 +140,21 @@ class Client:
     def login(self):
         self.request("/login/")
         self.request("/login/", CREDENTIALS)
+
+
+def multipart(fields, files):
+    boundary = "parityboundary7MA4YWxkTrZu0gW"
+    out = []
+    for name, values in fields.items():
+        for value in values:
+            out.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"'
+                       f"\r\n\r\n{value}\r\n")
+    for name, (filename, content_type, content) in files.items():
+        out.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"; '
+                   f'filename="{filename}"\r\nContent-Type: {content_type}'
+                   f"\r\n\r\n{content}\r\n")
+    out.append(f"--{boundary}--\r\n")
+    return "".join(out).encode(), f"multipart/form-data; boundary={boundary}"
 
 
 def compare(label, ref, clone, results):
@@ -173,11 +197,15 @@ def main():
                                    stdout=subprocess.DEVNULL)
                 continue
             path, _, body = rest.partition(" ")
-            form = None
-            if kind == "POST":
+            form = files = None
+            if kind == "UPLOAD":
+                body, _, file_spec = body.partition(" ")
+                field, _, spec = file_spec.partition("=")
+                files = {field: tuple(spec.split("|", 2))}
+            if kind in ("POST", "UPLOAD"):
                 form = urllib.parse.parse_qs(body, keep_blank_values=True)
             clients = (anon_ref, anon_clone) if kind == "ANON" else (ref, clone)
-            results = [c.request(path, form) for c in clients]
+            results = [c.request(path, form, files) for c in clients]
             pages += 1
             if not compare(line, *clients, results):
                 failed += 1

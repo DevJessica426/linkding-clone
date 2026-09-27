@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 final class Step {
   const Step(
@@ -30,6 +31,7 @@ final class Step {
     this.form,
     this.raw,
     this.contentType,
+    this.files,
     this.auth = Auth.token,
   }) : sql = null;
 
@@ -42,6 +44,7 @@ final class Step {
       form = null,
       raw = null,
       contentType = null,
+      files = null,
       auth = Auth.none;
 
   final String name;
@@ -51,6 +54,10 @@ final class Step {
   final Map<String, Object>? form;
   final String? raw;
   final String? contentType;
+
+  /// Sent as `multipart/form-data`, with [form] as its text fields: each
+  /// file is (field, file name, content type, content).
+  final List<(String, String, String, String)>? files;
   final Auth auth;
   final String? sql;
 }
@@ -750,6 +757,129 @@ UPDATE bookmarks_userprofile SET auto_tagging_rules = E'example.invalid auto\n.c
   ),
   const Step('profile shows sharing', _get, '/api/user/profile/'),
   const Step('HEAD a list', 'HEAD', '/api/bookmarks/'),
+
+  // Assets, on a bookmark with a known id.
+  const Step.sql('a bookmark for assets', r'''
+INSERT INTO bookmarks_bookmark (id, url, url_normalized, title, description,
+  notes, web_archive_snapshot_url, favicon_file, preview_image_file, unread,
+  is_archived, shared, date_added, date_modified, owner_id)
+SELECT 900, 'https://assets.example.invalid/', 'https://assets.example.invalid',
+  'Assets', '', '', '', '', '', false, false, false,
+  '2026-01-02T03:04:05Z', '2026-01-02T03:04:05Z', id
+FROM auth_user WHERE username = 'admin'
+'''),
+  const Step('no assets yet', _get, '/api/bookmarks/900/assets/'),
+  Step(
+    'upload a text file',
+    _post,
+    '/api/bookmarks/900/assets/upload/',
+    files: [('file', 'notes.txt', 'text/plain', 'hello asset\n' * 40)],
+  ),
+  const Step(
+    'upload a gzip file as it is',
+    _post,
+    '/api/bookmarks/900/assets/upload/',
+    files: [('file', 'dir/archive.tar.gz', 'application/gzip', 'not really')],
+  ),
+  const Step(
+    'upload a name without extension',
+    _post,
+    '/api/bookmarks/900/assets/upload/',
+    files: [('file', 'README', 'text/markdown', '# Readme')],
+  ),
+  const Step(
+    'upload with no file',
+    _post,
+    '/api/bookmarks/900/assets/upload/',
+    json: {'file': 'x'},
+  ),
+  const Step(
+    'upload with a form but no file',
+    _post,
+    '/api/bookmarks/900/assets/upload/',
+    form: {'file': 'x'},
+  ),
+  const Step(
+    'upload to a missing bookmark',
+    _post,
+    '/api/bookmarks/999999/assets/upload/',
+    files: [('file', 'a.txt', 'text/plain', 'a')],
+  ),
+  const Step('upload by GET', _get, '/api/bookmarks/900/assets/upload/'),
+  const Step('list assets', _get, '/api/bookmarks/900/assets/'),
+  const Step(
+    'list assets paged',
+    _get,
+    '/api/bookmarks/900/assets/?limit=1&offset=1',
+  ),
+  const Step(
+    'list assets of a missing bookmark',
+    _get,
+    '/api/bookmarks/999999/assets/',
+  ),
+  const Step('list without slash', _get, '/api/bookmarks/900/assets'),
+  const Step('one asset', _get, '/api/bookmarks/900/assets/1/'),
+  const Step('a missing asset', _get, '/api/bookmarks/900/assets/99/'),
+  const Step('a malformed asset id', _get, '/api/bookmarks/900/assets/abc/'),
+  const Step(
+    'an asset of another bookmark',
+    _get,
+    '/api/bookmarks/1/assets/1/',
+  ),
+  const Step('download', _get, '/api/bookmarks/900/assets/1/download/'),
+  const Step(
+    'download a gzip upload',
+    _get,
+    '/api/bookmarks/900/assets/2/download/',
+  ),
+  const Step(
+    'download unauthenticated',
+    _get,
+    '/api/bookmarks/900/assets/1/download/',
+    auth: Auth.none,
+  ),
+  const Step('PUT an asset', _put, '/api/bookmarks/900/assets/1/', json: {}),
+  const Step(
+    'singlefile without a file',
+    _post,
+    '/api/bookmarks/singlefile/',
+    form: {'url': 'https://assets.example.invalid/'},
+  ),
+  const Step(
+    'singlefile as JSON',
+    _post,
+    '/api/bookmarks/singlefile/',
+    json: {'url': 'https://assets.example.invalid/'},
+  ),
+  const Step(
+    'singlefile for a saved URL',
+    _post,
+    '/api/bookmarks/singlefile/',
+    form: {'url': 'https://assets.example.invalid'},
+    files: [
+      (
+        'file',
+        'page.html',
+        'text/html',
+        '<html><head><title>Snap</title></head><body><p>Saved page</p></body></html>',
+      ),
+    ],
+  ),
+  const Step(
+    'singlefile for a new URL',
+    _post,
+    '/api/bookmarks/singlefile/',
+    form: {'url': '$_pages/page.html'},
+    files: [
+      ('file', 'page.html', 'text/html', '<html><body>Other</body></html>'),
+    ],
+  ),
+  const Step('singlefile by GET', _get, '/api/bookmarks/singlefile/'),
+  const Step('assets after a snapshot', _get, '/api/bookmarks/900/assets/'),
+  const Step('the new bookmark', _get, '/api/bookmarks/?q=Saved+OR+page.html'),
+  const Step('delete an asset', _delete, '/api/bookmarks/900/assets/3/'),
+  const Step('delete it again', _delete, '/api/bookmarks/900/assets/3/'),
+  const Step('assets after deleting', _get, '/api/bookmarks/900/assets/'),
   const Step('final state', _get, '/api/bookmarks/?limit=100'),
 ];
 
@@ -768,7 +898,8 @@ Future<void> main(List<String> args) async {
   var failures = 0;
   for (var i = 0; i < steps.length; i++) {
     final a = const JsonEncoder.withIndent('  ').convert(left[i]);
-    final b = const JsonEncoder.withIndent('  ').convert(right[i]);
+    final b = const JsonEncoder.withIndent('  ')
+        .convert(_sameSizes(left[i], right[i]));
     if (a == b) continue;
     failures++;
     stdout
@@ -812,6 +943,31 @@ Future<List<Object?>> _run(String base, String token, String database) async {
       case Auth.none:
         break;
     }
+    if (step.files case final files?) {
+      final multipart =
+          http.MultipartRequest(step.method, Uri.parse('$base${step.path}'))
+            ..followRedirects = false
+            ..headers.addAll(request.headers)
+            ..fields.addAll({
+              for (final e in (step.form ?? const {}).entries)
+                e.key: '${e.value}',
+            });
+      for (final (field, name, type, content) in files) {
+        multipart.files.add(
+          http.MultipartFile.fromString(
+            field,
+            content,
+            filename: name,
+            contentType: MediaType.parse(type),
+          ),
+        );
+      }
+      final response = await http.Response.fromStream(
+        await client.send(multipart),
+      );
+      results.add(_normalize(base, response));
+      continue;
+    }
     if (step.json != null) {
       request.headers['content-type'] = 'application/json';
       request.body = jsonEncode(step.json);
@@ -837,6 +993,9 @@ Map<String, Object?> _normalize(String base, http.Response response) {
   Object? body;
   if (type == 'application/json' && response.body.isNotEmpty) {
     body = _clean(jsonDecode(response.body), base);
+  } else if (response.statusCode == 200 && response.body.isNotEmpty) {
+    // A downloaded file: its content counts.
+    body = response.body;
   } else if (response.body.isNotEmpty) {
     body = '<$type>';
   }
@@ -847,6 +1006,7 @@ Map<String, Object?> _normalize(String base, http.Response response) {
     if (location != null) 'location': location.replaceAll(base, '<base>'),
     'allow': ?response.headers['allow'],
     'www-authenticate': ?response.headers['www-authenticate'],
+    'content-disposition': ?response.headers['content-disposition'],
     'body': ?body,
   };
 }
@@ -883,6 +1043,30 @@ Object? _clean(Object? value, String base, [String? key]) {
     return value.replaceAll(base, '<base>');
   }
   return value;
+}
+
+/// [right] with each `file_size` taken from [left] when the two are within
+/// two bytes: a gzipped asset's size depends on the zlib build (the Dart SDK
+/// bundles Chromium's), not on what was stored.
+Object? _sameSizes(Object? left, Object? right) {
+  if (left is Map && right is Map) {
+    return {
+      for (final MapEntry(:key, :value) in right.entries)
+        key:
+            key == 'file_size' &&
+                value is int &&
+                left[key] is int &&
+                (value - (left[key] as int)).abs() <= 2
+            ? left[key]
+            : _sameSizes(left[key], value),
+    };
+  }
+  if (left is List && right is List && left.length == right.length) {
+    return [
+      for (var i = 0; i < right.length; i++) _sameSizes(left[i], right[i]),
+    ];
+  }
+  return right;
 }
 
 String _today() {

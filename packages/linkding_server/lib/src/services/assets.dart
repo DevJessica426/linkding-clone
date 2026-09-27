@@ -3,12 +3,14 @@ import 'dart:typed_data';
 
 import 'package:dust_dart/db.dart';
 
+import '../compat/gzip.dart';
 import '../db/assets_repo.dart';
 import '../db/rows.dart';
 import 'errors.dart';
 
 /// linkding's `services/assets.py`: files attached to bookmarks, kept in
-/// the asset folder and gzipped unless they already are.
+/// the asset folder and gzipped (as Python writes gzip files) unless they
+/// already are.
 final class AssetService {
   AssetService(this.db, this.folder);
 
@@ -38,7 +40,7 @@ final class AssetService {
     final file = File('$folder/$filename');
     await file.parent.create(recursive: true);
     await file.writeAsBytes(
-      gzipped ? GZipCodec(level: 9).encode(bytes) : bytes,
+      gzipped ? pythonGzip(bytes, path: file.path, now: now) : bytes,
     );
     final asset = (await AssetsRepo(db).insert(
       now,
@@ -55,12 +57,47 @@ final class AssetService {
     return asset;
   }
 
+  /// `upload_snapshot`: an HTML page saved elsewhere (the browser
+  /// extension's single-file snapshot) becomes the bookmark's latest
+  /// snapshot.
+  Future<AssetRow> uploadSnapshot(BookmarkRow bookmark, Uint8List html) async {
+    final now = DateTime.now().toUtc();
+    final filename = assetFilename('snapshot', now, bookmark.url, 'html.gz');
+    final file = File('$folder/$filename');
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(pythonGzip(html, path: file.path, now: now));
+    String two(int n) => n.toString().padLeft(2, '0');
+    final asset = (await AssetsRepo(db).insert(
+      now,
+      filename,
+      await file.length(),
+      'snapshot',
+      'text/html',
+      'HTML snapshot from ${two(now.month)}/${two(now.day)}/${now.year}',
+      'complete',
+      true,
+      bookmark.id,
+    )).orThrow;
+    (await AssetsRepo(
+      db,
+    ).setLatestSnapshot(bookmark.id, asset.id, now)).orThrow;
+    return asset;
+  }
+
   /// `remove_asset`, and the file with it.
   Future<void> remove(AssetRow asset) async {
     (await AssetsRepo(db).delete(asset.id, DateTime.now().toUtc())).orThrow;
     if (asset.file.isEmpty) return;
     final file = File('$folder/${asset.file}');
     if (await file.exists()) await file.delete();
+  }
+
+  /// `download_name`: snapshots get an extension, uploads keep their name.
+  static String downloadName(AssetRow asset) {
+    if (asset.assetType != 'snapshot') return asset.displayName;
+    return asset.contentType == 'application/pdf'
+        ? '${asset.displayName}.pdf'
+        : '${asset.displayName}.html';
   }
 
   /// The asset's content, unzipped; null when the file is gone.
