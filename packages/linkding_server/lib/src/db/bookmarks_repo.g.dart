@@ -81,6 +81,21 @@ SELECT EXISTS (
   }
 
   @override
+  Future<Result<bool, SqlxError>> duplicate(int ownerId, String normalizedUrl, String url, int id) {
+    return _db.fetchScalar<bool>(
+      r'''
+SELECT EXISTS (
+  SELECT 1 FROM bookmarks_bookmark
+  WHERE owner_id = $1
+    AND (url_normalized = $2 OR (url_normalized = '' AND url = $3))
+    AND id <> $4
+) AS duplicate
+''',
+      [ownerId, normalizedUrl, url, id],
+    );
+  }
+
+  @override
   Future<Result<BookmarkRow, SqlxError>> insert(String url, String urlNormalized, String title, String description, String notes, bool unread, bool isArchived, bool shared, DateTime dateAdded, DateTime dateModified, int ownerId) {
     return _db.fetchOne<BookmarkRow>(
       r'''

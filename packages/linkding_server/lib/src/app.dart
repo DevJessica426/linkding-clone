@@ -12,6 +12,7 @@ import 'services/bookmarks.dart';
 import 'services/website_loader.dart';
 import 'web/asset_views.dart';
 import 'web/auth_views.dart';
+import 'web/bookmark_form.dart';
 import 'web/bookmark_views.dart';
 import 'web/context.dart';
 
@@ -50,6 +51,7 @@ Router buildApp({
   final auth = AuthViews(web);
   final lists = BookmarkViews(web);
   final files = AssetViews(web);
+  final forms = BookmarkFormViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -63,6 +65,9 @@ Router buildApp({
     ..route('/bookmarks/archived/action', any(lists.archivedAction))
     ..route('/bookmarks/shared', any(lists.shared))
     ..route('/bookmarks/shared/action', any(lists.sharedAction))
+    ..route('/bookmarks/new', any(forms.create))
+    ..route('/bookmarks/close', any(forms.close))
+    ..route('/bookmarks/{id|[0-9]+}/edit', any(forms.edit))
     ..route('/assets/{id|[0-9]+}', any(files.view))
     ..route('/assets/{id|[0-9]+}/read', any(files.read))
     ..mount('/static', staticFiles('${config.webRoot}/static'))

@@ -159,6 +159,20 @@
       "driver": "postgres",
       "migrations": "./migrations",
       "schema_hash": "9bc2e0a1b66c0373",
+      "sql_hash": "66120a351ec406c2",
+      "sql": "\nSELECT EXISTS (\n  SELECT 1 FROM bookmarks_bookmark\n  WHERE owner_id = $1\n    AND (url_normalized = $2 OR (url_normalized = '' AND url = $3))\n    AND id <> $4\n) AS duplicate\n",
+      "user_parameter_count": 4,
+      "expanded_parameter_count": 4,
+      "fetch_mode": "one",
+      "row_type": null,
+      "columns": [
+        "duplicate"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "9bc2e0a1b66c0373",
       "sql_hash": "75d96b1c47dfdc41",
       "sql": "\nSELECT id, date_created, file, file_size, asset_type, content_type,\n       display_name, status, gzip, bookmark_id\nFROM bookmarks_bookmarkasset WHERE bookmark_id = $1\nORDER BY id\n",
       "user_parameter_count": 1,

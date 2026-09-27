@@ -68,6 +68,32 @@ POST /bookmarks/action?details=900 remove_asset=2
 POST /bookmarks/action?details=900 remove_asset=999
 GET /bookmarks?details=900
 
+# --- New and edit forms ---
+GET /bookmarks/new
+GET /bookmarks/new?url=https%3A%2F%2Fprefill.example.org%2F&title=T%26T&description=D&notes=N&tags=a+b&auto_close
+GET /bookmarks/new?url=&title=
+GET /bookmarks/1005/edit
+GET /bookmarks/1010/edit?return_url=/bookmarks%3Fq%3Dfiller%26page%3D2
+GET /bookmarks/1010/edit?return_url=https://evil.example/
+GET /bookmarks/999999/edit
+GET /bookmarks/1101/edit
+GET /bookmarks/close
+ANON /bookmarks/new?url=x
+ANON /bookmarks/close
+POST /bookmarks/new url=&tag_string=
+POST /bookmarks/new url=not+a+url&title=kept&tag_string=a+b&notes=some+notes&unread=on
+POST /bookmarks/new url=https%3A%2F%2Fnew.example.org%2Fa&title=%20%20Spaced%20%20&tag_string=one+two&notes=&unread=on&auto_close=False
+POST /bookmarks/new url=https%3A%2F%2Fpopup.example.org%2F&tag_string=&auto_close=True
+POST /bookmarks/new url=https%3A%2F%2Fsite3.example.org%2Fpath%3Fq%3D3&title=Merged&tag_string=merged&shared=on
+POST /bookmarks/new url=https%3A%2F%2Flong.example.org%2F&title=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&tag_string=
+POST /bookmarks/1005/edit?return_url=/bookmarks%3Fq%3Dfiller url=https%3A%2F%2Fsite3.example.org%2Fpath%3Fq%3D3&title=dup&tag_string=
+POST /bookmarks/1005/edit?return_url=/bookmarks%3Fq%3Dfiller url=https%3A%2F%2Fedited.example.org%2F&title=Edited&description=desc&notes=%23+Heading%0Atext&tag_string=python+edited&unread=on
+POST /bookmarks/1005/edit?return_url=http://evil.example/ url=https%3A%2F%2Fedited.example.org%2F&title=Again&tag_string=
+GET /bookmarks?q=edited
+GET /bookmarks?details=1005
+POST /bookmarks/1010/edit url=https%3A%2F%2Fsite10.example.org%2Fpath%3Fq%3D10&tag_string=kept
+GET /bookmarks?details=1010
+
 # --- Visitors ---
 ANON /bookmarks/shared
 ANON /bookmarks/shared?user=Zed

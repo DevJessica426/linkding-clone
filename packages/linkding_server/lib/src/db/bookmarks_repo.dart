@@ -64,6 +64,23 @@ SELECT EXISTS (
 ''')
   Future<Result<bool, SqlxError>> urlTaken(int ownerId, String url, int id);
 
+  /// Whether another of the owner's bookmarks is saved for this URL, compared
+  /// as [existing] compares: editing a bookmark into a duplicate is refused.
+  @Query(r'''
+SELECT EXISTS (
+  SELECT 1 FROM bookmarks_bookmark
+  WHERE owner_id = $1
+    AND (url_normalized = $2 OR (url_normalized = '' AND url = $3))
+    AND id <> $4
+) AS duplicate
+''')
+  Future<Result<bool, SqlxError>> duplicate(
+    int ownerId,
+    String normalizedUrl,
+    String url,
+    int id,
+  );
+
   @Query(r'''
 INSERT INTO bookmarks_bookmark (
   url, url_normalized, title, description, notes, website_title,

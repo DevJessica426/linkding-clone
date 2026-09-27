@@ -34,3 +34,115 @@ String selectField(
 String radioInput(String name, int index, String value, bool checked) =>
     '<input type="radio" name="$name" value="${e(value)}" '
     'id="id_${name}_$index" required${checked ? ' checked' : ''}>';
+
+/// A field's attributes as linkding's `formfield` tag and Django's
+/// `BoundField.as_widget` build them: the widget's own, then help and error
+/// references, `aria-invalid`, the tag's extra attributes, `required` and
+/// the id. A value of `true` is an attribute without a value.
+Map<String, Object> fieldAttributes(
+  String name, {
+  Map<String, Object> widget = const {},
+  bool required = false,
+  bool hasHelp = false,
+  List<String> errors = const [],
+  Map<String, Object> extra = const {},
+}) {
+  final attrs = <String, Object>{...widget};
+  void append(String key, String value) =>
+      attrs[key] = attrs[key] == null ? value : '${attrs[key]} $value';
+  if (hasHelp) append('aria-describedby', 'id_${name}_help');
+  if (errors.isNotEmpty) {
+    append('class', 'is-error');
+    append('aria-describedby', 'id_${name}_error');
+  }
+  if (required && errors.isEmpty) append('aria-invalid', 'false');
+  extra.forEach(
+    (key, value) =>
+        key == 'class' ? append(key, value as String) : attrs[key] = value,
+  );
+  if (required) attrs['required'] = true;
+  if (errors.isNotEmpty) attrs['aria-invalid'] = 'true';
+  attrs['id'] = 'id_$name';
+  return attrs;
+}
+
+String _attributes(Map<String, Object> attrs) => [
+  for (final MapEntry(:key, :value) in attrs.entries)
+    value == true ? ' $key' : ' $key="${e(value)}"',
+].join();
+
+/// `TextInput` and friends: no `value` attribute for an empty value.
+String inputField(
+  String type,
+  String name,
+  String? value,
+  Map<String, Object> attrs,
+) =>
+    '<input type="$type" name="$name"'
+    '${value == null || value.isEmpty ? '' : ' value="${e(value)}"'}'
+    '${_attributes(attrs)}>';
+
+/// `Textarea`: its content starts on a new line, as Django writes it.
+String textareaField(String name, String? value, Map<String, Object> attrs) =>
+    '<textarea name="$name"${_attributes(attrs)}>\n${e(value ?? '')}</textarea>';
+
+/// linkding's `FormCheckbox`, with its label beside the box.
+String checkboxField(
+  String name,
+  bool checked,
+  String label,
+  Map<String, Object> attrs,
+) =>
+    '<div class="form-checkbox"><input type="checkbox" name="$name"'
+    '${_attributes(attrs)}${checked ? ' checked' : ''}>'
+    '<i class="form-icon"></i><label for="id_$name">${e(label)}</label></div>';
+
+/// `{{ form.field.errors }}` through linkding's `shared/error_list.html`.
+String errorList(String name, List<String> errors) => errors.isEmpty
+    ? ''
+    : '<ul class="errorlist form-input-hint is-error" id="id_${name}_error">'
+          '${errors.map((m) => '<li>${e(m)}</li>').join()}</ul>';
+
+/// Non-field errors: the same list without an id.
+String formErrors(List<String> errors) => errors.isEmpty
+    ? ''
+    : '<ul class="errorlist nonfield form-input-hint is-error">'
+          '${errors.map((m) => '<li>${e(m)}</li>').join()}</ul>';
+
+/// `{% formhelp %}`.
+String fieldHelp(String name, String html) =>
+    '<div id="id_${name}_help" class="form-input-hint">$html</div>';
+
+/// `{% formlabel %}`.
+String fieldLabel(String name, String text) =>
+    '<label for="id_$name" class="form-label">$text</label>';
+
+/// Django's `CharField` cleaning: surrounding whitespace dropped, null
+/// characters and over-long values refused.
+({String value, List<String> errors}) cleanChar(
+  String? raw, {
+  bool required = false,
+  int? maxLength,
+}) {
+  final value = (raw ?? '').trim();
+  if (value.contains('\x00')) {
+    return (value: value, errors: const ['Null characters are not allowed.']);
+  }
+  if (value.isEmpty) {
+    return (
+      value: '',
+      errors: required ? const ['This field is required.'] : const [],
+    );
+  }
+  final length = value.runes.length;
+  if (maxLength != null && length > maxLength) {
+    return (
+      value: value,
+      errors: [
+        'Ensure this value has at most $maxLength '
+            'character${maxLength == 1 ? '' : 's'} (it has $length).',
+      ],
+    );
+  }
+  return (value: value, errors: const []);
+}
