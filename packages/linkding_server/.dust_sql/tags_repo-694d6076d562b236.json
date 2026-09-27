@@ -4,7 +4,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "1fd24b18880640a5",
       "sql": "\nSELECT DISTINCT t.id, t.name, t.date_added, t.owner_id\nFROM bookmarks_tag t\nJOIN bookmarks_bookmark_tags bt ON bt.tag_id = t.id\nJOIN bookmarks_bookmark b ON b.id = bt.bookmark_id\nJOIN bookmarks_userprofile p ON p.user_id = b.owner_id\nWHERE b.shared AND p.enable_sharing\n  AND (NOT $2::boolean OR p.enable_public_sharing)\n  AND ($1::integer IS NULL OR b.owner_id = $1)\n  AND UPPER(t.name::text) IN (SELECT UPPER(n) FROM unnest($3::text[]) AS n)\nORDER BY t.id\n",
       "user_parameter_count": 3,
@@ -21,7 +21,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "285b9a16594c9175",
       "sql": "\nINSERT INTO bookmarks_tag (name, date_added, owner_id) VALUES ($1, $2, $3)\nRETURNING id, name, date_added, owner_id\n",
       "user_parameter_count": 3,
@@ -38,7 +38,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "4b91ba8fc7b0d7bf",
       "sql": "\nSELECT id, name, date_added, owner_id FROM bookmarks_tag\nWHERE owner_id = $1\n  AND UPPER(name::text) IN (SELECT UPPER(n) FROM unnest($2::text[]) AS n)\nORDER BY id\n",
       "user_parameter_count": 2,
@@ -55,7 +55,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "4c1144e0d860ee89",
       "sql": "\nSELECT id, name, date_added, owner_id FROM bookmarks_tag\nWHERE owner_id = $1 AND UPPER(name::text) = UPPER($2)\nORDER BY id\nLIMIT 1\n",
       "user_parameter_count": 2,
@@ -72,7 +72,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "5821ff253513c59b",
       "sql": "SELECT count(*)::integer FROM bookmarks_tag WHERE owner_id = $1",
       "user_parameter_count": 1,
@@ -86,7 +86,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "5f1c1cf42c6f65a4",
       "sql": "\nSELECT id, name, date_added, owner_id FROM bookmarks_tag\nWHERE id = $1 AND owner_id = $2\n",
       "user_parameter_count": 2,
@@ -103,7 +103,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "6b48cbd002a22e10",
       "sql": "\nSELECT id, name, date_added, bookmark_count FROM (\n  SELECT t.id, t.name, t.date_added,\n         (SELECT count(*)::integer FROM bookmarks_bookmark_tags bt\n          WHERE bt.tag_id = t.id) AS bookmark_count\n  FROM bookmarks_tag t\n  WHERE t.owner_id = $1\n) t\nWHERE ($2 = '' OR UPPER(t.name::text) LIKE UPPER($2))\n  AND (NOT $3::boolean OR t.bookmark_count = 0)\nORDER BY\n  CASE WHEN $4::text = 'name-desc' THEN t.name END DESC,\n  CASE WHEN $4 = 'count-asc' THEN t.bookmark_count END ASC,\n  CASE WHEN $4 = 'count-desc' THEN t.bookmark_count END DESC,\n  t.name\n",
       "user_parameter_count": 4,
@@ -120,7 +120,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "873840e195a829e0",
       "sql": "\nWITH gone AS (\n  DELETE FROM bookmarks_tag WHERE id = $1 AND owner_id = $2 RETURNING id\n)\nDELETE FROM bookmarks_bookmark_tags WHERE tag_id IN (SELECT id FROM gone)\n",
       "user_parameter_count": 2,
@@ -132,7 +132,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "880e3f06bd81f53a",
       "sql": "\nSELECT id, name, date_added, owner_id FROM bookmarks_tag\nWHERE owner_id = $1\nORDER BY id\nLIMIT $2 OFFSET $3\n",
       "user_parameter_count": 3,
@@ -149,7 +149,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "96a5a7991c619455",
       "sql": "\nSELECT id, name, date_added, owner_id FROM bookmarks_tag\nWHERE owner_id = $1 ORDER BY id\n",
       "user_parameter_count": 1,
@@ -166,7 +166,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "c5c119f50501ef2a",
       "sql": "UPDATE bookmarks_tag SET name = $3 WHERE id = $1 AND owner_id = $2",
       "user_parameter_count": 3,
@@ -178,7 +178,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "f1c6a147136cd8e1",
       "sql": "\nWITH moved AS (\n  INSERT INTO bookmarks_bookmark_tags (bookmark_id, tag_id)\n  SELECT DISTINCT bt.bookmark_id, $2::integer FROM bookmarks_bookmark_tags bt\n  WHERE bt.tag_id = ANY($3)\n  ON CONFLICT (bookmark_id, tag_id) DO NOTHING\n), unlinked AS (\n  DELETE FROM bookmarks_bookmark_tags WHERE tag_id = ANY($3)\n)\nDELETE FROM bookmarks_tag WHERE owner_id = $1 AND id = ANY($3)\n",
       "user_parameter_count": 3,

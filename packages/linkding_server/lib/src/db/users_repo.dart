@@ -71,6 +71,11 @@ RETURNING id, password, last_login, is_superuser, username, first_name,
   )
   Future<Result<List<UserNameRow>, SqlxError>> activeUsers();
 
+  /// Every user, for choosing the guest profile, in table order as Django
+  /// lists a query without an ordering.
+  @Query(r'SELECT id, username FROM auth_user')
+  Future<Result<List<UserNameRow>, SqlxError>> allUsers();
+
   @Query(r'SELECT id, username FROM auth_user WHERE id = ANY($1) ORDER BY id')
   Future<Result<List<UserNameRow>, SqlxError>> names(List<int> ids);
 

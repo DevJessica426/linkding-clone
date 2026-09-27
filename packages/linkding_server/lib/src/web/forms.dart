@@ -38,11 +38,14 @@ String radioInput(String name, int index, String value, bool checked) =>
 /// A field's attributes as linkding's `formfield` tag and Django's
 /// `BoundField.as_widget` build them: the widget's own, then help and error
 /// references, `aria-invalid`, the tag's extra attributes, `required` and
-/// the id. A value of `true` is an attribute without a value.
+/// the id. A value of `true` is an attribute without a value. A select
+/// whose first option has a value gets no `required` attribute
+/// ([requiredAttribute] false), as Django leaves it off.
 Map<String, Object> fieldAttributes(
   String name, {
   Map<String, Object> widget = const {},
   bool required = false,
+  bool requiredAttribute = true,
   bool hasHelp = false,
   List<String> errors = const [],
   Map<String, Object> extra = const {},
@@ -60,7 +63,7 @@ Map<String, Object> fieldAttributes(
     (key, value) =>
         key == 'class' ? append(key, value as String) : attrs[key] = value,
   );
-  if (required) attrs['required'] = true;
+  if (required && requiredAttribute) attrs['required'] = true;
   if (errors.isNotEmpty) attrs['aria-invalid'] = 'true';
   attrs['id'] = 'id_$name';
   return attrs;
@@ -97,10 +100,13 @@ String checkboxField(
     '${_attributes(attrs)}${checked ? ' checked' : ''}>'
     '<i class="form-icon"></i><label for="id_$name">${e(label)}</label></div>';
 
-/// `{{ form.field.errors }}` through linkding's `shared/error_list.html`.
-String errorList(String name, List<String> errors) => errors.isEmpty
+/// `{{ form.field.errors }}` through linkding's `shared/error_list.html`,
+/// or Django's own list for a form without linkding's error class.
+String errorList(String name, List<String> errors, {bool styled = true}) =>
+    errors.isEmpty
     ? ''
-    : '<ul class="errorlist form-input-hint is-error" id="id_${name}_error">'
+    : '<ul class="errorlist${styled ? ' form-input-hint is-error' : ''}" '
+          'id="id_${name}_error">'
           '${errors.map((m) => '<li>${e(m)}</li>').join()}</ul>';
 
 /// Non-field errors: the same list without an id.
@@ -146,3 +152,11 @@ String fieldLabel(String name, String text) =>
   }
   return (value: value, errors: const []);
 }
+
+/// Django's `CheckboxInput.value_from_datadict`: missing is unticked,
+/// `true` and `false` (any case) are themselves, and any other non-empty
+/// value, `0` included, is ticked.
+bool checkboxValue(String? raw) => switch (raw?.toLowerCase()) {
+  null || '' || 'false' => false,
+  _ => true,
+};

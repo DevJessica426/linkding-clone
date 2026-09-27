@@ -16,6 +16,7 @@ import 'web/bookmark_form.dart';
 import 'web/bookmark_views.dart';
 import 'web/bundle_views.dart';
 import 'web/context.dart';
+import 'web/settings_views.dart';
 import 'web/tag_views.dart';
 
 /// The whole application: the REST API under `/api`, the health check, and
@@ -56,6 +57,7 @@ Router buildApp({
   final forms = BookmarkFormViews(web);
   final tags = TagViews(web);
   final bundles = BundleViews(web);
+  final settings = SettingsViews(web);
 
   return Router(onError: onError ?? _reportToStderr)
     ..route('/', any(auth.root))
@@ -81,6 +83,18 @@ Router buildApp({
     ..route('/bundles/new', any(bundles.create))
     ..route('/bundles/{id|[0-9]+}/edit', any(bundles.edit))
     ..route('/bundles/preview', any(bundles.preview))
+    ..route('/settings', any(settings.general))
+    ..route('/settings/general', any(settings.general))
+    ..route('/settings/update', any(settings.update))
+    ..route('/settings/integrations', any(settings.integrations))
+    ..route(
+      '/settings/integrations/create-api-token',
+      any(settings.createApiToken),
+    )
+    ..route(
+      '/settings/integrations/delete-api-token',
+      any(settings.deleteApiToken),
+    )
     ..route('/assets/{id|[0-9]+}', any(files.view))
     ..route('/assets/{id|[0-9]+}/read', any(files.read))
     ..mount('/static', staticFiles('${config.webRoot}/static'))

@@ -343,16 +343,15 @@ final class _Form {
          'tag_string': tagString,
        };
 
-  /// A submitted form shows what was sent. A checkbox counts as ticked
-  /// unless its value is missing, empty, `false` or `0`. A field that was
+  /// A submitted form shows what was sent. A field that was
   /// not sent at all saves as empty: none of these fields has a default
   /// that Django's `construct_instance` would keep instead.
   _Form.bound(FormData data)
     : rawUrl = data['url'],
       isBound = true,
       autoClose = data['auto_close'],
-      unread = _checked(data['unread']),
-      shared = _checked(data['shared']),
+      unread = checkboxValue(data['unread']),
+      shared = checkboxValue(data['shared']),
       hasNotes = false,
       raw = {
         'title': data['title'],
@@ -360,11 +359,6 @@ final class _Form {
         'notes': data['notes'],
         'tag_string': data['tag_string'],
       };
-
-  static bool _checked(String? value) =>
-      value != null &&
-      value.isNotEmpty &&
-      !const {'false', '0'}.contains(value.toLowerCase());
 
   final bool isBound;
   final String? rawUrl;

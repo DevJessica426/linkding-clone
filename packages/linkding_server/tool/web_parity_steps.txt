@@ -239,3 +239,26 @@ POST /bundles/action remove_bundle=1000
 POST /bundles/action remove_bundle=99999
 GET /bundles/action
 GET /bookmarks
+
+# --- Settings ---
+GET /settings
+GET /settings/general
+GET /settings/integrations
+GET /settings/integrations/create-api-token
+POST /settings/integrations/create-api-token name=%20%20
+GET /settings/integrations
+GET /settings/integrations
+POST /settings/integrations/create-api-token name=Mobile+%3Capp%3E
+POST /settings/integrations/delete-api-token token_id=99999
+GET /settings/update
+POST /settings/update update_profile=&theme=bogus&bookmark_date_display=&bookmark_description_display=separate&bookmark_description_max_lines=abc&bookmark_link_target=_self&web_archive_integration=disabled&tag_search=strict&tag_grouping=alphabetical&items_per_page=5&custom_css=body{}&auto_tagging_rules=x.com+x&display_url=on
+POST /settings/update update_profile=&theme=dark&bookmark_date_display=absolute&bookmark_description_display=separate&bookmark_description_max_lines=2.0&bookmark_link_target=_self&web_archive_integration=disabled&tag_search=lax&tag_grouping=disabled&items_per_page=12&custom_css=%20body+%7B+color%3A+red+%7D%20&auto_tagging_rules=&display_url=on&enable_sharing=on&display_view_bookmark_action=on&display_remove_bookmark_action=0&sticky_pagination=true&hide_bundles=false
+GET /settings/general
+GET /bookmarks
+POST /settings/update update_global_settings=&landing_page=shared_bookmarks&guest_profile_user=1000&enable_link_prefetch=on
+POST /settings/update update_global_settings=&landing_page=nope&guest_profile_user=
+POST /settings/update refresh_favicons=&create_missing_html_snapshots=
+ANON /bookmarks/shared
+ANON /
+POST /settings/update update_global_settings=&landing_page=login&guest_profile_user=&enable_link_prefetch=
+ANON /settings

@@ -56,6 +56,24 @@ final class Web {
     return (await SettingsRepo(database.connection).takeMessages(key)).orThrow;
   }
 
+  /// Keeps [value] in the visitor's session for a later request.
+  Future<void> setSessionValue(PageContext c, String name, String value) async {
+    final key = requestCookies(c.request)[sessionCookie];
+    if (key == null || !c.isAuthenticated) return;
+    (await SettingsRepo(
+      database.connection,
+    ).setSessionValue(key, name, value)).orThrow;
+  }
+
+  /// A value kept in the visitor's session, removed as it is read.
+  Future<String?> popSessionValue(PageContext c, String name) async {
+    final key = requestCookies(c.request)[sessionCookie];
+    if (key == null || !c.isAuthenticated) return null;
+    return (await SettingsRepo(
+      database.connection,
+    ).popSessionValue(key, name)).orThrow;
+  }
+
   /// Everything a page needs to know about who is asking.
   Future<PageContext> context(Request request) async {
     final user = await sessions.user(request);
@@ -105,6 +123,16 @@ final class PageContext {
   late final String _maskedCsrf = maskCsrf(_csrf.token);
 
   bool get isAuthenticated => user != null;
+
+  /// This request drawn with [profile] instead of the saved one.
+  PageContext withProfile(Profile profile) => PageContext(
+    request: request,
+    user: user,
+    profile: profile,
+    settings: settings,
+    toasts: toasts,
+    csrf: _csrf,
+  );
 
   /// The hidden form field Django's `{% csrf_token %}` renders.
   String get csrfInput =>
@@ -226,6 +254,15 @@ String turboReplace(String target, String content, {String method = ''}) =>
 /// linkding's `turbo.stream`: several stream elements in one response.
 Response turboStream(PageContext c, List<String> streams) =>
     c.html(streams.join('\n'), headers: {'content-type': turboStreamType});
+
+/// Django's page for a request that is not allowed: `PermissionDenied`.
+Response forbiddenPage() => Response(
+  403,
+  body:
+      '\n<!doctype html>\n<html lang="en">\n<head>\n  <title>403 Forbidden</title>\n'
+      '</head>\n<body>\n  <h1>403 Forbidden</h1><p></p>\n</body>\n</html>\n',
+  headers: {'content-type': 'text/html; charset=utf-8'},
+);
 
 /// Django's `redirect_to_login`: `/login/?next=<path>`.
 Response redirectToLogin(PageContext c) =>

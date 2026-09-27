@@ -4,7 +4,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "19df0aa79e6badc1",
       "sql": "\nUPDATE bookmarks_globalsettings SET landing_page = $2,\n  guest_profile_user_id = $3, enable_link_prefetch = $4\nWHERE id = $1\n",
       "user_parameter_count": 4,
@@ -16,7 +16,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "31f83770e7e57aa8",
       "sql": "\nWITH taken AS (\n  DELETE FROM clone_message WHERE session_key = $1\n  RETURNING id, level, message, extra_tags\n)\nSELECT level, message, extra_tags FROM taken ORDER BY id\n",
       "user_parameter_count": 1,
@@ -32,7 +32,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "4e02996a0e4ea2d5",
       "sql": "\nINSERT INTO bookmarks_globalsettings (landing_page, guest_profile_user_id,\n                                      enable_link_prefetch)\nSELECT 'login', NULL, false\nWHERE NOT EXISTS (SELECT 1 FROM bookmarks_globalsettings)\n",
       "user_parameter_count": 0,
@@ -44,7 +44,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "5004ed98ba35de13",
       "sql": "\nINSERT INTO bookmarks_toast (key, message, acknowledged, owner_id)\nVALUES ($1, $2, false, $3)\n",
       "user_parameter_count": 3,
@@ -56,7 +56,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "57941b831d9f02bc",
       "sql": "\nSELECT id, key, message, acknowledged, owner_id FROM bookmarks_toast\nWHERE owner_id = $1 AND NOT acknowledged ORDER BY id\n",
       "user_parameter_count": 1,
@@ -74,7 +74,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "5b99f8388b0f975f",
       "sql": "\nSELECT id, landing_page, guest_profile_user_id, enable_link_prefetch\nFROM bookmarks_globalsettings ORDER BY id LIMIT 1\n",
       "user_parameter_count": 0,
@@ -91,7 +91,7 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "70af90385a3543cd",
       "sql": "\nUPDATE bookmarks_toast SET acknowledged = true WHERE id = $1 AND owner_id = $2\n",
       "user_parameter_count": 2,
@@ -103,11 +103,37 @@
     {
       "driver": "postgres",
       "migrations": "./migrations",
-      "schema_hash": "6b3e88eae2c6ed25",
+      "schema_hash": "1a2d8679d52529ec",
+      "sql_hash": "7e8f362c7ee7cad5",
+      "sql": "\nDELETE FROM clone_session_value WHERE session_key = $1 AND name = $2\nRETURNING value\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "optional",
+      "row_type": null,
+      "columns": [
+        "value"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "1a2d8679d52529ec",
       "sql_hash": "9fc2703c1194b576",
       "sql": "\nINSERT INTO clone_message (session_key, level, message, extra_tags)\nVALUES ($1, $2, $3, $4)\n",
       "user_parameter_count": 4,
       "expanded_parameter_count": 4,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "1a2d8679d52529ec",
+      "sql_hash": "b19bf5f426bf9bca",
+      "sql": "\nINSERT INTO clone_session_value (session_key, name, value) VALUES ($1, $2, $3)\nON CONFLICT (session_key, name) DO UPDATE SET value = EXCLUDED.value\n",
+      "user_parameter_count": 3,
+      "expanded_parameter_count": 3,
       "fetch_mode": "execute",
       "row_type": null,
       "columns": []

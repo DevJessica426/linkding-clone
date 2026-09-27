@@ -78,4 +78,26 @@ WITH taken AS (
 SELECT level, message, extra_tags FROM taken ORDER BY id
 ''')
   Future<Result<List<MessageRow>, SqlxError>> takeMessages(String sessionKey);
+
+  // --- Session values ---
+
+  @Query(r'''
+INSERT INTO clone_session_value (session_key, name, value) VALUES ($1, $2, $3)
+ON CONFLICT (session_key, name) DO UPDATE SET value = EXCLUDED.value
+''')
+  Future<Result<Unit, SqlxError>> setSessionValue(
+    String sessionKey,
+    String name,
+    String value,
+  );
+
+  /// A session value, removed as it is read: `request.session.pop`.
+  @Query(r'''
+DELETE FROM clone_session_value WHERE session_key = $1 AND name = $2
+RETURNING value
+''')
+  Future<Result<String?, SqlxError>> popSessionValue(
+    String sessionKey,
+    String name,
+  );
 }

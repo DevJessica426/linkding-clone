@@ -97,6 +97,10 @@ EXPECTED = [
     (re.compile(r'<script src="/static/live-reload.js"></script>'), ""),
     (re.compile(r'<li class="menu-item">\s*<a href="/admin/"[^>]*>Admin</a>\s*</li>'), ""),
     (re.compile(r"web\.archive\.org/web/\d{14}/"), "web.archive.org/web/<time>/"),
+    # Feed and API token keys are random, and the bookmarklet names the host.
+    (re.compile(r"/feeds/[0-9a-f]{40}/"), "/feeds/<key>/"),
+    (re.compile(r'value="[0-9a-f]{40}"'), 'value="<key>"'),
+    (re.compile(r"http://localhost:909[01]/"), "<base>/"),
 ]
 
 

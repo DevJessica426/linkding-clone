@@ -123,4 +123,28 @@ SELECT level, message, extra_tags FROM taken ORDER BY id
       const $MessageRowRowDeserializer().deserialize,
     );
   }
+
+  @override
+  Future<Result<Unit, SqlxError>> setSessionValue(String sessionKey, String name, String value) {
+    return _db.execute(
+      r'''
+INSERT INTO clone_session_value (session_key, name, value) VALUES ($1, $2, $3)
+ON CONFLICT (session_key, name) DO UPDATE SET value = EXCLUDED.value
+''',
+      [sessionKey, name, value],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
+  }
+
+  @override
+  Future<Result<String?, SqlxError>> popSessionValue(String sessionKey, String name) {
+    return _db.fetchScalar<String?>(
+      r'''
+DELETE FROM clone_session_value WHERE session_key = $1 AND name = $2
+RETURNING value
+''',
+      [sessionKey, name],
+    );
+  }
 }
