@@ -1,0 +1,18 @@
+# Dart
+.dart_tool/
+build/
+*.js.deps
+*.js.map
+
+# Runtime data and logs from local runs
+/data/
+*.log
+/e2e/node_modules/
+/e2e/test-results/
+
+# Not ignored on purpose:
+#   pubspec.lock          the server is deployed, so the lock is part of the build
+#   **/*.g.dart           Dust output is committed so the code reads and builds
+#                         without the CLI; `dust check` keeps it honest
+#   .dust_sql/            Dust's query metadata, which lets `dust check --db
+#                         --offline` validate SQL without a database

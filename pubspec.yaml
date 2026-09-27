@@ -1,0 +1,16 @@
+name: linkding_workspace
+description: >-
+  A clone of linkding, the self-hosted bookmark manager, written end to end in
+  Dart with Dust.
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - packages/linkding_shared
+  - packages/linkding_server
+  - packages/linkding_web
+
+dev_dependencies:
+  lints: ^6.1.0

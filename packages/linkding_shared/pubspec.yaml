@@ -1,0 +1,19 @@
+name: linkding_shared
+description: >-
+  The linkding wire contract, shared by the server and the browser: Dust models
+  with generated JSON, a generated typed HTTP client, and the search query
+  language.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  dio: ^5.9.2
+  dust_dart: 0.2.0
+
+dev_dependencies:
+  test: ^1.26.0

@@ -1,0 +1,26 @@
+name: linkding_server
+description: >-
+  linkding's REST API and web interface on dust_server and PostgreSQL, using
+  linkding's own database schema.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.6
+  dust_dart: 0.2.0
+  dust_db_postgres: 0.2.0
+  dust_server: 0.2.0
+  html: ^0.15.6
+  http: ^1.5.0
+  jinja: ^0.7.2
+  linkding_shared: any
+  markdown: ^7.3.0
+  postgres: ^3.5.0
+
+dev_dependencies:
+  test: ^1.26.0

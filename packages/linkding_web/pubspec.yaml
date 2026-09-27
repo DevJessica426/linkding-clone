@@ -1,0 +1,19 @@
+name: linkding_web
+description: >-
+  The interactive parts of the linkding interface in Dart, compiled to
+  JavaScript: tag autocomplete, confirmations, bulk editing, the details
+  modal and keyboard shortcuts.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  linkding_shared: any
+  web: ^1.1.0
+
+dev_dependencies:
+  test: ^1.26.0
