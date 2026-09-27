@@ -3,7 +3,8 @@
 # parity suite (which starts both servers on fresh databases), loads the
 # same extra data into both, then fetches and submits the same pages on
 # both and reports every page that differs, and finally drives both in a
-# browser and reports every interaction that behaves differently.
+# browser, reporting every interaction that behaves differently and every
+# page whose screenshot differs (pairs and diffs in build/screenshots).
 #
 #   LINKDING_DIR=~/src/linkding tool/web_parity.sh
 set -euo pipefail
@@ -29,6 +30,8 @@ python3 "$TOOL/html_parity.py" \
 export NODE_PATH="${NODE_PATH:-$(npm root -g 2>/dev/null || true)}"
 if node -e 'require("playwright")' 2>/dev/null; then
   node "$TOOL/browser_parity.js" http://localhost:9090 http://localhost:9091
+  node "$TOOL/screenshot_parity.js" http://localhost:9090 http://localhost:9091 \
+    "$ROOT/build/screenshots"
 else
   echo "browser parity skipped: Playwright for Node is not installed" \
     "(npm i -g playwright)"
