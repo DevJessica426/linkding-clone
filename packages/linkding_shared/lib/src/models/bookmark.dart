@@ -94,7 +94,7 @@ final class BookmarkPage with _$BookmarkPage {
 @SerDe(renameAll: SerDeRename.snakeCase)
 final class WebsiteMetadata with _$WebsiteMetadata {
   const WebsiteMetadata({
-    required this.url,
+    this.url,
     this.title,
     this.description,
     this.previewImage,
@@ -103,7 +103,9 @@ final class WebsiteMetadata with _$WebsiteMetadata {
   factory WebsiteMetadata.fromJson(Map<String, Object?> json) =>
       _$WebsiteMetadataFromJson(json);
 
-  final String url;
+  /// The URL that was checked; null when `check` was called without one.
+  final String? url;
+
   final String? title;
   final String? description;
   final String? previewImage;

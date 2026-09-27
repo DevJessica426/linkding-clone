@@ -100,8 +100,10 @@ final class ServerConfig {
   /// Whether empty titles and descriptions are filled in from the page.
   final bool enableMetadataScraping;
 
-  String get redactedDatabaseUrl =>
-      databaseUrl.replaceFirst(RegExp(r'://([^:/@]+):[^@]*@'), r'://$1:***@');
+  String get redactedDatabaseUrl => databaseUrl.replaceFirstMapped(
+    RegExp(r'://([^:/@]+):[^@]*@'),
+    (match) => '://${match[1]}:***@',
+  );
 }
 
 String _defaultWebRoot() {

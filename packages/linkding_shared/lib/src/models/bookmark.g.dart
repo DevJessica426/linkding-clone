@@ -516,7 +516,9 @@ Map<String, Object?> _$WebsiteMetadataToJson(WebsiteMetadata instance) =>
 
 // factory WebsiteMetadata.fromJson(Map<String, Object?> json) => _$WebsiteMetadataFromJson(json);
 WebsiteMetadata _$WebsiteMetadataDeserialize(Map<String, Object?> json) {
-  final urlValue = JsonHelper.as<String>(json['url'], 'url', 'String');
+  final urlValue = json['url'] == null
+      ? null
+      : JsonHelper.as<String>(json['url'], 'url', 'String');
   final titleValue = json['title'] == null
       ? null
       : JsonHelper.as<String>(json['title'], 'title', 'String');
