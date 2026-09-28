@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dust_server/server.dart';
 
+import '../auth/password_validation.dart';
 import '../auth/sessions.dart';
 import '../config.dart';
 import '../core/profile.dart';
@@ -33,6 +34,11 @@ final class Web {
   final BookmarkService bookmarks;
   final AssetService assets;
   final WebsiteMetadataLoader metadata;
+
+  /// The password rules, with Django's list of common passwords.
+  late final passwords = PasswordValidator.fromFile(
+    '${config.webRoot}/data/common-passwords.txt.gz',
+  );
 
   /// Queues a one-time message for the visitor's next page that shows
   /// messages: Django's `messages.success` and friends.

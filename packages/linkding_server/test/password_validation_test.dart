@@ -5,6 +5,9 @@ import 'package:test/test.dart';
 /// The password validators linkding enables, with the messages Django 6.0
 /// gave for the same passwords and user.
 void main() {
+  final validator = PasswordValidator.fromFile(
+    'web/data/common-passwords.txt.gz',
+  );
   final user = UserRow(
     id: 1,
     password: '',
@@ -43,7 +46,7 @@ void main() {
 
   for (final MapEntry(key: password, value: messages) in fromDjango.entries) {
     test('"$password"', () {
-      expect(validatePassword(password, user), messages);
+      expect(validator.validate(password, user), messages);
     });
   }
 }

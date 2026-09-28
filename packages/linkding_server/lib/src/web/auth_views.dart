@@ -1,6 +1,5 @@
 import 'package:dust_server/server.dart';
 
-import '../auth/password_validation.dart';
 import '../auth/passwords.dart';
 import '../auth/sessions.dart';
 import '../compat/form_data.dart';
@@ -148,7 +147,7 @@ final class AuthViews {
       cleaned.remove('new_password2');
     }
     if (cleaned['new_password2'] case final password?) {
-      errors['new_password2']!.addAll(validatePassword(password, user));
+      errors['new_password2']!.addAll(web.passwords.validate(password, user));
     }
     if (errors.values.any((e) => e.isNotEmpty)) {
       return c.html(_passwordPage(c, errors), status: 422);

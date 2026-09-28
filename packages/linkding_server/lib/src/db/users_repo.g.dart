@@ -21,7 +21,8 @@ UserNameRow _$UserNameRowFromRow(Row row) {
 }
 
 /// Row deserializer for [UserNameRow].
-final class $UserNameRowRowDeserializer implements RowDeserializer<UserNameRow> {
+final class $UserNameRowRowDeserializer
+    implements RowDeserializer<UserNameRow> {
   const $UserNameRowRowDeserializer();
 
   @override
@@ -108,7 +109,13 @@ WHERE s.session_key = $1 AND s.expire_date > $2
   }
 
   @override
-  Future<Result<UserRow, SqlxError>> insert(String password, bool isSuperuser, String username, String email, DateTime dateJoined) {
+  Future<Result<UserRow, SqlxError>> insert(
+    String password,
+    bool isSuperuser,
+    String username,
+    String email,
+    DateTime dateJoined,
+  ) {
     return _db.fetchOne<UserRow>(
       r'''
 INSERT INTO auth_user (password, last_login, is_superuser, username,
@@ -125,22 +132,28 @@ RETURNING id, password, last_login, is_superuser, username, first_name,
 
   @override
   Future<Result<Unit, SqlxError>> setPassword(int id, String password) {
-    return _db.execute(
-      r'''UPDATE auth_user SET password = $2 WHERE id = $1''',
-      [id, password],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(
+          r'''UPDATE auth_user SET password = $2 WHERE id = $1''',
+          [id, password],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> setLastLogin(int id, DateTime at) {
-    return _db.execute(
-      r'''UPDATE auth_user SET last_login = $2 WHERE id = $1''',
-      [id, at],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(
+          r'''UPDATE auth_user SET last_login = $2 WHERE id = $1''',
+          [id, at],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
@@ -194,8 +207,9 @@ FROM bookmarks_userprofile WHERE user_id = $1
 
   @override
   Future<Result<Unit, SqlxError>> insertDefaultProfile(int userId) {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(
+          r'''
 INSERT INTO bookmarks_userprofile (
   user_id, theme, bookmark_date_display, bookmark_link_target,
   web_archive_integration, enable_sharing, enable_favicons, tag_search,
@@ -220,16 +234,50 @@ VALUES (
   false)
 ON CONFLICT (user_id) DO NOTHING
 ''',
-      [userId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [userId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> updateProfile(int userId, String theme, String bookmarkDateDisplay, String bookmarkDescriptionDisplay, int bookmarkDescriptionMaxLines, String bookmarkLinkTarget, String webArchiveIntegration, String tagSearch, String tagGrouping, bool enableSharing, bool enablePublicSharing, bool enableFavicons, bool enablePreviewImages, bool displayUrl, bool displayViewBookmarkAction, bool displayEditBookmarkAction, bool displayArchiveBookmarkAction, bool displayRemoveBookmarkAction, bool permanentNotes, String customCss, String customCssHash, String autoTaggingRules, bool enableAutomaticHtmlSnapshots, bool defaultMarkUnread, bool defaultMarkShared, int itemsPerPage, bool stickyPagination, bool collapseSidePanel, bool hideBundles, bool legacySearch) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> updateProfile(
+    int userId,
+    String theme,
+    String bookmarkDateDisplay,
+    String bookmarkDescriptionDisplay,
+    int bookmarkDescriptionMaxLines,
+    String bookmarkLinkTarget,
+    String webArchiveIntegration,
+    String tagSearch,
+    String tagGrouping,
+    bool enableSharing,
+    bool enablePublicSharing,
+    bool enableFavicons,
+    bool enablePreviewImages,
+    bool displayUrl,
+    bool displayViewBookmarkAction,
+    bool displayEditBookmarkAction,
+    bool displayArchiveBookmarkAction,
+    bool displayRemoveBookmarkAction,
+    bool permanentNotes,
+    String customCss,
+    String customCssHash,
+    String autoTaggingRules,
+    bool enableAutomaticHtmlSnapshots,
+    bool defaultMarkUnread,
+    bool defaultMarkShared,
+    int itemsPerPage,
+    bool stickyPagination,
+    bool collapseSidePanel,
+    bool hideBundles,
+    bool legacySearch,
+  ) {
+    return _db
+        .execute(
+          r'''
 UPDATE bookmarks_userprofile SET
   theme = $2, bookmark_date_display = $3, bookmark_description_display = $4,
   bookmark_description_max_lines = $5, bookmark_link_target = $6,
@@ -245,39 +293,86 @@ UPDATE bookmarks_userprofile SET
   legacy_search = $30
 WHERE user_id = $1
 ''',
-      [userId, theme, bookmarkDateDisplay, bookmarkDescriptionDisplay, bookmarkDescriptionMaxLines, bookmarkLinkTarget, webArchiveIntegration, tagSearch, tagGrouping, enableSharing, enablePublicSharing, enableFavicons, enablePreviewImages, displayUrl, displayViewBookmarkAction, displayEditBookmarkAction, displayArchiveBookmarkAction, displayRemoveBookmarkAction, permanentNotes, customCss, customCssHash, autoTaggingRules, enableAutomaticHtmlSnapshots, defaultMarkUnread, defaultMarkShared, itemsPerPage, stickyPagination, collapseSidePanel, hideBundles, legacySearch],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [
+            userId,
+            theme,
+            bookmarkDateDisplay,
+            bookmarkDescriptionDisplay,
+            bookmarkDescriptionMaxLines,
+            bookmarkLinkTarget,
+            webArchiveIntegration,
+            tagSearch,
+            tagGrouping,
+            enableSharing,
+            enablePublicSharing,
+            enableFavicons,
+            enablePreviewImages,
+            displayUrl,
+            displayViewBookmarkAction,
+            displayEditBookmarkAction,
+            displayArchiveBookmarkAction,
+            displayRemoveBookmarkAction,
+            permanentNotes,
+            customCss,
+            customCssHash,
+            autoTaggingRules,
+            enableAutomaticHtmlSnapshots,
+            defaultMarkUnread,
+            defaultMarkShared,
+            itemsPerPage,
+            stickyPagination,
+            collapseSidePanel,
+            hideBundles,
+            legacySearch,
+          ],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setSearchPreferences(int userId, String json) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> setSearchPreferences(
+    int userId,
+    String json,
+  ) {
+    return _db
+        .execute(
+          r'''
 UPDATE bookmarks_userprofile SET search_preferences = $2::jsonb
 WHERE user_id = $1
 ''',
-      [userId, json],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [userId, json],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> setCollapseSidePanel(int userId, bool value) {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(
+          r'''
 UPDATE bookmarks_userprofile SET collapse_side_panel = $2 WHERE user_id = $1
 ''',
-      [userId, value],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [userId, value],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<ApiTokenRow, SqlxError>> insertApiToken(String key, String name, DateTime created, int userId) {
+  Future<Result<ApiTokenRow, SqlxError>> insertApiToken(
+    String key,
+    String name,
+    DateTime created,
+    int userId,
+  ) {
     return _db.fetchOne<ApiTokenRow>(
       r'''
 INSERT INTO bookmarks_apitoken (key, name, created, user_id)
@@ -303,12 +398,15 @@ WHERE user_id = $1 ORDER BY created DESC, id DESC
 
   @override
   Future<Result<Unit, SqlxError>> deleteApiToken(int id, int userId) {
-    return _db.execute(
-      r'''DELETE FROM bookmarks_apitoken WHERE id = $1 AND user_id = $2''',
-      [id, userId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(
+          r'''DELETE FROM bookmarks_apitoken WHERE id = $1 AND user_id = $2''',
+          [id, userId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
@@ -320,16 +418,23 @@ WHERE user_id = $1 ORDER BY created DESC, id DESC
   }
 
   @override
-  Future<Result<Unit, SqlxError>> insertFeedToken(String key, DateTime created, int userId) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> insertFeedToken(
+    String key,
+    DateTime created,
+    int userId,
+  ) {
+    return _db
+        .execute(
+          r'''
 INSERT INTO bookmarks_feedtoken (key, created, user_id) VALUES ($1, $2, $3)
 ON CONFLICT (user_id) DO NOTHING
 ''',
-      [key, created, userId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [key, created, userId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
@@ -348,58 +453,78 @@ WHERE f.key = $1
   }
 
   @override
-  Future<Result<Unit, SqlxError>> insertSession(String key, int userId, DateTime expires) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> insertSession(
+    String key,
+    int userId,
+    DateTime expires,
+  ) {
+    return _db
+        .execute(
+          r'''
 INSERT INTO clone_session (session_key, user_id, expire_date)
 VALUES ($1, $2, $3)
 ''',
-      [key, userId, expires],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [key, userId, expires],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> deleteSession(String key) {
-    return _db.execute(
-      r'''DELETE FROM clone_session WHERE session_key = $1''',
-      [key],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(r'''DELETE FROM clone_session WHERE session_key = $1''', [key])
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> renewSession(String key, String newKey, DateTime expires) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> renewSession(
+    String key,
+    String newKey,
+    DateTime expires,
+  ) {
+    return _db
+        .execute(
+          r'''
 UPDATE clone_session SET session_key = $2, expire_date = $3
 WHERE session_key = $1
 ''',
-      [key, newKey, expires],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [key, newKey, expires],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> deleteOtherSessions(int userId, String keep) {
-    return _db.execute(
-      r'''DELETE FROM clone_session WHERE user_id = $1 AND session_key <> $2''',
-      [userId, keep],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(
+          r'''DELETE FROM clone_session WHERE user_id = $1 AND session_key <> $2''',
+          [userId, keep],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> deleteExpiredSessions(DateTime now) {
-    return _db.execute(
-      r'''DELETE FROM clone_session WHERE expire_date <= $1''',
-      [now],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(
+          r'''DELETE FROM clone_session WHERE expire_date <= $1''',
+          [now],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 }

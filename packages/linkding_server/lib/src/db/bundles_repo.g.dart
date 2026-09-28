@@ -33,7 +33,11 @@ ORDER BY "order", id
   }
 
   @override
-  Future<Result<List<BundleRow>, SqlxError>> page(int ownerId, int limit, int offset) {
+  Future<Result<List<BundleRow>, SqlxError>> page(
+    int ownerId,
+    int limit,
+    int offset,
+  ) {
     return _db.fetchAll<BundleRow>(
       r'''
 SELECT id, name, search, any_tags, all_tags, excluded_tags, filter_unread,
@@ -82,7 +86,18 @@ FROM bookmarks_bookmarkbundle WHERE owner_id = $1
   }
 
   @override
-  Future<Result<BundleRow, SqlxError>> insert(String name, String search, String anyTags, String allTags, String excludedTags, int order, DateTime now, int ownerId, String filterShared, String filterUnread) {
+  Future<Result<BundleRow, SqlxError>> insert(
+    String name,
+    String search,
+    String anyTags,
+    String allTags,
+    String excludedTags,
+    int order,
+    DateTime now,
+    int ownerId,
+    String filterShared,
+    String filterUnread,
+  ) {
     return _db.fetchOne<BundleRow>(
       r'''
 INSERT INTO bookmarks_bookmarkbundle (
@@ -92,13 +107,35 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $7, $8, $9, $10)
 RETURNING id, name, search, any_tags, all_tags, excluded_tags, filter_unread,
           filter_shared, "order", date_created, date_modified, owner_id
 ''',
-      [name, search, anyTags, allTags, excludedTags, order, now, ownerId, filterShared, filterUnread],
+      [
+        name,
+        search,
+        anyTags,
+        allTags,
+        excludedTags,
+        order,
+        now,
+        ownerId,
+        filterShared,
+        filterUnread,
+      ],
       const $BundleRowRowDeserializer().deserialize,
     );
   }
 
   @override
-  Future<Result<BundleRow, SqlxError>> update(int id, String name, String search, String anyTags, String allTags, String excludedTags, int order, DateTime now, String filterShared, String filterUnread) {
+  Future<Result<BundleRow, SqlxError>> update(
+    int id,
+    String name,
+    String search,
+    String anyTags,
+    String allTags,
+    String excludedTags,
+    int order,
+    DateTime now,
+    String filterShared,
+    String filterUnread,
+  ) {
     return _db.fetchOne<BundleRow>(
       r'''
 UPDATE bookmarks_bookmarkbundle SET
@@ -108,27 +145,42 @@ WHERE id = $1
 RETURNING id, name, search, any_tags, all_tags, excluded_tags, filter_unread,
           filter_shared, "order", date_created, date_modified, owner_id
 ''',
-      [id, name, search, anyTags, allTags, excludedTags, order, now, filterShared, filterUnread],
+      [
+        id,
+        name,
+        search,
+        anyTags,
+        allTags,
+        excludedTags,
+        order,
+        now,
+        filterShared,
+        filterUnread,
+      ],
       const $BundleRowRowDeserializer().deserialize,
     );
   }
 
   @override
   Future<Result<Unit, SqlxError>> delete(int id, int ownerId) {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(
+          r'''
 DELETE FROM bookmarks_bookmarkbundle WHERE id = $1 AND owner_id = $2
 ''',
-      [id, ownerId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [id, ownerId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> renumber(int ownerId) {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(
+          r'''
 UPDATE bookmarks_bookmarkbundle b SET "order" = r.position
 FROM (
   SELECT id, (row_number() OVER (ORDER BY "order", id) - 1)::integer AS position
@@ -136,21 +188,26 @@ FROM (
 ) r
 WHERE b.id = r.id AND b."order" <> r.position
 ''',
-      [ownerId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [ownerId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> setOrder(int id, int order) {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(
+          r'''
 UPDATE bookmarks_bookmarkbundle SET "order" = $2 WHERE id = $1
 ''',
-      [id, order],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [id, order],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 }

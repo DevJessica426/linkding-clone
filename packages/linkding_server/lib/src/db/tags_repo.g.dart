@@ -33,7 +33,10 @@ LIMIT 1
   }
 
   @override
-  Future<Result<List<TagRow>, SqlxError>> withNames(int ownerId, List<String> names) {
+  Future<Result<List<TagRow>, SqlxError>> withNames(
+    int ownerId,
+    List<String> names,
+  ) {
     return _db.fetchAll<TagRow>(
       r'''
 SELECT id, name, date_added, owner_id FROM bookmarks_tag
@@ -47,7 +50,11 @@ ORDER BY id
   }
 
   @override
-  Future<Result<List<TagRow>, SqlxError>> sharedNamed(int? ownerId, bool publicOnly, List<String> names) {
+  Future<Result<List<TagRow>, SqlxError>> sharedNamed(
+    int? ownerId,
+    bool publicOnly,
+    List<String> names,
+  ) {
     return _db.fetchAll<TagRow>(
       r'''
 SELECT DISTINCT t.id, t.name, t.date_added, t.owner_id
@@ -67,7 +74,11 @@ ORDER BY t.id
   }
 
   @override
-  Future<Result<TagRow, SqlxError>> insert(String name, DateTime dateAdded, int ownerId) {
+  Future<Result<TagRow, SqlxError>> insert(
+    String name,
+    DateTime dateAdded,
+    int ownerId,
+  ) {
     return _db.fetchOne<TagRow>(
       r'''
 INSERT INTO bookmarks_tag (name, date_added, owner_id) VALUES ($1, $2, $3)
@@ -91,7 +102,11 @@ WHERE id = $1 AND owner_id = $2
   }
 
   @override
-  Future<Result<List<TagRow>, SqlxError>> page(int ownerId, int limit, int offset) {
+  Future<Result<List<TagRow>, SqlxError>> page(
+    int ownerId,
+    int limit,
+    int offset,
+  ) {
     return _db.fetchAll<TagRow>(
       r'''
 SELECT id, name, date_added, owner_id FROM bookmarks_tag
@@ -125,7 +140,12 @@ WHERE owner_id = $1 ORDER BY id
   }
 
   @override
-  Future<Result<List<TagUsageRow>, SqlxError>> listing(int ownerId, String pattern, bool unusedOnly, String sort) {
+  Future<Result<List<TagUsageRow>, SqlxError>> listing(
+    int ownerId,
+    String pattern,
+    bool unusedOnly,
+    String sort,
+  ) {
     return _db.fetchAll<TagUsageRow>(
       r'''
 SELECT id, name, date_added, bookmark_count FROM (
@@ -150,33 +170,44 @@ ORDER BY
 
   @override
   Future<Result<Unit, SqlxError>> rename(int id, int ownerId, String name) {
-    return _db.execute(
-      r'''UPDATE bookmarks_tag SET name = $3 WHERE id = $1 AND owner_id = $2''',
-      [id, ownerId, name],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+    return _db
+        .execute(
+          r'''UPDATE bookmarks_tag SET name = $3 WHERE id = $1 AND owner_id = $2''',
+          [id, ownerId, name],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
   Future<Result<Unit, SqlxError>> delete(int id, int ownerId) {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(
+          r'''
 WITH gone AS (
   DELETE FROM bookmarks_tag WHERE id = $1 AND owner_id = $2 RETURNING id
 )
 DELETE FROM bookmarks_bookmark_tags WHERE tag_id IN (SELECT id FROM gone)
 ''',
-      [id, ownerId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [id, ownerId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> merge(int ownerId, int intoId, List<int> fromIds) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> merge(
+    int ownerId,
+    int intoId,
+    List<int> fromIds,
+  ) {
+    return _db
+        .execute(
+          r'''
 WITH moved AS (
   INSERT INTO bookmarks_bookmark_tags (bookmark_id, tag_id)
   SELECT DISTINCT bt.bookmark_id, $2::integer FROM bookmarks_bookmark_tags bt
@@ -187,9 +218,11 @@ WITH moved AS (
 )
 DELETE FROM bookmarks_tag WHERE owner_id = $1 AND id = ANY($3)
 ''',
-      [ownerId, intoId, fromIds],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [ownerId, intoId, fromIds],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 }

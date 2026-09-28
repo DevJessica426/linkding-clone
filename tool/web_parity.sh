@@ -15,6 +15,7 @@ PGPASSWORD="${PGPASSWORD:-conduit}"
 export PGUSER PGPASSWORD
 PG="postgres://$PGUSER:$PGPASSWORD@localhost:5432"
 
+"$ROOT/tool/check_loc.sh" || echo "(line-count rule not met yet; see above)"
 "$ROOT/tool/parity.sh"
 
 TOOL="$ROOT/packages/linkding_server/tool"

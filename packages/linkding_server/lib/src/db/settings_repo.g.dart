@@ -32,31 +32,39 @@ FROM bookmarks_globalsettings ORDER BY id LIMIT 1
 
   @override
   Future<Result<Unit, SqlxError>> ensureGlobal() {
-    return _db.execute(
-      r'''
+    return _db
+        .execute(r'''
 INSERT INTO bookmarks_globalsettings (landing_page, guest_profile_user_id,
                                       enable_link_prefetch)
 SELECT 'login', NULL, false
 WHERE NOT EXISTS (SELECT 1 FROM bookmarks_globalsettings)
-''',
-      [],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+''', [])
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> updateGlobal(int id, String landingPage, int? guestProfileUserId, bool enableLinkPrefetch) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> updateGlobal(
+    int id,
+    String landingPage,
+    int? guestProfileUserId,
+    bool enableLinkPrefetch,
+  ) {
+    return _db
+        .execute(
+          r'''
 UPDATE bookmarks_globalsettings SET landing_page = $2,
   guest_profile_user_id = $3, enable_link_prefetch = $4
 WHERE id = $1
 ''',
-      [id, landingPage, guestProfileUserId, enableLinkPrefetch],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [id, landingPage, guestProfileUserId, enableLinkPrefetch],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
@@ -72,16 +80,23 @@ WHERE owner_id = $1 AND NOT acknowledged ORDER BY id
   }
 
   @override
-  Future<Result<Unit, SqlxError>> addToast(String key, String message, int ownerId) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> addToast(
+    String key,
+    String message,
+    int ownerId,
+  ) {
+    return _db
+        .execute(
+          r'''
 INSERT INTO bookmarks_toast (key, message, acknowledged, owner_id)
 VALUES ($1, $2, false, $3)
 ''',
-      [key, message, ownerId],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [key, message, ownerId],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
@@ -96,16 +111,24 @@ RETURNING id
   }
 
   @override
-  Future<Result<Unit, SqlxError>> addMessage(String sessionKey, String level, String message, String extraTags) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> addMessage(
+    String sessionKey,
+    String level,
+    String message,
+    String extraTags,
+  ) {
+    return _db
+        .execute(
+          r'''
 INSERT INTO clone_message (session_key, level, message, extra_tags)
 VALUES ($1, $2, $3, $4)
 ''',
-      [sessionKey, level, message, extraTags],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [sessionKey, level, message, extraTags],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
@@ -124,20 +147,30 @@ SELECT level, message, extra_tags FROM taken ORDER BY id
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setSessionValue(String sessionKey, String name, String value) {
-    return _db.execute(
-      r'''
+  Future<Result<Unit, SqlxError>> setSessionValue(
+    String sessionKey,
+    String name,
+    String value,
+  ) {
+    return _db
+        .execute(
+          r'''
 INSERT INTO clone_session_value (session_key, name, value) VALUES ($1, $2, $3)
 ON CONFLICT (session_key, name) DO UPDATE SET value = EXCLUDED.value
 ''',
-      [sessionKey, name, value],
-    ).then(
-      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-    );
+          [sessionKey, name, value],
+        )
+        .then(
+          (result) =>
+              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+        );
   }
 
   @override
-  Future<Result<String?, SqlxError>> popSessionValue(String sessionKey, String name) {
+  Future<Result<String?, SqlxError>> popSessionValue(
+    String sessionKey,
+    String name,
+  ) {
     return _db.fetchScalar<String?>(
       r'''
 DELETE FROM clone_session_value WHERE session_key = $1 AND name = $2

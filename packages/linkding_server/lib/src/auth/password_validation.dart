@@ -2,33 +2,35 @@ import 'dart:convert';
 import 'dart:io';
 
 import '../db/rows.dart';
-import 'common_passwords.dart';
 
 /// Django's `AUTH_PASSWORD_VALIDATORS` as linkding configures them: a new
 /// password must not resemble the user's name or email, must have eight
 /// characters, must not be a common password, and must not be all digits.
-/// Returns every message, in the validators' order.
-List<String> validatePassword(String password, UserRow user) => [
-  ?_similarity(password, user),
-  if (password.runes.length < 8)
-    'This password is too short. It must contain at least 8 characters.',
-  if (_commonPasswords.contains(password.toLowerCase().trim()))
-    'This password is too common.',
-  if (_numeric.hasMatch(password)) 'This password is entirely numeric.',
-];
+final class PasswordValidator {
+  PasswordValidator(this._common);
+
+  /// Reads Django's list of common passwords: gzipped, one per line.
+  factory PasswordValidator.fromFile(String path) => PasswordValidator({
+    for (final line in const LineSplitter().convert(
+      utf8.decode(gzip.decode(File(path).readAsBytesSync())),
+    ))
+      line.trim(),
+  });
+
+  final Set<String> _common;
+
+  /// Every message for [password], in the validators' order.
+  List<String> validate(String password, UserRow user) => [
+    ?_similarity(password, user),
+    if (password.runes.length < 8)
+      'This password is too short. It must contain at least 8 characters.',
+    if (_common.contains(password.toLowerCase().trim()))
+      'This password is too common.',
+    if (_numeric.hasMatch(password)) 'This password is entirely numeric.',
+  ];
+}
 
 final _numeric = RegExp(r'^\p{Nd}+$', unicode: true);
-
-final Set<String> _commonPasswords = {
-  for (final line in const LineSplitter().convert(
-    utf8.decode(
-      gzip.decode(
-        base64.decode(commonPasswordsGzipBase64.replaceAll('\n', '')),
-      ),
-    ),
-  ))
-    line.trim(),
-};
 
 /// `UserAttributeSimilarityValidator`: the first attribute, or part of one
 /// between non-word characters, whose characters overlap the password's
