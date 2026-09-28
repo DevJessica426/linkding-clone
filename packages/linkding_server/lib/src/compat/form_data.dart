@@ -97,3 +97,15 @@ Map<String, String> _dispositionParams(String header) {
   }
   return params;
 }
+
+/// The submitted form as a handler reads it: `request.POST` for a POST,
+/// empty for anything else, as Django parses only POST bodies.
+final class PostedForm implements FromRequest<FormData> {
+  const PostedForm();
+
+  @override
+  Future<Result<FormData, Rejection>> extract(Request request) async =>
+      Ok(request.method == 'POST' ? await readFormData(request) : _empty);
+}
+
+const _empty = FormData({});

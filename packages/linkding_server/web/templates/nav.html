@@ -1,0 +1,41 @@
+<div class="hide-md">
+<a href="/bookmarks/new" class="btn btn-primary mr-2">Add bookmark</a>
+<ld-dropdown class="dropdown">
+<button class="btn btn-link dropdown-toggle" tabindex="0">Bookmarks</button>
+<ul class="menu" role="list" tabindex="-1">
+<li class="menu-item"> <a href="/bookmarks" class="menu-link">Active</a> </li>
+<li class="menu-item"> <a href="/bookmarks/archived" class="menu-link">Archived</a> </li>
+{{#sharing}}
+<li class="menu-item"> <a href="/bookmarks/shared" class="menu-link">Shared</a> </li>
+{{/sharing}}
+<li class="menu-item"> <a href="/bookmarks?unread=yes" class="menu-link">Unread</a> </li>
+<li class="menu-item"> <a href="/bookmarks?q=!untagged" class="menu-link">Untagged</a> </li>
+</ul> </ld-dropdown>
+<ld-dropdown class="dropdown">
+<button class="btn btn-link dropdown-toggle" tabindex="0">Settings</button>
+<ul class="menu" role="list" tabindex="-1">
+<li class="menu-item"> <a href="/settings/general" class="menu-link">General</a> </li>
+<li class="menu-item"> <a href="/settings/integrations" class="menu-link">Integrations</a> </li>
+</ul> </ld-dropdown>
+<form class="d-inline" action="/logout/" method="post" data-turbo="false"> {{> csrf-input}} <button type="submit" class="btn btn-link">Logout</button> </form>
+</div>
+<div class="show-md">
+<a href="/bookmarks/new" aria-label="Add bookmark" class="btn btn-primary">
+<svg width="24" height="24"> <use href="/static/icons.svg?v={{version}}#plus"></use> </svg> </a>
+<ld-dropdown class="dropdown dropdown-right">
+<button class="btn btn-link dropdown-toggle" aria-label="Navigation menu" tabindex="0">
+<svg width="24" height="24"> <use href="/static/icons.svg?v={{version}}#menu"></use> </svg> </button>
+<!-- menu component --> <ul class="menu" role="list" tabindex="-1">
+<li class="menu-item"> <a href="/bookmarks" class="menu-link">Bookmarks</a> </li>
+<li class="menu-item"> <a href="/bookmarks/archived" class="menu-link">Archived bookmarks</a> </li>
+{{#sharing}}
+<li class="menu-item"> <a href="/bookmarks/shared" class="menu-link">Shared bookmarks</a> </li>
+{{/sharing}}
+<li class="menu-item"> <a href="/bookmarks?unread=yes" class="menu-link">Unread</a> </li>
+<li class="menu-item"> <a href="/bookmarks?q=!untagged" class="menu-link">Untagged</a> </li>
+<div class="divider"></div>
+<li class="menu-item"> <a href="/settings/general" class="menu-link">Settings</a> </li>
+<li class="menu-item"> <a href="/settings/integrations" class="menu-link">Integrations</a> </li>
+<div class="divider"></div>
+<li class="menu-item"> <form class="d-inline" action="/logout/" method="post" data-turbo="false"> {{> csrf-input}} <button type="submit" class="btn btn-link menu-link">Logout</button> </form> </li>
+</ul> </ld-dropdown> </div>

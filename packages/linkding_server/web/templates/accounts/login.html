@@ -1,0 +1,21 @@
+  <main class="auth-page" aria-labelledby="main-heading">
+    <div class="section-header">
+      <h1 id="main-heading">Login</h1>
+    </div>
+      <form method="post" action="/login/">
+        {{> csrf-input}}
+{{#failed}}
+        <p class="form-input-hint is-error">Your username and password didn't match. Please try again.</p>
+{{/failed}}
+        <div class="form-group">
+          <label for="id_username" class="form-label">Username</label>
+          <input type="text" name="username"{{#hasUsername}} value="{{username}}"{{/hasUsername}} autofocus autocapitalize="none" autocomplete="username" maxlength="150" aria-invalid="false" class="form-input" required id="id_username">
+        </div>
+        <div class="form-group">
+          <label for="id_password" class="form-label">Password</label>
+          <input type="password" name="password" autocomplete="current-password" aria-invalid="false" class="form-input" required id="id_password">
+        </div>
+        <input type="submit" value="Login" class="btn btn-primary width-100 mt-4" />
+        <input type="hidden" name="next" value="{{next}}" />
+      </form>
+  </main>

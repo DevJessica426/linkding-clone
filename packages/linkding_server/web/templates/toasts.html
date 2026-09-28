@@ -1,0 +1,15 @@
+        <div class="message-list">
+          <form action="/toasts/acknowledge?return_url={{returnUrl}}"
+                method="post">
+            {{> csrf-input}}
+{{#toasts}}
+              <div class="toast d-flex">
+                {{message}}
+                <button type="submit"
+                        name="toast"
+                        value="{{id}}"
+                        class="btn btn-clear"></button>
+              </div>
+{{/toasts}}
+          </form>
+        </div>

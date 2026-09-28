@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-api-base-url="/api/">
+{{> head}}
+  <body>
+    <header class="container">
+{{#hasToasts}}
+{{> toasts}}
+{{/hasToasts}}
+      <div class="d-flex justify-between">
+        <a href="/" class="app-link d-flex align-center">
+          <img class="app-logo" src="/static/logo.png" alt="Application logo">
+          <span class="app-name">LINKDING</span>
+        </a>
+        <nav>
+{{#signedIn}}
+{{> nav}}
+{{/signedIn}}
+{{^signedIn}}
+            <a href="/login/" class="btn btn-link">Login</a>
+{{/signedIn}}
+        </nav>
+      </div>
+    </header>
+    <div class="content container">
+{{{content}}}
+    </div>
+    <div class="modals">
+{{{overlays}}}
+    </div>
+  </body>
+</html>

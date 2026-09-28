@@ -1,6 +1,6 @@
 import 'package:linkding_server/src/compat/django.dart';
 import 'package:linkding_server/src/compat/xml_writer.dart';
-import 'package:linkding_server/src/web/site_views.dart';
+import 'package:linkding_server/src/site/site.dart';
 import 'package:test/test.dart';
 
 /// The writers behind the feeds and the manifest, against what Python and

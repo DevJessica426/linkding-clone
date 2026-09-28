@@ -7,7 +7,7 @@ import 'src/db/database.dart';
 import 'src/db/users_repo.dart';
 import 'src/services/errors.dart';
 
-export 'src/app.dart';
+export 'src/app/app.dart';
 export 'src/config.dart';
 export 'src/db/database.dart';
 export 'src/services/http_client.dart' show Allowlist, GuardedHttpClient;

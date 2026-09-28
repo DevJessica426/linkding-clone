@@ -214,43 +214,6 @@ final class PageContext {
       );
 }
 
-/// The preferences of a visitor when no guest profile is set: a fresh
-/// `UserProfile` with favicons enabled.
-const standardProfile = ProfileRow(
-  id: 0,
-  userId: 0,
-  theme: 'auto',
-  bookmarkDateDisplay: 'relative',
-  bookmarkDescriptionDisplay: 'inline',
-  bookmarkDescriptionMaxLines: 1,
-  bookmarkLinkTarget: '_blank',
-  webArchiveIntegration: 'disabled',
-  tagSearch: 'strict',
-  tagGrouping: 'alphabetical',
-  enableSharing: false,
-  enablePublicSharing: false,
-  enableFavicons: true,
-  enablePreviewImages: false,
-  displayUrl: false,
-  displayViewBookmarkAction: true,
-  displayEditBookmarkAction: true,
-  displayArchiveBookmarkAction: true,
-  displayRemoveBookmarkAction: true,
-  permanentNotes: false,
-  customCss: '',
-  customCssHash: '',
-  autoTaggingRules: '',
-  searchPreferencesJson: '{}',
-  enableAutomaticHtmlSnapshots: true,
-  defaultMarkUnread: false,
-  defaultMarkShared: false,
-  itemsPerPage: 30,
-  stickyPagination: false,
-  collapseSidePanel: false,
-  hideBundles: false,
-  legacySearch: false,
-);
-
 /// Django's 403 page for a failed CSRF check.
 Response csrfFailurePage(PageContext c, String reason) => c.html(
   '<!DOCTYPE html><html lang="en"><head><title>403 Forbidden</title></head>'
