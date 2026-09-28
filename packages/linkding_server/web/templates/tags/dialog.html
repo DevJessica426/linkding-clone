@@ -1,0 +1,21 @@
+<turbo-frame id="tag-modal">
+<form method="post"
+      action="{{action}}"
+      data-turbo-frame="{{target}}"
+      novalidate>
+  {{> csrf-input}}
+  <ld-modal class="{{modalClass}}"
+            data-close-url="{{closeUrl}}"
+            data-turbo-frame="tag-modal">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-container" role="dialog" aria-modal="true">
+{{> modal-header}}
+      <div class="modal-body">{{{body}}}</div>
+      <div class="modal-footer d-flex justify-between">
+        <button type="button" class="btn btn-wide" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-primary btn-wide">{{submit}}</button>
+      </div>
+    </div>
+  </ld-modal>
+</form>
+</turbo-frame>

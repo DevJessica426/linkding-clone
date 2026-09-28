@@ -1,0 +1,38 @@
+<ul class="pagination">
+{{#hasPrevious}}
+    <li class="page-item">
+      <a href="{{previous}}"
+         tabindex="-1"
+         data-turbo-frame="{{frame}}">Previous</a>
+    </li>
+{{/hasPrevious}}
+{{^hasPrevious}}
+    <li class="page-item disabled">
+      <a href="#" tabindex="-1">Previous</a>
+    </li>
+{{/hasPrevious}}
+{{#numbers}}
+{{#gap}}
+      <li class="page-item">
+        <span>...</span>
+      </li>
+{{/gap}}
+{{^gap}}
+      <li class="page-item {{#active}}active{{/active}}">
+        <a href="{{link}}" data-turbo-frame="{{frame}}">{{number}}</a>
+      </li>
+{{/gap}}
+{{/numbers}}
+{{#hasNext}}
+    <li class="page-item">
+      <a href="{{next}}"
+         tabindex="-1"
+         data-turbo-frame="{{frame}}">Next</a>
+    </li>
+{{/hasNext}}
+{{^hasNext}}
+    <li class="page-item disabled">
+      <a href="#" tabindex="-1">Next</a>
+    </li>
+{{/hasNext}}
+</ul>

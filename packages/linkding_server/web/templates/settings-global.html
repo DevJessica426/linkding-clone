@@ -1,0 +1,38 @@
+      <section aria-labelledby="global-settings-heading">
+        <h2 id="global-settings-heading">Global settings</h2>
+        <form action="/settings/update"
+              method="post"
+              novalidate
+              data-turbo="false">
+          {{> csrf-input}}
+          <div class="form-group">
+            <label for="id_landing_page" class="form-label">Landing page</label>
+            {{{w_landing_page}}}
+            <div id="id_landing_page_help" class="form-input-hint">
+              The page that unauthenticated users are redirected to when accessing the root URL.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="id_guest_profile_user" class="form-label">Guest user profile</label>
+            {{{w_guest_profile_user}}}
+            <div id="id_guest_profile_user_help" class="form-input-hint">
+              The user profile to use for users that are not logged in. This will affect how publicly shared bookmarks
+              are displayed regarding theme, bookmark list settings, etc. You can either use your own profile or create
+              a dedicated user for this purpose. By default, a standard profile with fixed settings is used.
+            </div>
+          </div>
+          <div class="form-group">
+            {{{w_enable_link_prefetch}}}
+            <div id="id_enable_link_prefetch_help" class="form-input-hint">
+              Prefetches internal links when hovering over them. This can improve the perceived performance when
+              navigating application, but also increases the load on the server as well as bandwidth usage.
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="submit"
+                   name="update_global_settings"
+                   value="Save"
+                   class="btn btn-primary btn-wide mt-2">
+          </div>
+        </form>
+      </section>

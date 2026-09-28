@@ -1,0 +1,19 @@
+        <details class="mb-4">
+          <summary>
+            <span class="text-bold mb-1">How to merge tags</span>
+          </summary>
+          <ol>
+            <li>Enter the name of the tag you want to keep</li>
+            <li>Enter the names of tags to merge into the target tag</li>
+            <li>The target tag is added to all bookmarks that have any of the merge tags</li>
+            <li>The merged tags are deleted</li>
+          </ol>
+        </details>
+{{#fields}}
+        <div class="form-group">
+          <label for="id_{{name}}" class="form-label">{{label}}</label>
+          <ld-tag-autocomplete input-id="id_{{name}}" input-name="{{name}}" input-value="{{value}}" input-aria-describedby="{{describedBy}}"{{#hasClasses}} input-class="{{classes}}"{{/hasClasses}}></ld-tag-autocomplete>
+          <div id="id_{{name}}_help" class="form-input-hint">{{{help}}}</div>
+          {{{errors}}}
+        </div>
+{{/fields}}

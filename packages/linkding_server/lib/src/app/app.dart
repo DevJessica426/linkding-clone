@@ -4,6 +4,7 @@ import 'package:dust_server/server.dart';
 
 import '../accounts/accounts.dart';
 import '../api/api.dart';
+import '../assets/asset_pages.dart';
 import '../auth/password_validation.dart';
 import '../auth/passwords.dart';
 import '../auth/sessions.dart';
@@ -17,7 +18,9 @@ import '../pages/visitor_layer.dart';
 import '../services/assets.dart';
 import '../services/bookmarks.dart';
 import '../services/website_loader.dart';
+import '../settings/settings.dart';
 import '../site/site.dart';
+import '../tags/tags.dart';
 import '../web/context.dart';
 import 'headers.dart';
 import 'health.dart';
@@ -68,6 +71,9 @@ Router buildApp({
     ..merge(siteRoutes())
     ..merge(accountRoutes())
     ..merge(feedRoutes())
+    ..merge(tagRoutes())
+    ..merge(assetRoutes())
+    ..merge(settingsRoutes())
     ..merge(legacyPages(web));
 
   return Router(onError: onError ?? _reportToStderr)

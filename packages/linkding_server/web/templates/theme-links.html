@@ -1,0 +1,28 @@
+{{#themeLight}}
+    <link href="/static/theme-light.css?v={{version}}"
+          rel="stylesheet"
+          type="text/css" />
+    <meta name="theme-color" content="#5856e0">
+{{/themeLight}}
+{{#themeDark}}
+    <link href="/static/theme-dark.css?v={{version}}"
+          rel="stylesheet"
+          type="text/css" />
+    <meta name="theme-color" content="#161822">
+{{/themeDark}}
+{{#themeAuto}}
+    <link href="/static/theme-dark.css?v={{version}}"
+          rel="stylesheet"
+          type="text/css"
+          media="(prefers-color-scheme: dark)" />
+    <link href="/static/theme-light.css?v={{version}}"
+          rel="stylesheet"
+          type="text/css"
+          media="(prefers-color-scheme: light)" />
+    <meta name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          content="#161822">
+    <meta name="theme-color"
+          media="(prefers-color-scheme: light)"
+          content="#5856e0">
+{{/themeAuto}}

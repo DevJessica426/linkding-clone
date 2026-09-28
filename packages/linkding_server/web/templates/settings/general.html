@@ -1,0 +1,327 @@
+  <main class="settings-page" aria-labelledby="main-heading">
+    <h1 id="main-heading">Settings</h1>
+    {{#hasSuccess}}<div class="toast toast-success mb-4">{{success}}</div>{{/hasSuccess}}
+    {{#hasError}}<div class="toast toast-error mb-4">{{error}}</div>{{/hasError}}
+    <section aria-labelledby="profile-heading">
+      <h2 id="profile-heading">Profile</h2>
+      <p>
+        <a href="/change-password/">Change password</a>
+      </p>
+      <form action="/settings/update"
+            method="post"
+            novalidate
+            data-turbo="false">
+        {{> csrf-input}}
+        <div class="form-group">
+          <label for="id_theme" class="form-label">Theme</label>
+          {{{w_theme}}}
+          <div id="id_theme_help" class="form-input-hint">
+            Whether to use a light or dark theme, or automatically adjust the theme based on your system's settings.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="id_bookmark_date_display" class="form-label">Bookmark date format</label>
+          {{{w_bookmark_date_display}}}
+          <div id="id_bookmark_date_display_help" class="form-input-hint">
+            Whether to show bookmark dates as relative (how long ago), or as absolute dates. Alternatively the date can
+            be hidden.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="id_bookmark_description_display" class="form-label">Bookmark description</label>
+          {{{w_bookmark_description_display}}}
+          <div id="id_bookmark_description_display_help" class="form-input-hint">
+            Whether to show bookmark descriptions and tags in the same line, or as separate blocks.
+          </div>
+        </div>
+        <div class="{{maxLinesClass}}">
+          <label for="id_bookmark_description_max_lines" class="form-label">Bookmark description max lines</label>
+          {{{w_bookmark_description_max_lines}}}
+          
+          <div id="id_bookmark_description_max_lines_help" class="form-input-hint">
+            Limits the number of lines that are displayed for the bookmark description.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_display_url}}}
+          <div id="id_display_url_help" class="form-input-hint">
+            When enabled, this setting displays the bookmark URL below the title.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_permanent_notes}}}
+          <div id="id_permanent_notes_help" class="form-input-hint">
+            Whether to show bookmark notes permanently, without having to toggle them individually.
+            Alternatively the keyboard shortcut <code>e</code> can be used to temporarily show all notes.
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="form-label">Bookmark actions</span>
+          {{{w_display_view_bookmark_action}}}
+          {{{w_display_edit_bookmark_action}}}
+          {{{w_display_archive_bookmark_action}}}
+          {{{w_display_remove_bookmark_action}}}
+          <div class="form-input-hint">Which actions to display for each bookmark.</div>
+        </div>
+        <div class="form-group">
+          <label for="id_bookmark_link_target" class="form-label">Open bookmarks in</label>
+          {{{w_bookmark_link_target}}}
+          <div id="id_bookmark_link_target_help" class="form-input-hint">
+            Whether to open bookmarks a new page or in the same page.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="id_items_per_page" class="form-label">Items per page</label>
+          {{{w_items_per_page}}}
+          {{{itemsPerPageErrors}}}
+          <div id="id_items_per_page_help" class="form-input-hint">
+            The number of bookmarks to display per page.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_sticky_pagination}}}
+          <div id="id_sticky_pagination_help" class="form-input-hint">
+            When enabled, the pagination controls will stick to the bottom of the screen, so that they are always
+            visible without having to scroll to the end of the page first.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_collapse_side_panel}}}
+          <div id="id_collapse_side_panel_help" class="form-input-hint">
+            When enabled, the tags side panel will be collapsed by default to give more space to the bookmark list.
+            Instead, the tags are shown in an expandable drawer.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_hide_bundles}}}
+          <div id="id_hide_bundles_help" class="form-input-hint">
+            Allows to hide the bundles in the side panel if you don't intend to use them.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="id_tag_search" class="form-label">Tag search</label>
+          {{{w_tag_search}}}
+          <div id="id_tag_search_help" class="form-input-hint">
+            In strict mode, tags must be prefixed with a hash character (#).
+            In lax mode, tags can also be searched without the hash character.
+            Note that tags without the hash character are indistinguishable from search terms, which means the search
+            result will also include bookmarks where a search term matches otherwise.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_legacy_search}}}
+          <div id="id_legacy_search_help" class="form-input-hint">
+            Since version 1.44.0, linkding has a new search engine that supports logical expressions (and, or, not).
+            If you run into any issues with the new search, you can enable this option to temporarily switch back to the old search.
+            Please report any issues you encounter with the new search on <a href="https://github.com/sissbruecker/linkding/issues"
+    target="_blank">GitHub</a> so they can be addressed.
+            This option will be removed in a future version.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="id_tag_grouping" class="form-label">Tag grouping</label>
+          {{{w_tag_grouping}}}
+          <div id="id_tag_grouping_help" class="form-input-hint">
+            In alphabetical mode, tags will be grouped by the first letter.
+            If disabled, tags will not be grouped.
+          </div>
+        </div>
+        <div class="form-group">
+          <details {{#open_auto_tagging_rules}}open{{/open_auto_tagging_rules}}>
+            <summary>
+              <span class="form-label d-inline-block">Auto Tagging</span>
+            </summary>
+            <label for="id_auto_tagging_rules"
+                   class="text-assistive">Auto Tagging</label>
+            <div>{{{w_auto_tagging_rules}}}</div>
+          </details>
+          <div id="id_auto_tagging_rules_help" class="form-input-hint">
+            Automatically adds tags to bookmarks based on predefined rules.
+            Each line is a single rule that maps a URL to one or more tags. For example:
+            <pre>youtube.com video
+reddit.com/r/Music music reddit</pre>
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_enable_favicons}}}
+          <div id="id_enable_favicons_help" class="form-input-hint">
+            Automatically loads favicons for bookmarked websites and displays them next to each bookmark.
+            Enabling this feature automatically downloads all missing favicons.
+            By default, this feature uses a <b>Google service</b> to download favicons.
+            If you don't want to use this service, check the
+            <a href="https://linkding.link/options/#ld_favicon_provider"
+               target="_blank">options documentation</a> on how to configure a custom favicon provider.
+            Icons are downloaded in the background, and it may take a while for them to show up.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_enable_preview_images}}}
+          <div id="id_enable_preview_images_help" class="form-input-hint">
+            Automatically loads preview images for bookmarked websites and displays them next to each bookmark.
+            Enabling this feature automatically downloads all missing preview images.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="id_web_archive_integration" class="form-label">Internet Archive integration</label>
+          {{{w_web_archive_integration}}}
+          <div id="id_web_archive_integration_help" class="form-input-hint">
+            Enabling this feature will automatically create snapshots of bookmarked websites on the
+            <a href="https://web.archive.org/" target="_blank" rel="noopener">Internet Archive Wayback Machine</a>.
+            This allows to preserve, and later access the website as it was at the point in time it was bookmarked, in
+            case it goes offline or its content is modified.
+            Please consider donating to the <a href="https://archive.org/donate" target="_blank" rel="noopener">Internet Archive</a> if you make use of this feature.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_enable_sharing}}}
+          <div id="id_enable_sharing_help" class="form-input-hint">
+            Allows to share bookmarks with other users, and to view shared bookmarks.
+            Disabling this feature will hide all previously shared bookmarks from other users.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_enable_public_sharing}}}
+          <div id="id_enable_public_sharing_help" class="form-input-hint">
+            Makes shared bookmarks publicly accessible, without requiring a login.
+            That means that anyone with a link to this instance can view shared bookmarks via the <a href="/bookmarks/shared">shared bookmarks page</a>.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_default_mark_unread}}}
+          <div id="id_default_mark_unread_help" class="form-input-hint">
+            Sets the default state for the "Mark as unread" option when creating a new bookmark.
+            Setting this option will make all new bookmarks default to unread.
+            This can be overridden when creating each new bookmark.
+          </div>
+        </div>
+        <div class="form-group">
+          {{{w_default_mark_shared}}}
+          <div id="id_default_mark_shared_help" class="form-input-hint">
+            Sets the default state for the "Share" option when creating a new bookmark.
+            Setting this option will make all new bookmarks default to shared.
+            This can be overridden when creating each new bookmark.
+          </div>
+        </div>
+        <div class="form-group">
+          <details {{#open_custom_css}}open{{/open_custom_css}}>
+            <summary>
+              <span class="form-label d-inline-block">Custom CSS</span>
+            </summary>
+            <label for="id_custom_css"
+                   class="text-assistive">Custom CSS</label>
+            <div>{{{w_custom_css}}}</div>
+          </details>
+          <div id="id_custom_css_help" class="form-input-hint">
+            Allows to add custom CSS to the page.
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="submit"
+                 name="update_profile"
+                 value="Save"
+                 class="btn btn-primary btn-wide mt-2">
+        </div>
+      </form>
+    </section>
+{{#isSuperuser}}
+{{> settings-global}}
+{{/isSuperuser}}
+    <section aria-labelledby="import-heading">
+      <h2 id="import-heading">Import</h2>
+      <p>
+        Import bookmarks and tags in the Netscape HTML format. This will execute a sync where new bookmarks are
+        added and existing ones are updated.
+      </p>
+      <form method="post"
+            enctype="multipart/form-data"
+            action="/settings/import">
+        {{> csrf-input}}
+        <div class="form-group">
+          <label for="import_map_private_flag" class="form-checkbox">
+            <input type="checkbox"
+                   id="import_map_private_flag"
+                   name="map_private_flag"
+                   aria-describedby="import_map_private_flag_help">
+            <i class="form-icon"></i> Import public bookmarks as shared
+          </label>
+          <div id="import_map_private_flag_help" class="form-input-hint">
+            When importing bookmarks from a service that supports marking bookmarks as public or private (using the
+            <code>PRIVATE</code> attribute), enabling this option will import all bookmarks that are marked as not
+            private as shared bookmarks.
+            Otherwise, all bookmarks will be imported as private bookmarks.
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group width-75 width-md-100">
+            <input class="form-input" type="file" name="import_file">
+            <input type="submit" class="input-group-btn btn btn-primary" value="Upload">
+          </div>
+        </div>
+      </form>
+    </section>
+    <section aria-labelledby="export-heading">
+      <h2 id="export-heading">Export</h2>
+      <p>Export all bookmarks in Netscape HTML format.</p>
+      <a class="btn btn-primary"
+         target="_blank"
+         href="/settings/export">Download (.html)</a>
+    </section>
+    <section class="about" aria-labelledby="about-heading">
+      <h2 id="about-heading">About</h2>
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>Version</td>
+            <td>{{about}}</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top">Links</td>
+            <td>
+              <div class="d-flex flex-column gap-2">
+                <a href="https://github.com/sissbruecker/linkding/" target="_blank">GitHub</a>
+                <a href="https://linkding.link/" target="_blank">Documentation</a>
+                <a href="https://github.com/sissbruecker/linkding/blob/master/CHANGELOG.md"
+                   target="_blank">Changelog</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>    (function init() {
+      const enableSharing = document.getElementById("id_enable_sharing");
+      const enablePublicSharing = document.getElementById("id_enable_public_sharing");
+      const defaultMarkShared = document.getElementById("id_default_mark_shared");
+      const bookmarkDescriptionDisplay = document.getElementById("id_bookmark_description_display");
+      const bookmarkDescriptionMaxLines = document.getElementById("id_bookmark_description_max_lines");
+
+      // Automatically disable public bookmark sharing and default shared option if bookmark sharing is disabled
+      function updateSharingOptions() {
+        if (enableSharing.checked) {
+          enablePublicSharing.disabled = false;
+          defaultMarkShared.disabled = false;
+        } else {
+          enablePublicSharing.disabled = true;
+          enablePublicSharing.checked = false;
+          defaultMarkShared.disabled = true;
+          defaultMarkShared.checked = false;
+        }
+      }
+
+      updateSharingOptions();
+      enableSharing.addEventListener("change", updateSharingOptions);
+
+      // Automatically hide the bookmark description max lines input if the description display is set to inline
+      function updateBookmarkDescriptionMaxLines() {
+        if (bookmarkDescriptionDisplay.value === "inline") {
+          bookmarkDescriptionMaxLines.closest(".form-group").classList.add("d-hide");
+        } else {
+          bookmarkDescriptionMaxLines.closest(".form-group").classList.remove("d-hide");
+        }
+      }
+
+      updateBookmarkDescriptionMaxLines();
+      bookmarkDescriptionDisplay.addEventListener("change", updateBookmarkDescriptionMaxLines);
+    })();
+  </script>

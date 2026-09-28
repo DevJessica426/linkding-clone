@@ -138,6 +138,9 @@ EXPECTED.append((
 
 
 def normalize(document):
+    # The clone's templates (Mustache) write "/" in values as "&#x2F;", which
+    # parses to the same page; spelled out, the patterns below see it.
+    document = document.replace("&#x2F;", "/")
     for pattern, replacement in EXPECTED:
         document = pattern.sub(replacement, document)
     parser = Tokens()
