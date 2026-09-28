@@ -16,7 +16,10 @@ part of 'database.dart';
 final class _$LinkdingDatabase implements LinkdingDatabase {
   _$LinkdingDatabase._(this._driver);
 
-  factory _$LinkdingDatabase.connect(String url, {PgConnectOptions? options}) {
+  factory _$LinkdingDatabase.connect(
+    String url, {
+    PgConnectOptions? options,
+  }) {
     final driver = PostgresDriver.connect(
       url,
       migrations: _$linkdingDatabaseMigrations,

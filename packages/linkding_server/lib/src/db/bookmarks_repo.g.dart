@@ -49,11 +49,7 @@ FROM bookmarks_bookmark WHERE id = $1
   }
 
   @override
-  Future<Result<BookmarkRow?, SqlxError>> existing(
-    int ownerId,
-    String normalizedUrl,
-    String url,
-  ) {
+  Future<Result<BookmarkRow?, SqlxError>> existing(int ownerId, String normalizedUrl, String url) {
     return _db.fetchOptional<BookmarkRow>(
       r'''
 SELECT id, url, url_normalized, title, description, notes,
@@ -85,12 +81,7 @@ SELECT EXISTS (
   }
 
   @override
-  Future<Result<bool, SqlxError>> duplicate(
-    int ownerId,
-    String normalizedUrl,
-    String url,
-    int id,
-  ) {
+  Future<Result<bool, SqlxError>> duplicate(int ownerId, String normalizedUrl, String url, int id) {
     return _db.fetchScalar<bool>(
       r'''
 SELECT EXISTS (
@@ -105,19 +96,7 @@ SELECT EXISTS (
   }
 
   @override
-  Future<Result<BookmarkRow, SqlxError>> insert(
-    String url,
-    String urlNormalized,
-    String title,
-    String description,
-    String notes,
-    bool unread,
-    bool isArchived,
-    bool shared,
-    DateTime dateAdded,
-    DateTime dateModified,
-    int ownerId,
-  ) {
+  Future<Result<BookmarkRow, SqlxError>> insert(String url, String urlNormalized, String title, String description, String notes, bool unread, bool isArchived, bool shared, DateTime dateAdded, DateTime dateModified, int ownerId) {
     return _db.fetchOne<BookmarkRow>(
       r'''
 INSERT INTO bookmarks_bookmark (
@@ -132,37 +111,13 @@ RETURNING id, url, url_normalized, title, description, notes,
           is_archived, shared, date_added, date_modified, date_accessed,
           owner_id, latest_snapshot_id
 ''',
-      [
-        url,
-        urlNormalized,
-        title,
-        description,
-        notes,
-        unread,
-        isArchived,
-        shared,
-        dateAdded,
-        dateModified,
-        ownerId,
-      ],
+      [url, urlNormalized, title, description, notes, unread, isArchived, shared, dateAdded, dateModified, ownerId],
       const $BookmarkRowRowDeserializer().deserialize,
     );
   }
 
   @override
-  Future<Result<BookmarkRow, SqlxError>> update(
-    int id,
-    String url,
-    String urlNormalized,
-    String title,
-    String description,
-    String notes,
-    bool unread,
-    bool isArchived,
-    bool shared,
-    DateTime dateAdded,
-    DateTime dateModified,
-  ) {
+  Future<Result<BookmarkRow, SqlxError>> update(int id, String url, String urlNormalized, String title, String description, String notes, bool unread, bool isArchived, bool shared, DateTime dateAdded, DateTime dateModified) {
     return _db.fetchOne<BookmarkRow>(
       r'''
 UPDATE bookmarks_bookmark SET
@@ -175,19 +130,7 @@ RETURNING id, url, url_normalized, title, description, notes,
           is_archived, shared, date_added, date_modified, date_accessed,
           owner_id, latest_snapshot_id
 ''',
-      [
-        id,
-        url,
-        urlNormalized,
-        title,
-        description,
-        notes,
-        unread,
-        isArchived,
-        shared,
-        dateAdded,
-        dateModified,
-      ],
+      [id, url, urlNormalized, title, description, notes, unread, isArchived, shared, dateAdded, dateModified],
       const $BookmarkRowRowDeserializer().deserialize,
     );
   }
@@ -211,9 +154,7 @@ RETURNING file
   }
 
   @override
-  Future<Result<List<BookmarkTagRow>, SqlxError>> tagNames(
-    List<int> bookmarkIds,
-  ) {
+  Future<Result<List<BookmarkTagRow>, SqlxError>> tagNames(List<int> bookmarkIds) {
     return _db.fetchAll<BookmarkTagRow>(
       r'''
 SELECT bt.bookmark_id, t.id AS tag_id, t.name
@@ -241,159 +182,107 @@ ORDER BY id
   }
 
   @override
-  Future<Result<Unit, SqlxError>> unlinkOtherTags(
-    int bookmarkId,
-    List<int> tagIds,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> unlinkOtherTags(int bookmarkId, List<int> tagIds) {
+    return _db.execute(
+      r'''
 DELETE FROM bookmarks_bookmark_tags
 WHERE bookmark_id = $1 AND NOT (tag_id = ANY($2))
 ''',
-          [bookmarkId, tagIds],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [bookmarkId, tagIds],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
   Future<Result<Unit, SqlxError>> linkTags(int bookmarkId, List<int> tagIds) {
-    return _db
-        .execute(
-          r'''
+    return _db.execute(
+      r'''
 INSERT INTO bookmarks_bookmark_tags (bookmark_id, tag_id)
 SELECT $1, tag_id FROM unnest($2::integer[]) AS tag_id
 ON CONFLICT (bookmark_id, tag_id) DO NOTHING
 ''',
-          [bookmarkId, tagIds],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [bookmarkId, tagIds],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setArchived(
-    int ownerId,
-    List<int> ids,
-    bool archived,
-    DateTime now,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> setArchived(int ownerId, List<int> ids, bool archived, DateTime now) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET is_archived = $3, date_modified = $4
 WHERE owner_id = $1 AND id = ANY($2)
 ''',
-          [ownerId, ids, archived, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [ownerId, ids, archived, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setUnread(
-    int ownerId,
-    List<int> ids,
-    bool unread,
-    DateTime now,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> setUnread(int ownerId, List<int> ids, bool unread, DateTime now) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET unread = $3, date_modified = $4
 WHERE owner_id = $1 AND id = ANY($2)
 ''',
-          [ownerId, ids, unread, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [ownerId, ids, unread, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setShared(
-    int ownerId,
-    List<int> ids,
-    bool shared,
-    DateTime now,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> setShared(int ownerId, List<int> ids, bool shared, DateTime now) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET shared = $3, date_modified = $4
 WHERE owner_id = $1 AND id = ANY($2)
 ''',
-          [ownerId, ids, shared, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [ownerId, ids, shared, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setState(
-    int id,
-    int ownerId,
-    bool isArchived,
-    bool unread,
-    bool shared,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> setState(int id, int ownerId, bool isArchived, bool unread, bool shared) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET is_archived = $3, unread = $4, shared = $5
 WHERE id = $1 AND owner_id = $2
 ''',
-          [id, ownerId, isArchived, unread, shared],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [id, ownerId, isArchived, unread, shared],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
   Future<Result<Unit, SqlxError>> markRead(int id, int ownerId) {
-    return _db
-        .execute(
-          r'''
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET unread = false WHERE id = $1 AND owner_id = $2
 ''',
-          [id, ownerId],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [id, ownerId],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> touch(
-    int ownerId,
-    List<int> ids,
-    DateTime now,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> touch(int ownerId, List<int> ids, DateTime now) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET date_modified = $3
 WHERE owner_id = $1 AND id = ANY($2)
 ''',
-          [ownerId, ids, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [ownerId, ids, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
@@ -409,55 +298,34 @@ ORDER BY id
   }
 
   @override
-  Future<Result<Unit, SqlxError>> linkAll(
-    List<int> bookmarkIds,
-    List<int> tagIds,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> linkAll(List<int> bookmarkIds, List<int> tagIds) {
+    return _db.execute(
+      r'''
 INSERT INTO bookmarks_bookmark_tags (bookmark_id, tag_id)
 SELECT b, t FROM unnest($1::integer[]) AS b, unnest($2::integer[]) AS t
 ON CONFLICT (bookmark_id, tag_id) DO NOTHING
 ''',
-          [bookmarkIds, tagIds],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [bookmarkIds, tagIds],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> unlinkAll(
-    List<int> bookmarkIds,
-    List<int> tagIds,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> unlinkAll(List<int> bookmarkIds, List<int> tagIds) {
+    return _db.execute(
+      r'''
 DELETE FROM bookmarks_bookmark_tags
 WHERE bookmark_id = ANY($1) AND tag_id = ANY($2)
 ''',
-          [bookmarkIds, tagIds],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [bookmarkIds, tagIds],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<List<BookmarkRow>, SqlxError>> list(
-    int? ownerId,
-    String list,
-    bool publicOnly,
-    DateTime? modifiedSince,
-    DateTime? addedSince,
-    String unread,
-    String shared,
-    String sort,
-  ) {
+  Future<Result<List<BookmarkRow>, SqlxError>> list(int? ownerId, String list, bool publicOnly, DateTime? modifiedSince, DateTime? addedSince, String unread, String shared, String sort) {
     return _db.fetchAll<BookmarkRow>(
       r'''
 SELECT b.id, b.url, b.url_normalized, b.title, b.description, b.notes,
@@ -492,16 +360,7 @@ ORDER BY
   CASE WHEN $8 IN ('title_asc', 'added_asc', 'modified_asc') THEN b.id END ASC,
   b.id DESC
 ''',
-      [
-        ownerId,
-        list,
-        publicOnly,
-        modifiedSince,
-        addedSince,
-        unread,
-        shared,
-        sort,
-      ],
+      [ownerId, list, publicOnly, modifiedSince, addedSince, unread, shared, sort],
       const $BookmarkRowRowDeserializer().deserialize,
     );
   }
@@ -522,10 +381,7 @@ FROM bookmarks_bookmark WHERE owner_id = $1
   }
 
   @override
-  Future<Result<List<BookmarkRow>, SqlxError>> withNormalizedUrls(
-    int ownerId,
-    List<String> normalizedUrls,
-  ) {
+  Future<Result<List<BookmarkRow>, SqlxError>> withNormalizedUrls(int ownerId, List<String> normalizedUrls) {
     return _db.fetchAll<BookmarkRow>(
       r'''
 SELECT id, url, url_normalized, title, description, notes,
@@ -540,42 +396,17 @@ FROM bookmarks_bookmark WHERE owner_id = $1 AND url_normalized = ANY($2)
   }
 
   @override
-  Future<Result<Unit, SqlxError>> importUpdate(
-    int id,
-    String url,
-    String urlNormalized,
-    DateTime dateAdded,
-    DateTime dateModified,
-    bool unread,
-    bool shared,
-    String title,
-    String description,
-    String notes,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> importUpdate(int id, String url, String urlNormalized, DateTime dateAdded, DateTime dateModified, bool unread, bool shared, String title, String description, String notes) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET
   url = $2, url_normalized = $3, date_added = $4, date_modified = $5,
   unread = $6, shared = $7, title = $8, description = $9, notes = $10
 WHERE id = $1
 ''',
-          [
-            id,
-            url,
-            urlNormalized,
-            dateAdded,
-            dateModified,
-            unread,
-            shared,
-            title,
-            description,
-            notes,
-          ],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [id, url, urlNormalized, dateAdded, dateModified, unread, shared, title, description, notes],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 }

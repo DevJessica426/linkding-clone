@@ -61,12 +61,8 @@ ProfileRow _$ProfileRowFromRow(Row row) {
     userId: row.read<int>('user_id'),
     theme: row.read<String>('theme'),
     bookmarkDateDisplay: row.read<String>('bookmark_date_display'),
-    bookmarkDescriptionDisplay: row.read<String>(
-      'bookmark_description_display',
-    ),
-    bookmarkDescriptionMaxLines: row.read<int>(
-      'bookmark_description_max_lines',
-    ),
+    bookmarkDescriptionDisplay: row.read<String>('bookmark_description_display'),
+    bookmarkDescriptionMaxLines: row.read<int>('bookmark_description_max_lines'),
     bookmarkLinkTarget: row.read<String>('bookmark_link_target'),
     webArchiveIntegration: row.read<String>('web_archive_integration'),
     tagSearch: row.read<String>('tag_search'),
@@ -78,18 +74,14 @@ ProfileRow _$ProfileRowFromRow(Row row) {
     displayUrl: row.readBool('display_url'),
     displayViewBookmarkAction: row.readBool('display_view_bookmark_action'),
     displayEditBookmarkAction: row.readBool('display_edit_bookmark_action'),
-    displayArchiveBookmarkAction: row.readBool(
-      'display_archive_bookmark_action',
-    ),
+    displayArchiveBookmarkAction: row.readBool('display_archive_bookmark_action'),
     displayRemoveBookmarkAction: row.readBool('display_remove_bookmark_action'),
     permanentNotes: row.readBool('permanent_notes'),
     customCss: row.read<String>('custom_css'),
     customCssHash: row.read<String>('custom_css_hash'),
     autoTaggingRules: row.read<String>('auto_tagging_rules'),
     searchPreferencesJson: row.read<String>('search_preferences_json'),
-    enableAutomaticHtmlSnapshots: row.readBool(
-      'enable_automatic_html_snapshots',
-    ),
+    enableAutomaticHtmlSnapshots: row.readBool('enable_automatic_html_snapshots'),
     defaultMarkUnread: row.readBool('default_mark_unread'),
     defaultMarkShared: row.readBool('default_mark_shared'),
     itemsPerPage: row.read<int>('items_per_page'),
@@ -149,8 +141,7 @@ BookmarkRow _$BookmarkRowFromRow(Row row) {
 }
 
 /// Row deserializer for [BookmarkRow].
-final class $BookmarkRowRowDeserializer
-    implements RowDeserializer<BookmarkRow> {
+final class $BookmarkRowRowDeserializer implements RowDeserializer<BookmarkRow> {
   const $BookmarkRowRowDeserializer();
 
   @override
@@ -184,8 +175,7 @@ BookmarkTagRow _$BookmarkTagRowFromRow(Row row) {
 }
 
 /// Row deserializer for [BookmarkTagRow].
-final class $BookmarkTagRowRowDeserializer
-    implements RowDeserializer<BookmarkTagRow> {
+final class $BookmarkTagRowRowDeserializer implements RowDeserializer<BookmarkTagRow> {
   const $BookmarkTagRowRowDeserializer();
 
   @override
@@ -296,8 +286,7 @@ TagUsageRow _$TagUsageRowFromRow(Row row) {
 }
 
 /// Row deserializer for [TagUsageRow].
-final class $TagUsageRowRowDeserializer
-    implements RowDeserializer<TagUsageRow> {
+final class $TagUsageRowRowDeserializer implements RowDeserializer<TagUsageRow> {
   const $TagUsageRowRowDeserializer();
 
   @override
@@ -376,8 +365,7 @@ ApiTokenRow _$ApiTokenRowFromRow(Row row) {
 }
 
 /// Row deserializer for [ApiTokenRow].
-final class $ApiTokenRowRowDeserializer
-    implements RowDeserializer<ApiTokenRow> {
+final class $ApiTokenRowRowDeserializer implements RowDeserializer<ApiTokenRow> {
   const $ApiTokenRowRowDeserializer();
 
   @override
@@ -412,8 +400,7 @@ GlobalSettingsRow _$GlobalSettingsRowFromRow(Row row) {
 }
 
 /// Row deserializer for [GlobalSettingsRow].
-final class $GlobalSettingsRowRowDeserializer
-    implements RowDeserializer<GlobalSettingsRow> {
+final class $GlobalSettingsRowRowDeserializer implements RowDeserializer<GlobalSettingsRow> {
   const $GlobalSettingsRowRowDeserializer();
 
   @override

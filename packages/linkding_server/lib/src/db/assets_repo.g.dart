@@ -47,11 +47,7 @@ WHERE a.id = $1 AND b.owner_id = $2
   }
 
   @override
-  Future<Result<AssetRow?, SqlxError>> ofBookmark(
-    int id,
-    int bookmarkId,
-    int ownerId,
-  ) {
+  Future<Result<AssetRow?, SqlxError>> ofBookmark(int id, int bookmarkId, int ownerId) {
     return _db.fetchOptional<AssetRow>(
       r'''
 SELECT a.id, a.date_created, a.file, a.file_size, a.asset_type,
@@ -66,17 +62,7 @@ WHERE a.id = $1 AND a.bookmark_id = $2 AND b.owner_id = $3
   }
 
   @override
-  Future<Result<AssetRow, SqlxError>> insert(
-    DateTime dateCreated,
-    String file,
-    int? fileSize,
-    String assetType,
-    String contentType,
-    String displayName,
-    String status,
-    bool gzip,
-    int bookmarkId,
-  ) {
+  Future<Result<AssetRow, SqlxError>> insert(DateTime dateCreated, String file, int? fileSize, String assetType, String contentType, String displayName, String status, bool gzip, int bookmarkId) {
     return _db.fetchOne<AssetRow>(
       r'''
 INSERT INTO bookmarks_bookmarkasset (
@@ -86,26 +72,15 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING id, date_created, file, file_size, asset_type, content_type,
           display_name, status, gzip, bookmark_id
 ''',
-      [
-        dateCreated,
-        file,
-        fileSize,
-        assetType,
-        contentType,
-        displayName,
-        status,
-        gzip,
-        bookmarkId,
-      ],
+      [dateCreated, file, fileSize, assetType, contentType, displayName, status, gzip, bookmarkId],
       const $AssetRowRowDeserializer().deserialize,
     );
   }
 
   @override
   Future<Result<Unit, SqlxError>> delete(int id, DateTime now) {
-    return _db
-        .execute(
-          r'''
+    return _db.execute(
+      r'''
 WITH gone AS (
   DELETE FROM bookmarks_bookmarkasset WHERE id = $1 RETURNING id, bookmark_id
 )
@@ -122,44 +97,32 @@ UPDATE bookmarks_bookmark b SET
   END
 WHERE b.id = (SELECT bookmark_id FROM gone)
 ''',
-          [id, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [id, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
-  Future<Result<Unit, SqlxError>> setLatestSnapshot(
-    int bookmarkId,
-    int assetId,
-    DateTime now,
-  ) {
-    return _db
-        .execute(
-          r'''
+  Future<Result<Unit, SqlxError>> setLatestSnapshot(int bookmarkId, int assetId, DateTime now) {
+    return _db.execute(
+      r'''
 UPDATE bookmarks_bookmark SET latest_snapshot_id = $2, date_modified = $3
 WHERE id = $1
 ''',
-          [bookmarkId, assetId, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+      [bookmarkId, assetId, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 
   @override
   Future<Result<Unit, SqlxError>> touchBookmark(int bookmarkId, DateTime now) {
-    return _db
-        .execute(
-          r'''UPDATE bookmarks_bookmark SET date_modified = $2 WHERE id = $1''',
-          [bookmarkId, now],
-        )
-        .then(
-          (result) =>
-              result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
-        );
+    return _db.execute(
+      r'''UPDATE bookmarks_bookmark SET date_modified = $2 WHERE id = $1''',
+      [bookmarkId, now],
+    ).then(
+      (result) => result.andThen<Unit>((_) => const Ok<Unit, SqlxError>(unit)),
+    );
   }
 }
