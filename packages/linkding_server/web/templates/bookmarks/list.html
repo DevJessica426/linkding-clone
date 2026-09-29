@@ -1,0 +1,42 @@
+{{#hasItems}}
+  <section aria-label="Bookmark list">
+    <ul class="bookmark-list{{#showNotes}} show-notes{{/showNotes}}"
+        role="list"
+        tabindex="-1"
+        style="--ld-bookmark-description-max-lines:{{maxLines}}"
+        data-bookmarks-total="{{total}}">
+{{#items}}
+{{> bookmark-item}}
+{{/items}}
+    </ul>
+    <div class="bookmark-pagination{{#stickyPagination}} sticky{{/stickyPagination}}">
+{{#pagination}}
+{{> pagination}}
+{{/pagination}}
+    </div>
+  </section>
+{{/hasItems}}
+{{^hasItems}}
+{{#invalidQuery}}
+<div class="empty mt-4">
+    <p class="empty-title h5">Invalid search query</p>
+    <p class="empty-subtitle">
+      The search query you entered is not valid. Common reasons are unclosed parentheses or a logical operator (AND, OR,
+      NOT) without operands. The error message from the parser is: "{{queryError}}".
+    </p>
+</div>
+{{/invalidQuery}}
+{{^invalidQuery}}
+<div class="empty mt-4">
+    <p class="empty-title h5">You have no bookmarks yet</p>
+    <p class="empty-subtitle">
+      You can get started by <a href="/bookmarks/new">adding</a> bookmarks,
+      <a href="/settings/general">importing</a> your existing bookmarks or configuring the
+      <a href="/settings/integrations">browser extension</a> or the <a href="/settings/integrations">bookmarklet</a>.
+    </p>
+</div>
+{{/invalidQuery}}
+{{/hasItems}}
+<script>
+  document.dispatchEvent(new CustomEvent('bookmark-list-updated'));
+</script>

@@ -1,7 +1,7 @@
 import 'package:dust_server/server.dart';
 
 import '../config.dart';
-import '../web/html.dart' show q;
+import 'html.dart' show q;
 import 'visitor.dart';
 
 /// What every template can use: the CSRF token, produced only when a

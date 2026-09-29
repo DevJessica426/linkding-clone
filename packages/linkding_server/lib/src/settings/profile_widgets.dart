@@ -1,6 +1,6 @@
 import '../db/rows.dart';
-import '../web/forms.dart';
-import '../web/html.dart';
+import '../pages/html.dart';
+import '../pages/widgets.dart';
 import 'profile_form.dart';
 
 /// A `FormSelect` with the attributes [fieldAttributes] built.

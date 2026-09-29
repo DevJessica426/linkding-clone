@@ -8,6 +8,8 @@ import '../assets/asset_pages.dart';
 import '../auth/password_validation.dart';
 import '../auth/passwords.dart';
 import '../auth/sessions.dart';
+import '../bookmarks/bookmarks.dart';
+import '../bundles/bundles.dart';
 import '../config.dart';
 import '../db/database.dart';
 import '../feeds/feeds.dart';
@@ -21,10 +23,8 @@ import '../services/website_loader.dart';
 import '../settings/settings.dart';
 import '../site/site.dart';
 import '../tags/tags.dart';
-import '../web/context.dart';
 import 'headers.dart';
 import 'health.dart';
-import 'legacy_pages.dart';
 
 /// The whole application: the pages, the REST API under `/api`, the static
 /// files, and the health check, with what they depend on attached as state.
@@ -45,22 +45,6 @@ Router buildApp({
     '${config.webRoot}/templates',
   );
   final errors = ErrorPages(templates);
-  final api = LinkdingApi(
-    database: database,
-    bookmarks: bookmarks,
-    assets: assets,
-    metadata: metadata,
-    sessions: sessions,
-    config: config,
-  );
-  final web = Web(
-    database: database,
-    config: config,
-    sessions: sessions,
-    bookmarks: bookmarks,
-    assets: assets,
-    metadata: metadata,
-  );
 
   // Every page goes through Django's middleware, as layers: who the
   // visitor is, the CSRF check, and the error pages.
@@ -70,20 +54,21 @@ Router buildApp({
     ..routeLayer(PageErrors(errors))
     ..merge(siteRoutes())
     ..merge(accountRoutes())
+    ..merge(bookmarkRoutes())
     ..merge(feedRoutes())
     ..merge(tagRoutes())
     ..merge(assetRoutes())
     ..merge(settingsRoutes())
-    ..merge(legacyPages(web));
+    ..merge(bundleRoutes());
 
   return Router(onError: onError ?? _reportToStderr)
     ..layer(securityHeaders)
     ..layer(const OpenerPolicy())
     ..merge(pages)
     ..mount('/static', staticFiles('${config.webRoot}/static'))
-    ..route('/api/', any(api.root))
-    ..route('/api', any(LinkdingApi.appendSlash))
-    ..nest('/api', api.router())
+    ..route('/api/', any(apiRoot))
+    ..route('/api', any(appendSlash))
+    ..nest('/api', apiRoutes())
     ..route('/health', get(health))
     ..fallback((_) => errors.notFound())
     ..withState<LinkdingDatabase>(database)

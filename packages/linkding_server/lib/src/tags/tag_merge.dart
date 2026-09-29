@@ -2,8 +2,8 @@ import 'package:dust_server/server.dart';
 
 import '../compat/form_data.dart';
 import '../pages/session_data.dart';
+import '../pages/widgets.dart';
 import '../services/errors.dart';
-import '../web/forms.dart';
 import 'tag_dialogs.dart';
 import 'tag_forms.dart';
 

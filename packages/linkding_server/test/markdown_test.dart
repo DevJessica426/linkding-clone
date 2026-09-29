@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:linkding_server/src/web/markdown.dart';
+import 'package:linkding_server/src/notes/markdown.dart';
 import 'package:test/test.dart';
 
 /// Bookmark notes rendered as linkding's `{% markdown %}` tag renders them,

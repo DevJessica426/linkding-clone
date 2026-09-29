@@ -1,0 +1,76 @@
+{{#viewAction}}
+                  <a href="{{detailsUrl}}"
+                     class="view-action"
+                     data-turbo-action="replace"
+                     data-turbo-frame="details-modal">View</a>
+{{/viewAction}}
+{{#isEditable}}
+{{#editAction}}
+                    <a href="/bookmarks/{{id}}/edit?return_url={{returnUrl}}">Edit</a>
+{{/editAction}}
+{{#archiveAction}}
+{{#isArchived}}
+                      <button type="submit"
+                              name="unarchive"
+                              value="{{id}}"
+                              class="btn btn-link btn-sm">Unarchive</button>
+{{/isArchived}}
+{{^isArchived}}
+                      <button type="submit"
+                              name="archive"
+                              value="{{id}}"
+                              class="btn btn-link btn-sm">Archive</button>
+{{/isArchived}}
+{{/archiveAction}}
+{{#removeAction}}
+                    <button data-confirm
+                            type="submit"
+                            name="remove"
+                            value="{{id}}"
+                            class="btn btn-link btn-sm">Remove</button>
+{{/removeAction}}
+{{/isEditable}}
+{{^isEditable}}
+                  <span>Shared by
+                    <a href="?{{ownerQuery}}">{{owner}}</a>
+                  </span>
+{{/isEditable}}
+{{#hasExtraActions}}
+                  <div class="extra-actions">
+                    <span class="hide-sm">|</span>
+{{#markAsRead}}
+                      <button type="submit"
+                              name="mark_as_read"
+                              value="{{id}}"
+                              class="btn btn-link btn-sm btn-icon"
+                              data-confirm
+                              data-confirm-question="Mark as read?">
+                        <svg width="16" height="16">
+                          <use href="/static/icons.svg?v={{version}}#unread"></use>
+                        </svg>
+                        Unread
+                      </button>
+{{/markAsRead}}
+{{#unshare}}
+                      <button type="submit"
+                              name="unshare"
+                              value="{{id}}"
+                              class="btn btn-link btn-sm btn-icon"
+                              data-confirm
+                              data-confirm-question="Unshare?">
+                        <svg width="16" height="16">
+                          <use href="/static/icons.svg?v={{version}}#share"></use>
+                        </svg>
+                        Shared
+                      </button>
+{{/unshare}}
+{{#notesButton}}
+                      <button type="button" class="btn btn-link btn-sm btn-icon toggle-notes">
+                        <svg width="16" height="16">
+                          <use href="/static/icons.svg?v={{version}}#note"></use>
+                        </svg>
+                        Notes
+                      </button>
+{{/notesButton}}
+                  </div>
+{{/hasExtraActions}}

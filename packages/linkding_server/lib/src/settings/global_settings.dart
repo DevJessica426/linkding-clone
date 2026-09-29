@@ -4,8 +4,9 @@ import '../compat/form_data.dart';
 import '../db/rows.dart';
 import '../db/settings_repo.dart';
 import '../db/users_repo.dart';
+import '../pages/cleaning.dart';
+import '../pages/widgets.dart';
 import '../services/errors.dart';
-import '../web/forms.dart';
 import 'profile_widgets.dart';
 
 /// What `settings-global.html` reads: the global settings' widgets, for a

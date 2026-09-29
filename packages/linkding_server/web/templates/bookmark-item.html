@@ -1,0 +1,85 @@
+        <li data-bookmark-id="{{id}}"
+            role="listitem"
+            {{#hasClasses}}class="{{classes}}"{{/hasClasses}}>
+          <div class="content">
+            <div class="title">
+{{#showActions}}
+                <label class="form-checkbox bulk-edit-checkbox">
+                  <input type="checkbox" name="bookmark_id" value="{{id}}">
+                  <i class="form-icon"></i>
+                </label>
+{{/showActions}}
+{{#hasFavicon}}
+                <img class="favicon" src="{{favicon}}" alt="">
+{{/hasFavicon}}
+              <a href="{{url}}"
+                 target="{{target}}"
+                 rel="noopener">
+                <span>{{title}}</span>
+              </a>
+            </div>
+{{#displayUrl}}
+              <div class="url-path truncate">
+                <a href="{{url}}"
+                   target="{{target}}"
+                   rel="noopener"
+                   class="url-display">{{url}}</a>
+              </div>
+{{/displayUrl}}
+{{#inlineDescription}}
+              <div class="description inline truncate">
+{{#hasTags}}
+                  <span class="tags">
+                    {{#tags}}<a href="?{{query}}">{{name}}</a>{{/tags}}
+                  </span>
+{{/hasTags}}
+                {{#tagsAndDescription}}|{{/tagsAndDescription}}
+                {{#hasDescription}}<span>{{description}}</span>{{/hasDescription}}
+              </div>
+{{/inlineDescription}}
+{{^inlineDescription}}
+              {{#hasDescription}}<div class="description separate">{{description}}</div>{{/hasDescription}}
+{{#hasTags}}
+                <div class="tags">
+                  {{#tags}}<a href="?{{query}}">{{name}}</a>{{/tags}}
+                </div>
+{{/hasTags}}
+{{/inlineDescription}}
+{{#hasNotes}}
+              <div class="notes">
+                <div class="markdown">{{{notes}}}</div>
+              </div>
+{{/hasNotes}}
+            <div class="actions">
+{{#hasDate}}
+{{#hasSnapshot}}
+                <a href="{{snapshotUrl}}"
+                     title="{{snapshotTitle}}"
+                     target="{{target}}"
+                     rel="noopener">{{date}}</a>
+{{/hasSnapshot}}
+{{^hasSnapshot}}
+                <span>{{date}}</span>
+{{/hasSnapshot}}
+{{#showActions}}
+                <span>|</span>
+{{/showActions}}
+{{/hasDate}}
+{{#showActions}}
+{{> bookmark-item-actions}}
+{{/showActions}}
+            </div>
+          </div>
+{{#previewImages}}
+{{#hasPreviewImage}}
+              <img class="preview-image"
+                   src="{{previewImage}}"
+                   alt=""
+                   loading="lazy" />
+{{/hasPreviewImage}}
+{{^hasPreviewImage}}
+              <div class="preview-image placeholder">
+                <div class="img" /></div>
+{{/hasPreviewImage}}
+{{/previewImages}}
+        </li>

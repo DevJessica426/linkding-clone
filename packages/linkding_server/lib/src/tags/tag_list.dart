@@ -4,14 +4,14 @@ import '../compat/form_data.dart';
 import '../db/database.dart';
 import '../db/rows.dart';
 import '../db/tags_repo.dart';
+import '../pages/html.dart' show q;
 import '../pages/paginator.dart';
 import '../pages/query.dart';
+import '../pages/query_params.dart';
 import '../pages/render.dart';
 import '../pages/session_data.dart';
 import '../pages/visitor.dart';
 import '../services/errors.dart';
-import '../web/html.dart' show q;
-import '../web/query_params.dart';
 import 'tag_forms.dart';
 
 /// `/tags`: search, filter, sort and page through the tags, or remove one.

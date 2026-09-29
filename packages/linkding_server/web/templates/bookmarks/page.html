@@ -1,0 +1,61 @@
+  <ld-bookmark-page {{^bulkEdit}}no-bulk-edit{{/bulkEdit}}
+                    class="bookmarks-page grid columns-md-1 {{#collapseSidePanel}}collapse-side-panel{{/collapseSidePanel}}">
+    <main class="main col-2" aria-labelledby="main-heading">
+      <div class="section-header {{#bulkEdit}}mb-0{{/bulkEdit}}">
+        <h1 id="main-heading">{{heading}}</h1>
+        <div class="header-controls">
+{{#search}}
+{{> bookmark-search}}
+{{/search}}
+{{#bulkEdit}}
+          <button class="btn hide-sm ml-2 bulk-edit-active-toggle" title="Bulk edit">
+            <svg width="20px" height="20px">
+              <use href="/static/icons.svg?v={{version}}#bulk-edit"></use>
+            </svg>
+          </button>
+{{/bulkEdit}}
+          <ld-filter-drawer-trigger>
+            <button class="btn ml-2">Filters</button>
+          </ld-filter-drawer-trigger>
+        </div>
+      </div>
+      <form class="bookmark-actions"
+            action="{{actionUrl}}"
+            method="post"
+            autocomplete="off">
+        {{> csrf-input}}
+{{#bulkEdit}}
+{{> bookmark-bulk-bar}}
+{{/bulkEdit}}
+        <div id="bookmark-list-container">{{{list}}}</div>
+      </form>
+    </main>
+    <div class="side-panel col-1 hide-md">
+{{#bundleSection}}
+{{> bookmark-bundles}}
+{{/bundleSection}}
+{{#userSection}}
+{{> bookmark-users}}
+{{/userSection}}
+<section aria-labelledby="tags-heading">
+  <div class="section-header no-wrap">
+    <h2 id="tags-heading">Tags</h2>
+{{#signedIn}}
+      <ld-dropdown class="dropdown dropdown-right ml-auto">
+        <button class="btn btn-noborder dropdown-toggle" aria-label="Tags menu">
+          <svg width="20" height="20">
+            <use href="/static/icons.svg?v={{version}}#menu"></use>
+          </svg>
+        </button>
+        <ul class="menu" role="list" tabindex="-1">
+          <li class="menu-item">
+            <a href="/tags" class="menu-link">Manage tags</a>
+          </li>
+        </ul>
+      </ld-dropdown>
+{{/signedIn}}
+  </div>
+  <div id="tag-cloud-container">{{{tagCloud}}}</div>
+</section>
+    </div>
+  </ld-bookmark-page>

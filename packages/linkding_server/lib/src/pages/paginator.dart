@@ -1,4 +1,4 @@
-import '../web/query_params.dart';
+import 'query_params.dart';
 import 'visitor.dart';
 
 /// A page of a list as Django's `Paginator.get_page` picks it: a missing or

@@ -1,0 +1,2 @@
+
+ <div class="tag-cloud">{{#hasSelected}} <p class="selected-tags"> {{#selected}}<a href="?{{query}}" class="text-bold mr-2"><span>-{{name}}</span></a> {{/selected}}</p>{{/hasSelected}} <div class="unselected-tags"> {{#groups}}<p class="group"> {{#tags}}{{#highlight}}<a href="?{{query}}" class="mr-2" data-is-tag-item><span class="highlight-char">{{first}}</span><span>{{rest}}</span></a>{{/highlight}}{{^highlight}}<a href="?{{query}}" class="mr-2" data-is-tag-item><span>{{name}}</span></a>{{/highlight}} {{/tags}}</p> {{/groups}}</div> </div> 

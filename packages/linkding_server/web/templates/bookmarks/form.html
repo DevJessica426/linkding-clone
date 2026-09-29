@@ -1,0 +1,94 @@
+  <div class="bookmarks-form-page">
+    <main aria-labelledby="main-heading">
+      <div class="section-header">
+        <h1 id="main-heading">{{heading}}</h1>
+      </div>
+      <ld-form data-submit-on-ctrl-enter>
+        <form action="{{action}}" method="post" novalidate>
+<div class="bookmarks-form">
+  {{> csrf-input}}
+  {{{autoClose}}}
+  <div class="form-group">
+    <label for="id_url" class="form-label">URL</label>
+    <div class="has-icon-right">
+      {{{urlInput}}}
+      <i class="form-icon loading"></i>
+    </div>
+    {{{urlErrors}}}
+    <div class="form-input-hint bookmark-exists">
+      This URL is already bookmarked.
+      The form has been pre-filled with the existing bookmark, and saving the form will update the existing bookmark.
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="id_tag_string" class="form-label">Tags</label>
+    <ld-tag-autocomplete input-id="id_tag_string" input-name="tag_string" input-value="{{tagString}}" input-aria-describedby="{{tagDescribedBy}}"></ld-tag-autocomplete>
+    <div id="id_tag_string_help" class="form-input-hint">
+      Enter any number of tags separated by space and <strong>without</strong> the hash (#).
+      If a tag does not exist it will be automatically created.
+    </div>
+    <div class="form-input-hint auto-tags"></div>
+  </div>
+  <div class="form-group">
+    <div class="d-flex justify-between align-baseline">
+      <label for="id_title" class="form-label">Title</label>
+      <div class="flex">
+        <button id="refresh-button" class="btn btn-link suffix-button" type="button">Refresh from website</button>
+        <ld-clear-button data-for="id_title">
+          <button class="ml-2 btn btn-link suffix-button" type="button">Clear</button>
+        </ld-clear-button>
+      </div>
+    </div>
+    {{{titleInput}}}
+  </div>
+  <div class="form-group">
+    <div class="d-flex justify-between align-baseline">
+      <label for="id_description" class="form-label">Description</label>
+      <ld-clear-button data-for="id_description">
+        <button class="btn btn-link suffix-button" type="button">Clear</button>
+      </ld-clear-button>
+    </div>
+    {{{descriptionInput}}}
+  </div>
+  <div class="form-group">
+    <details class="notes"{{#hasNotes}} open{{/hasNotes}}>
+      <summary>
+        <span class="form-label d-inline-block">Notes</span>
+      </summary>
+      <label for="id_notes" class="text-assistive">Notes</label>
+      {{{notesInput}}}
+      <div id="id_notes_help" class="form-input-hint">
+        Additional notes, supports Markdown.
+      </div>
+    </details>
+  </div>
+  <div class="form-group">
+    {{{unreadInput}}}
+    <div id="id_unread_help" class="form-input-hint">
+      Unread bookmarks can be filtered for, and marked as read after you had a chance to look at them.
+    </div>
+  </div>
+{{#sharing}}
+    <div class="form-group">
+      {{{sharedInput}}}
+      <div id="id_shared_help" class="form-input-hint">{{sharedHelp}}</div>
+    </div>
+{{/sharing}}
+  <div class="divider"></div>
+  <div class="form-group d-flex justify-between">
+{{#isAutoClose}}
+      <input type="submit" value="Save and close" class="btn btn-primary btn-wide">
+{{/isAutoClose}}
+{{^isAutoClose}}
+      <input type="submit"
+             value="Save"
+             class="btn btn-primary btn btn-primary btn-wide">
+{{/isAutoClose}}
+    <a href="{{returnUrl}}" class="btn">Cancel</a>
+  </div>
+{{> bookmark-form-script}}
+</div>
+        </form>
+      </ld-form>
+    </main>
+  </div>

@@ -4,9 +4,9 @@ import '../compat/django.dart';
 import '../compat/form_data.dart';
 import '../db/database.dart';
 import '../db/settings_repo.dart';
+import '../pages/return_url.dart';
 import '../pages/visitor.dart';
 import '../services/errors.dart';
-import '../web/bookmark_form.dart' show safeReturnUrl;
 
 /// `/toasts/acknowledge`: dismisses one of the user's toasts, then back to
 /// the page it was shown on. A missing or non-numeric `toast` is an error

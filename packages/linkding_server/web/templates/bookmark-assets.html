@@ -1,0 +1,50 @@
+<div>
+{{#hasAssets}}
+    <div class="item-list assets">
+{{#assets}}
+        <div class="list-item" data-asset-id="{{id}}">
+          <div class="list-item-icon {{iconClass}}">{{{icon}}}</div>
+          <div class="list-item-text {{textClass}}">
+            <span class="truncate">
+              {{name}}
+              {{#pending}}(queued){{/pending}}
+              {{#failed}}(failed){{/failed}}
+            </span>
+            {{#hasSize}}<span class="filesize">{{size}}</span>{{/hasSize}}
+          </div>
+          <div class="list-item-actions">
+{{#hasFile}}
+              <a class="btn btn-link"
+                 href="/assets/{{id}}"
+                 target="_blank">View</a>
+{{/hasFile}}
+{{#isEditable}}
+              <button data-confirm
+                      type="submit"
+                      name="remove_asset"
+                      value="{{id}}"
+                      class="btn btn-link">Remove</button>
+{{/isEditable}}
+          </div>
+        </div>
+{{/assets}}
+    </div>
+{{/hasAssets}}
+{{#isEditable}}
+    <div class="assets-actions">
+{{#uploadsEnabled}}
+        <ld-upload-button>
+          <button id="upload-asset"
+                  name="upload_asset"
+                  value="{{id}}"
+                  type="submit"
+                  class="btn btn-sm">Upload file</button>
+          <input id="upload-asset-file"
+                 name="upload_asset_file"
+                 type="file"
+                 class="d-hide">
+        </ld-upload-button>
+{{/uploadsEnabled}}
+    </div>
+{{/isEditable}}
+</div>

@@ -1,0 +1,58 @@
+<div class="search-container">
+  <form id="search" action="" method="get" role="search">
+    <ld-search-autocomplete input-name="q"
+                            input-placeholder="Search for words or #tags"
+                            input-value="{{q}}"
+                            target="{{target}}"
+                            mode="{{mode}}"
+                            user="{{user}}"
+                            shared="{{shared}}"
+                            unread="{{unread}}">
+    </ld-search-autocomplete>
+    <input type="submit" value="Search" class="d-none">
+    {{#searchHidden}}{{> bookmark-hidden-field}}{{/searchHidden}}
+  </form>
+  <ld-dropdown class="search-options dropdown dropdown-right">
+    <button type="button"
+            aria-label="Search preferences"
+            class="btn dropdown-toggle{{#badge}} badge{{/badge}}">
+      <svg width="20" height="20">
+        <use href="/static/icons.svg?v={{version}}#preferences"></use>
+      </svg>
+    </button>
+    <div class="menu" tabindex="0">
+      <form id="search_preferences" action="" method="post">
+        {{> csrf-input}}
+          <div class="form-group">
+            <label for="id_sort"
+                   class="form-label{{#sortBold}} text-bold{{/sortBold}}">Sort by</label>
+            {{{sortSelect}}}
+          </div>
+{{#filters}}
+          <div class="form-group radio-group"
+               role="radiogroup"
+               aria-labelledby="search-{{name}}-label">
+            <label id="search-{{name}}-label"
+                   class="form-label{{#bold}} text-bold{{/bold}}">
+              {{label}}
+            </label>
+{{#radios}}
+              <label for="{{id}}" class="form-radio form-inline">
+                {{{radio}}}
+                <i class="form-icon"></i>
+                {{label}}
+              </label>
+{{/radios}}
+          </div>
+{{/filters}}
+        <div class="actions">
+          <button type="submit" class="btn btn-sm btn-primary" name="apply">Apply</button>
+{{#signedIn}}
+            <button type="submit" class="btn btn-sm" name="save">Save as default</button>
+{{/signedIn}}
+        </div>
+        {{#preferencesHidden}}{{> bookmark-hidden-field}}{{/preferencesHidden}}
+      </form>
+    </div>
+  </ld-dropdown>
+</div>

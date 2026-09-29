@@ -1,7 +1,6 @@
-/// linkding's `humanize_*_date` helpers and Django's `Paginator` window.
+/// linkding's `humanize_*_date` helpers and Django's date and size
+/// filters.
 library;
-
-export '../pages/paginator.dart' show Page;
 
 const _weekdays = [
   'Monday',

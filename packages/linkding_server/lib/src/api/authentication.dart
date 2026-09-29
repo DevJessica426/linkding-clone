@@ -7,7 +7,7 @@ import '../auth/sessions.dart';
 import '../db/rows.dart';
 import '../db/users_repo.dart';
 import '../services/errors.dart';
-import 'requests.dart';
+import 'errors.dart';
 
 const _safeMethods = {'GET', 'HEAD', 'OPTIONS', 'TRACE'};
 

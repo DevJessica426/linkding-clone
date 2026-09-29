@@ -1,0 +1,64 @@
+
+    (function init() {
+      const tableBody = document.querySelector(".crud-table tbody");
+      if (!tableBody) return;
+
+      let draggedElement = null;
+
+      const rows = tableBody.querySelectorAll('tr');
+      rows.forEach((item) => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragend', handleDragEnd);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('dragenter', handleDragEnter);
+      });
+
+      function handleDragStart(e) {
+        draggedElement = this;
+
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.dropEffect = 'move';
+
+        this.classList.add('drag-start');
+        setTimeout(() => {
+          this.classList.remove('drag-start');
+          this.classList.add('dragging');
+        }, 0);
+      }
+
+      function handleDragEnd() {
+        this.classList.remove('dragging');
+
+        const moveBundleInput = document.querySelector('input[name="move_bundle"]');
+        const movePositionInput = document.querySelector('input[name="move_position"]');
+        moveBundleInput.value = draggedElement.getAttribute('data-bundle-id');
+        movePositionInput.value = Array.from(tableBody.children).indexOf(draggedElement);
+
+        const form = this.closest('form');
+        form.requestSubmit(moveBundleInput);
+
+        draggedElement = null;
+      }
+
+      function handleDragOver(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        return false;
+      }
+
+      function handleDragEnter() {
+        if (this !== draggedElement) {
+          const listItems = Array.from(tableBody.children);
+          const draggedIndex = listItems.indexOf(draggedElement);
+          const currentIndex = listItems.indexOf(this);
+
+          if (draggedIndex < currentIndex) {
+            this.insertAdjacentElement('afterend', draggedElement);
+          } else {
+            this.insertAdjacentElement('beforebegin', draggedElement);
+          }
+        }
+      }
+    })();
+  

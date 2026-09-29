@@ -1,7 +1,7 @@
 import 'package:dust_server/server.dart';
 
 import '../compat/pyurl.dart';
-import '../web/query_params.dart';
+import 'query_params.dart';
 
 /// linkding's `redirect_with_query`: [url] with the request's query,
 /// re-encoded, with the last value of a repeated name.

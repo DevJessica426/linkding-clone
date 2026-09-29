@@ -1,0 +1,44 @@
+<div class="form-group">
+  <label for="id_name" class="form-label">Name</label>
+  {{{nameInput}}}
+  {{{nameErrors}}}
+</div>
+<div class="form-group">
+  <label for="id_search" class="form-label">Search terms</label>
+  {{{searchInput}}}
+  {{{searchErrors}}}
+  <div id="id_search_help" class="form-input-hint">
+    All of these search terms must be present in a bookmark to match.
+  </div>
+</div>
+{{#tagFields}}
+<div class="form-group">
+  <label for="id_{{name}}" class="form-label">{{label}}</label>
+  <ld-tag-autocomplete input-id="id_{{name}}" input-name="{{name}}" input-value="{{value}}" input-aria-describedby="{{describedBy}}"{{#hasClass}} input-class="{{classes}}"{{/hasClass}}></ld-tag-autocomplete>
+  <div id="id_{{name}}_help" class="form-input-hint">
+    {{help}}
+  </div>
+</div>
+{{/tagFields}}
+{{#selectFields}}
+<div class="form-group">
+  <label for="id_{{name}}" class="form-label">{{label}}</label>
+  {{{widget}}}
+  <div id="id_{{name}}_help" class="form-input-hint">
+    {{help}}
+  </div>
+</div>
+{{/selectFields}}
+<div class="form-footer d-flex mt-4">
+  <input type="submit"
+         name="save"
+         value="Save"
+         class="btn btn-primary btn-wide">
+  <a href="/bundles"
+     class="btn btn-wide ml-auto">Cancel</a>
+  <a href="/bundles/preview"
+     data-turbo-frame="preview"
+     class="d-none"
+     id="preview-link"></a>
+</div>
+<script>{{> bundle-preview-script}}</script>

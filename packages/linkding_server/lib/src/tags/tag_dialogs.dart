@@ -4,13 +4,13 @@ import '../compat/form_data.dart';
 import '../db/database.dart';
 import '../db/tags_repo.dart';
 import '../pages/query.dart';
+import '../pages/query_params.dart';
 import '../pages/render.dart';
 import '../pages/session_data.dart';
 import '../pages/turbo.dart';
 import '../pages/visitor.dart';
+import '../pages/widgets.dart';
 import '../services/errors.dart';
-import '../web/forms.dart';
-import '../web/query_params.dart';
 import 'tag_forms.dart';
 
 /// linkding's tag dialogs, each a Turbo frame; a form with errors comes

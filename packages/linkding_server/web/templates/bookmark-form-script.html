@@ -1,0 +1,154 @@
+  <script type="application/javascript">
+    /**
+     * - Pre-fill title and description with metadata from website as soon as URL changes
+     * - Show hint if URL is already bookmarked
+     */
+    (function init() {
+      const urlInput = document.getElementById('id_url');
+      const titleInput = document.getElementById('id_title');
+      const descriptionInput = document.getElementById('id_description');
+      const notesDetails = document.querySelector('form details.notes');
+      const notesInput = document.getElementById('id_notes');
+      const unreadCheckbox = document.getElementById('id_unread');
+      const sharedCheckbox = document.getElementById('id_shared');
+      const refreshButton = document.getElementById('refresh-button');
+      const bookmarkExistsHint = document.querySelector('.form-input-hint.bookmark-exists');
+      const editedBookmarkId = parseInt('{{bookmarkId}}');
+      let isTitleModified = !!titleInput.value;
+      let isDescriptionModified = !!descriptionInput.value;
+
+      function toggleLoadingIcon(input, show) {
+        const icon = input.parentNode.querySelector('i.form-icon');
+        icon.style['visibility'] = show ? 'visible' : 'hidden';
+      }
+
+      function updateInput(input, value) {
+        if (!input) {
+          return;
+        }
+        input.value = value;
+        input.dispatchEvent(new Event('value-changed'));
+      }
+
+      function updateCheckbox(input, value) {
+        if (!input) {
+          return;
+        }
+        input.checked = value;
+      }
+
+      function checkUrl() {
+        if (!urlInput.value) {
+          return;
+        }
+
+        toggleLoadingIcon(urlInput, true);
+
+        const websiteUrl = encodeURIComponent(urlInput.value);
+        const requestUrl = `/api/bookmarks/check?url=${websiteUrl}`;
+        fetch(requestUrl)
+          .then(response => response.json())
+          .then(data => {
+            const metadata = data.metadata;
+            toggleLoadingIcon(urlInput, false);
+
+            // Display hint if URL is already bookmarked
+            const existingBookmark = data.bookmark;
+            bookmarkExistsHint.style['display'] = existingBookmark ? 'block' : 'none';
+            refreshButton.style['display'] = existingBookmark ? 'inline-block' : 'none';
+
+            // Prefill form with existing bookmark data
+            if (existingBookmark) {
+              // Workaround: tag input will be replaced by tag autocomplete, so
+              // defer getting the input until we need it
+              const tagsInput = document.getElementById('id_tag_string');
+
+              bookmarkExistsHint.style['display'] = 'block';
+              notesDetails.open = !!existingBookmark.notes;
+              updateInput(titleInput, existingBookmark.title);
+              updateInput(descriptionInput, existingBookmark.description);
+              updateInput(notesInput, existingBookmark.notes);
+              updateInput(tagsInput, existingBookmark.tag_names.join(" "));
+              updateCheckbox(unreadCheckbox, existingBookmark.unread);
+              updateCheckbox(sharedCheckbox, existingBookmark.shared);
+            } else {
+              // Update title and description with website metadata, unless they have been modified
+              if (!isTitleModified) {
+                updateInput(titleInput, metadata.title);
+              }
+              if (!isDescriptionModified) {
+                updateInput(descriptionInput, metadata.description);
+              }
+            }
+
+            // Preview auto tags
+            const autoTags = data.auto_tags;
+            const autoTagsHint = document.querySelector('.form-input-hint.auto-tags');
+
+            if (autoTags.length > 0) {
+              autoTags.sort();
+              autoTagsHint.style['display'] = 'block';
+              autoTagsHint.innerHTML = `Auto tags: ${autoTags.join(" ")}`;
+            } else {
+              autoTagsHint.style['display'] = 'none';
+            }
+          });
+      }
+
+      function refreshMetadata() {
+        if (!urlInput.value) {
+          return;
+        }
+
+        toggleLoadingIcon(urlInput, true);
+
+        const websiteUrl = encodeURIComponent(urlInput.value);
+        const requestUrl = `/api/bookmarks/check?url=${websiteUrl}&ignore_cache=true`;
+
+        fetch(requestUrl)
+          .then(response => response.json())
+          .then(data => {
+            const metadata = data.metadata;
+            const existingBookmark = data.bookmark;
+            toggleLoadingIcon(urlInput, false);
+
+            if (metadata.title && metadata.title !== existingBookmark?.title) {
+              titleInput.value = metadata.title;
+              titleInput.classList.add("modified");
+            }
+
+            if (metadata.description && metadata.description !== existingBookmark?.description) {
+              descriptionInput.value = metadata.description;
+              descriptionInput.classList.add("modified");
+            }
+          });
+      }
+
+      refreshButton.addEventListener('click', refreshMetadata);
+
+      // Fetch website metadata when page loads and when URL changes, unless we are editing an existing bookmark
+      if (!editedBookmarkId) {
+        function debounce(callback, delay = 500) {
+          let timeoutId;
+          return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+              timeoutId = null;
+              callback(...args);
+            }, delay);
+          };
+        }
+
+        checkUrl();
+        urlInput.addEventListener('input', debounce(checkUrl));
+        titleInput.addEventListener('input', () => {
+          isTitleModified = true;
+        });
+        descriptionInput.addEventListener('input', () => {
+          isDescriptionModified = true;
+        });
+      } else {
+        refreshButton.style['display'] = 'inline-block';
+      }
+    })();
+  </script>

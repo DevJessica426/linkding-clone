@@ -1,0 +1,41 @@
+{{^details}}
+<turbo-frame id="details-modal" target="_top">
+</turbo-frame>
+{{/details}}
+{{#details}}
+<turbo-frame id="details-modal" target="_top">
+  <ld-details-modal class="modal active bookmark-details"
+                    data-bookmark-id="{{id}}"
+                    data-close-url="{{closeUrl}}"
+                    data-turbo-frame="details-modal">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-container" role="dialog" aria-modal="true">
+{{> modal-header}}
+      <div class="modal-body">{{> bookmark-details-form}}</div>
+{{#isEditable}}
+        <div class="modal-footer">
+          <div class="actions">
+            <div class="left-actions">
+              <a class="btn btn-wide"
+                 href="/bookmarks/{{id}}/edit?return_url={{editReturnUrl}}">Edit</a>
+            </div>
+            <div class="right-actions">
+              <form action="{{actionUrl}}"
+                    method="post"
+                    data-turbo-action="replace">
+                {{> csrf-input}}
+                <input type="hidden" name="disable_turbo" value="true">
+                <button data-confirm
+                        class="btn btn-error btn-wide"
+                        type="submit"
+                        name="remove"
+                        value="{{id}}">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+{{/isEditable}}
+    </div>
+  </ld-details-modal>
+</turbo-frame>
+{{/details}}

@@ -1,0 +1,11 @@
+{{#hasMatches}}
+<turbo-frame id="preview">
+  <div class="mb-4">Found {{count}} bookmarks matching this bundle.</div>
+{{{list}}}
+</turbo-frame>
+{{/hasMatches}}
+{{^hasMatches}}
+<turbo-frame id="preview">
+  <div>No bookmarks match the current bundle.</div>
+</turbo-frame>
+{{/hasMatches}}

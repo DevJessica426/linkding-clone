@@ -1,7 +1,7 @@
 import 'package:dust_server/server.dart';
 
-import '../web/html.dart' show q;
 import 'error_pages.dart';
+import 'html.dart' show q;
 
 /// Turns a page route's failures, which Dust's extractors and handlers
 /// report as JSON rejections, into what linkding answers a browser with: a

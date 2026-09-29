@@ -9,8 +9,8 @@ import '../db/rows.dart';
 import '../db/users_repo.dart';
 import '../pages/render.dart';
 import '../pages/visitor.dart';
+import '../pages/widgets.dart';
 import '../services/errors.dart';
-import '../web/forms.dart';
 
 /// `/change-password/`: Django's `PasswordChangeView` with linkding's
 /// error list, answering a failed change with 422 for Turbo.
