@@ -1,10 +1,10 @@
 import 'package:linkding_shared/linkding_shared.dart';
 
 import '../compat/form_data.dart';
-import '../db/rows.dart';
-import '../db/tags_repo.dart';
-import '../pages/cleaning.dart';
-import '../services/errors.dart';
+import '../db/or_throw.dart';
+import '../db/rows/rows.dart';
+import '../db/repos/tags_repo.dart';
+import '../pages/support/cleaning.dart';
 
 /// The user's tag with the id in [id], or null (not a number, too large,
 /// or not theirs).

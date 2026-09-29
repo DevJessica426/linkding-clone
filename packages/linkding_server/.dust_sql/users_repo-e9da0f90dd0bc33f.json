@@ -1,0 +1,218 @@
+{
+  "version": 3,
+  "entries": [
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "01bc3c0cba49498b",
+      "sql": "SELECT id, username FROM auth_user WHERE is_active ORDER BY username",
+      "user_parameter_count": 0,
+      "expanded_parameter_count": 0,
+      "fetch_mode": "all",
+      "row_type": "UserNameRow",
+      "columns": [
+        "id",
+        "username"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "10933853b3c3e74b",
+      "sql": "\nINSERT INTO auth_user (password, last_login, is_superuser, username,\n                       first_name, last_name, email, is_staff, is_active,\n                       date_joined)\nVALUES ($1, NULL, $2, $3, '', '', $4, $2, true, $5)\nRETURNING id, password, last_login, is_superuser, username, first_name,\n          last_name, email, is_staff, is_active, date_joined\n",
+      "user_parameter_count": 5,
+      "expanded_parameter_count": 5,
+      "fetch_mode": "one",
+      "row_type": "UserRow",
+      "columns": [
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_staff",
+        "is_active",
+        "date_joined"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "27e34e26a191d5ea",
+      "sql": "\nSELECT id, password, last_login, is_superuser, username, first_name,\n       last_name, email, is_staff, is_active, date_joined\nFROM auth_user WHERE id = $1\n",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "optional",
+      "row_type": "UserRow",
+      "columns": [
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_staff",
+        "is_active",
+        "date_joined"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "402eba09919d0867",
+      "sql": "\nSELECT id, password, last_login, is_superuser, username, first_name,\n       last_name, email, is_staff, is_active, date_joined\nFROM auth_user WHERE username = $1\n",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "optional",
+      "row_type": "UserRow",
+      "columns": [
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_staff",
+        "is_active",
+        "date_joined"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "50d29aa2db1c3509",
+      "sql": "SELECT id, username FROM auth_user WHERE id = ANY($1) ORDER BY id",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "all",
+      "row_type": "UserNameRow",
+      "columns": [
+        "id",
+        "username"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "853f1969c104f7a0",
+      "sql": "\nSELECT u.id, u.password, u.last_login, u.is_superuser, u.username,\n       u.first_name, u.last_name, u.email, u.is_staff, u.is_active,\n       u.date_joined\nFROM bookmarks_apitoken t JOIN auth_user u ON u.id = t.user_id\nWHERE t.key = $1\n",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "optional",
+      "row_type": "UserRow",
+      "columns": [
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_staff",
+        "is_active",
+        "date_joined"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "89308d3aa44be15c",
+      "sql": "\nSELECT u.id, u.password, u.last_login, u.is_superuser, u.username,\n       u.first_name, u.last_name, u.email, u.is_staff, u.is_active,\n       u.date_joined\nFROM bookmarks_feedtoken f JOIN auth_user u ON u.id = f.user_id\nWHERE f.key = $1\n",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "optional",
+      "row_type": "UserRow",
+      "columns": [
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_staff",
+        "is_active",
+        "date_joined"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "918690ab2e2fac01",
+      "sql": "UPDATE auth_user SET last_login = $2 WHERE id = $1",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "a295c727db700c28",
+      "sql": "SELECT id, username FROM auth_user",
+      "user_parameter_count": 0,
+      "expanded_parameter_count": 0,
+      "fetch_mode": "all",
+      "row_type": "UserNameRow",
+      "columns": [
+        "id",
+        "username"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "b4a661257433b6d0",
+      "sql": "UPDATE auth_user SET password = $2 WHERE id = $1",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "b89cb2e201446a05",
+      "sql": "\nSELECT u.id, u.password, u.last_login, u.is_superuser, u.username,\n       u.first_name, u.last_name, u.email, u.is_staff, u.is_active,\n       u.date_joined\nFROM clone_session s JOIN auth_user u ON u.id = s.user_id\nWHERE s.session_key = $1 AND s.expire_date > $2\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "optional",
+      "row_type": "UserRow",
+      "columns": [
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_staff",
+        "is_active",
+        "date_joined"
+      ]
+    }
+  ]
+}

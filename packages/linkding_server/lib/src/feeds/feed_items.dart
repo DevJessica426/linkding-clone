@@ -1,10 +1,11 @@
 import 'package:dust_dart/db.dart';
 
 import '../core/profile.dart';
-import '../db/rows.dart';
-import '../db/users_repo.dart';
-import '../services/errors.dart';
-import '../services/search.dart';
+import '../db/or_throw.dart';
+import '../db/repos/profiles_repo.dart';
+import '../db/rows/rows.dart';
+import '../db/repos/users_repo.dart';
+import '../search/search.dart';
 
 /// The four feeds of linkding's `feeds.py`, with their titles and
 /// descriptions.
@@ -29,8 +30,9 @@ Future<List<Candidate>> feedItems(
   UserRow? tokenUser,
 ) async {
   final searches = BookmarkSearchQuery(db);
-  Future<Profile> profileOf(int userId) async =>
-      Profile((await UsersRepo(db).profile(userId)).orThrow ?? standardProfile);
+  Future<Profile> profileOf(int userId) async => Profile(
+    (await ProfilesRepo(db).profile(userId)).orThrow ?? standardProfile,
+  );
 
   switch (kind) {
     case FeedKind.all || FeedKind.unread:

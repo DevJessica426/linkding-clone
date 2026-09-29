@@ -1,20 +1,22 @@
 import 'package:dust_server/server.dart';
 
-import '../auth/sessions.dart' show newTokenKey;
+import '../accounts/sessions.dart' show newTokenKey;
 import '../compat/form_data.dart';
+import '../db/repos/tokens_repo.dart';
 import '../db/database.dart';
-import '../db/users_repo.dart';
-import '../pages/render.dart';
-import '../pages/session_data.dart';
-import '../pages/visitor.dart';
-import '../services/errors.dart';
+import '../pages/support/render.dart';
+import '../pages/session/session_data.dart';
+import '../pages/session/visitor.dart';
+import '../db/or_throw.dart';
 
 /// `/settings/integrations`: the browser extension and bookmarklet, the API
 /// tokens (a new one's key shown once), and the feed URLs.
 Future<Response> settingsIntegrations(Request request) async {
   final visitor = await request.extract(const Extension<Visitor>());
   final user = visitor.signedIn;
-  final users = UsersRepo((await request.state<LinkdingDatabase>()).connection);
+  final tokenRepo = TokensRepo(
+    (await request.state<LinkdingDatabase>()).connection,
+  );
   final session = await SessionData.of(request);
   final newKey = await session.pop('api_token_key');
   final newName = await session.pop('api_token_name');
@@ -22,16 +24,16 @@ Future<Response> settingsIntegrations(Request request) async {
       .where((m) => m.extraTags == 'api_success_message')
       .firstOrNull
       ?.message;
-  var feedKey = (await users.feedToken(user.id)).orThrow;
+  var feedKey = (await tokenRepo.feedToken(user.id)).orThrow;
   if (feedKey == null) {
-    (await users.insertFeedToken(
+    (await tokenRepo.insertFeedToken(
       newTokenKey(),
       DateTime.now().toUtc(),
       user.id,
     )).orThrow;
-    feedKey = (await users.feedToken(user.id)).orThrow!;
+    feedKey = (await tokenRepo.feedToken(user.id)).orThrow!;
   }
-  final tokens = (await users.apiTokens(user.id)).orThrow;
+  final tokens = (await tokenRepo.apiTokens(user.id)).orThrow;
   return renderPage(
     await request.state<TemplateEngine>(),
     visitor,
@@ -70,7 +72,7 @@ Future<Response> createApiToken(Request request) async {
   var name = (form['name'] ?? '').trim();
   if (name.isEmpty) name = 'API Token';
   final db = (await request.state<LinkdingDatabase>()).connection;
-  final token = (await UsersRepo(db).insertApiToken(
+  final token = (await TokensRepo(db).insertApiToken(
     newTokenKey(),
     name,
     DateTime.now().toUtc(),
@@ -92,16 +94,16 @@ Future<Result<Response, Rejection>> deleteApiToken(Request request) async {
     final visitor = await request.extract(const Extension<Visitor>());
     final form = await request.extract(const PostedForm());
     final user = visitor.signedIn;
-    final users = UsersRepo(
+    final tokenRepo = TokensRepo(
       (await request.state<LinkdingDatabase>()).connection,
     );
     final id = int.tryParse(form['token_id']?.trim() ?? '');
-    final tokens = (await users.apiTokens(user.id)).orThrow;
+    final tokens = (await tokenRepo.apiTokens(user.id)).orThrow;
     final token = tokens.where((t) => t.id == id).firstOrNull;
     if (token == null) {
       return const Err(Rejection.notFound('API token does not exist'));
     }
-    (await users.deleteApiToken(token.id, user.id)).orThrow;
+    (await tokenRepo.deleteApiToken(token.id, user.id)).orThrow;
     await (await SessionData.of(request)).addMessage(
       'API token "${token.name}" has been deleted.',
       extraTags: 'api_success_message',

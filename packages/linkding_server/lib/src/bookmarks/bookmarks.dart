@@ -4,18 +4,15 @@ library;
 
 import 'package:dust_server/server.dart';
 
-import '../pages/sign_in.dart';
-import 'form_handlers.dart';
-import 'list_actions.dart';
-import 'list_handlers.dart';
+import '../pages/session/sign_in.dart';
+import 'forms/form_handlers.dart';
+import 'lists/list_actions.dart';
+import 'lists/list_handlers.dart';
 
-export 'bookmark_access.dart';
-export 'list_kind.dart';
-export 'list_links.dart';
-export 'list_loader.dart' show searchList;
-export 'list_page.dart';
-export 'list_values.dart';
-export 'tag_cloud.dart';
+export 'details/details.dart';
+export 'forms/forms.dart';
+export 'lists/lists.dart';
+export 'service/service.dart';
 
 Router bookmarkRoutes() => Router()
   ..merge(

@@ -3,7 +3,7 @@ library;
 
 import 'package:dust_server/server.dart';
 
-import '../pages/sign_in.dart';
+import '../pages/session/sign_in.dart';
 import 'general_page.dart';
 import 'import_export.dart';
 import 'integrations.dart';

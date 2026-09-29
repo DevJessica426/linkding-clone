@@ -1,16 +1,16 @@
 import 'package:dust_server/server.dart';
 
-import '../auth/password_validation.dart';
-import '../auth/passwords.dart';
-import '../auth/sessions.dart';
 import '../compat/form_data.dart';
 import '../db/database.dart';
-import '../db/rows.dart';
-import '../db/users_repo.dart';
-import '../pages/render.dart';
-import '../pages/visitor.dart';
-import '../pages/widgets.dart';
-import '../services/errors.dart';
+import '../db/or_throw.dart';
+import '../db/rows/rows.dart';
+import '../db/repos/users_repo.dart';
+import '../pages/support/render.dart';
+import '../pages/session/visitor.dart';
+import '../pages/support/widgets.dart';
+import 'password_validation.dart';
+import 'passwords.dart';
+import 'sessions.dart';
 
 /// `/change-password/`: Django's `PasswordChangeView` with linkding's
 /// error list, answering a failed change with 422 for Turbo.

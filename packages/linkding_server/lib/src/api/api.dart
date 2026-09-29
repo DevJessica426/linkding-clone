@@ -3,13 +3,13 @@ library;
 
 import 'package:dust_server/server.dart';
 
-import 'asset_endpoints.dart';
-import 'bookmark_actions.dart';
-import 'bookmark_lists.dart';
-import 'bundle_endpoints.dart';
-import 'singlefile.dart';
-import 'tag_endpoints.dart';
-import 'user_profile.dart';
+import 'bookmarks/asset_endpoints.dart';
+import 'bookmarks/bookmark_actions.dart';
+import 'bookmarks/bookmark_lists.dart';
+import 'bundles/bundle_endpoints.dart';
+import 'bookmarks/singlefile.dart';
+import 'tags/tag_endpoints.dart';
+import 'user/user_profile.dart';
 import 'view.dart';
 
 export 'view.dart' show appendSlash;

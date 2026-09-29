@@ -3,8 +3,8 @@ library;
 
 import 'package:dust_server/server.dart';
 
-import '../pages/append_slash.dart';
-import '../pages/sign_in.dart';
+import '../pages/support/append_slash.dart';
+import '../pages/session/sign_in.dart';
 import 'password_pages.dart';
 import 'sign_in_pages.dart';
 

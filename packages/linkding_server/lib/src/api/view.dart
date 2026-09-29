@@ -1,8 +1,8 @@
 import 'package:dust_server/server.dart';
 
-import '../auth/sessions.dart';
+import '../accounts/sessions.dart';
 import '../db/database.dart';
-import '../db/rows.dart';
+import '../db/rows/rows.dart';
 import 'authentication.dart';
 import 'errors.dart';
 

@@ -41,3 +41,11 @@ String currentWord(web.HTMLInputElement input) {
   final bounds = currentWordBounds(input);
   return input.value.substring(bounds.start, bounds.end);
 }
+
+/// Replaces the word at the caret with [text].
+void replaceCurrentWord(web.HTMLInputElement input, String text) {
+  final bounds = currentWordBounds(input);
+  final value = input.value;
+  input.value =
+      '${value.substring(0, bounds.start)}$text${value.substring(bounds.end)}';
+}

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dust_server/server.dart';
 
-import '../pages/visitor.dart';
+import '../pages/session/visitor.dart';
 
 /// `/manifest.json`, written as Django's `JsonResponse` writes linkding's
 /// web app manifest; the background follows the visitor's theme.

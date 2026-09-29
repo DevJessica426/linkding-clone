@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dust_dart/db.dart';
 
-import '../db/rows.dart';
-import '../db/users_repo.dart';
-import '../services/errors.dart';
+import '../db/or_throw.dart';
+import '../db/repos/profiles_repo.dart';
+import '../db/rows/rows.dart';
 import 'profile_form.dart';
 
 /// Saving a valid [ProfileForm], and applying an invalid one.
@@ -73,7 +73,7 @@ extension ProfileSaving on ProfileForm {
   /// hash for the pages to link it by.
   Future<void> save(Executor db, int userId) async {
     final css = (raw['custom_css'] ?? '').trim();
-    (await UsersRepo(db).updateProfile(
+    (await ProfilesRepo(db).updateProfile(
       userId,
       raw['theme']!,
       raw['bookmark_date_display']!,

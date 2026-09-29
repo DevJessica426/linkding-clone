@@ -3,9 +3,9 @@ import 'package:dust_server/server.dart';
 
 import '../core/profile.dart';
 import '../db/database.dart';
-import '../db/rows.dart';
-import '../db/users_repo.dart';
-import '../services/errors.dart';
+import '../db/or_throw.dart';
+import '../db/repos/profiles_repo.dart';
+import '../db/rows/rows.dart';
 import 'errors.dart';
 import 'view.dart';
 
@@ -18,7 +18,7 @@ Future<UserRow> apiUserOf(Request request) => request.extract(const ApiUser());
 
 /// The saved preferences of [userId].
 Future<Profile> profileOf(Executor db, int userId) async =>
-    Profile((await UsersRepo(db).profile(userId)).orThrow!);
+    Profile((await ProfilesRepo(db).profile(userId)).orThrow!);
 
 /// The id in the path: 404 "Not found." when it is not a number, and "No
 /// [model] matches" when it cannot name a row.

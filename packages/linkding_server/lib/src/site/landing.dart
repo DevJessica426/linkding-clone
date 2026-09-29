@@ -1,7 +1,7 @@
 import 'package:dust_server/server.dart';
 
-import '../pages/query.dart';
-import '../pages/visitor.dart';
+import '../pages/support/query.dart';
+import '../pages/session/visitor.dart';
 
 /// `/`: to the bookmarks, or for visitors to the shared bookmarks when that
 /// is the landing page, keeping the query as linkding's

@@ -2,7 +2,7 @@ import 'package:dust_server/server.dart';
 
 import '../config.dart';
 import '../db/database.dart';
-import '../db/settings_repo.dart';
+import '../db/repos/settings_repo.dart';
 
 /// `GET /health`, byte for byte as linkding answers it.
 Future<Response> health(Request request) async {

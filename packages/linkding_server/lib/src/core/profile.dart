@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../db/rows.dart';
+import '../db/rows/rows.dart';
 
 /// A user's preferences, read from `bookmarks_userprofile`.
 extension type const Profile(ProfileRow row) {

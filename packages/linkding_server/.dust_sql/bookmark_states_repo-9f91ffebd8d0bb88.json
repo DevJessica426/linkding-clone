@@ -1,0 +1,91 @@
+{
+  "version": 3,
+  "entries": [
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "0c3d04ce4eee10ec",
+      "sql": "\nSELECT id FROM bookmarks_bookmark WHERE owner_id = $1 AND id = ANY($2)\nORDER BY id\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "all",
+      "row_type": "IdRow",
+      "columns": [
+        "id"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "8ccb88540c4952fc",
+      "sql": "\nUPDATE bookmarks_bookmark SET shared = $3, date_modified = $4\nWHERE owner_id = $1 AND id = ANY($2)\n",
+      "user_parameter_count": 4,
+      "expanded_parameter_count": 4,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "ae22dae6f75f14ca",
+      "sql": "\nUPDATE bookmarks_bookmark SET unread = $3, date_modified = $4\nWHERE owner_id = $1 AND id = ANY($2)\n",
+      "user_parameter_count": 4,
+      "expanded_parameter_count": 4,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "ae428da09ead7149",
+      "sql": "\nUPDATE bookmarks_bookmark SET is_archived = $3, unread = $4, shared = $5\nWHERE id = $1 AND owner_id = $2\n",
+      "user_parameter_count": 5,
+      "expanded_parameter_count": 5,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "ced1e8f9885754ae",
+      "sql": "\nUPDATE bookmarks_bookmark SET unread = false WHERE id = $1 AND owner_id = $2\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "eb0b90bad47cb93e",
+      "sql": "\nUPDATE bookmarks_bookmark SET date_modified = $3\nWHERE owner_id = $1 AND id = ANY($2)\n",
+      "user_parameter_count": 3,
+      "expanded_parameter_count": 3,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "f560303ff174c486",
+      "sql": "\nUPDATE bookmarks_bookmark SET is_archived = $3, date_modified = $4\nWHERE owner_id = $1 AND id = ANY($2)\n",
+      "user_parameter_count": 4,
+      "expanded_parameter_count": 4,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    }
+  ]
+}

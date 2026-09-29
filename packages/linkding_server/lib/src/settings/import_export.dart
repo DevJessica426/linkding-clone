@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:dust_server/server.dart';
 
+import '../bookmarks/service/bookmark_service.dart';
 import '../compat/form_data.dart';
 import '../config.dart';
-import '../db/bookmarks_repo.dart';
+import '../db/repos/bookmark_list_repo.dart';
 import '../db/database.dart';
-import '../pages/session_data.dart';
-import '../pages/visitor.dart';
-import '../services/bookmarks.dart';
-import '../services/errors.dart';
-import '../services/netscape.dart';
+import '../db/or_throw.dart';
+import '../netscape/netscape.dart';
+import '../pages/session/session_data.dart';
+import '../pages/session/visitor.dart';
 
 /// `/settings/import`: bookmarks from a Netscape bookmarks file, reported
 /// on the settings page.
@@ -57,7 +57,7 @@ Future<Response> exportBookmarks(Request request) async {
   final visitor = await request.extract(const Extension<Visitor>());
   final user = visitor.signedIn;
   final db = (await request.state<LinkdingDatabase>()).connection;
-  final bookmarks = (await BookmarksRepo(db).allOwned(user.id)).orThrow;
+  final bookmarks = (await BookmarkListRepo(db).allOwned(user.id)).orThrow;
   final tags = await (await request.state<BookmarkService>()).tagNames([
     for (final b in bookmarks) b.id,
   ]);

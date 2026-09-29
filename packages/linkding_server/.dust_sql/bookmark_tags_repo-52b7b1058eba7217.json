@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "entries": [
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "259d5ee8a29eaafa",
+      "sql": "\nINSERT INTO bookmarks_bookmark_tags (bookmark_id, tag_id)\nSELECT $1, tag_id FROM unnest($2::integer[]) AS tag_id\nON CONFLICT (bookmark_id, tag_id) DO NOTHING\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "368c6518e71317ff",
+      "sql": "\nDELETE FROM bookmarks_bookmark_tags\nWHERE bookmark_id = ANY($1) AND tag_id = ANY($2)\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "59fe76f9aaba741e",
+      "sql": "\nINSERT INTO bookmarks_bookmark_tags (bookmark_id, tag_id)\nSELECT b, t FROM unnest($1::integer[]) AS b, unnest($2::integer[]) AS t\nON CONFLICT (bookmark_id, tag_id) DO NOTHING\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "a61aa798f386af5e",
+      "sql": "\nSELECT bt.bookmark_id, t.id AS tag_id, t.name\nFROM bookmarks_bookmark_tags bt JOIN bookmarks_tag t ON t.id = bt.tag_id\nWHERE bt.bookmark_id = ANY($1)\nORDER BY t.id\n",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "all",
+      "row_type": "BookmarkTagRow",
+      "columns": [
+        "bookmark_id",
+        "tag_id",
+        "name"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "e32cf8ea92fb3e30",
+      "sql": "\nDELETE FROM bookmarks_bookmark_tags\nWHERE bookmark_id = $1 AND NOT (tag_id = ANY($2))\n",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    }
+  ]
+}

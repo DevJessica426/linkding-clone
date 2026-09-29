@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'auth/passwords.dart';
+import 'accounts/passwords.dart';
 import 'config.dart';
 import 'db/database.dart';
-import 'db/settings_repo.dart';
-import 'db/users_repo.dart';
-import 'services/errors.dart';
+import 'db/or_throw.dart';
+import 'db/repos/profiles_repo.dart';
+import 'db/repos/settings_repo.dart';
+import 'db/repos/users_repo.dart';
 
 /// Migrations that create linkding's own tables. On a database a real
 /// linkding created, they are recorded as applied instead of run.
@@ -103,7 +104,8 @@ Future<int> createUser(
     '',
     DateTime.now().toUtc(),
   )).orThrow;
-  (await users.insertDefaultProfile(user.id)).orThrow;
+  (await ProfilesRepo(database.connection).insertDefaultProfile(user.id))
+      .orThrow;
   return user.id;
 }
 

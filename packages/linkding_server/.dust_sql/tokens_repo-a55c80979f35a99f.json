@@ -1,0 +1,79 @@
+{
+  "version": 3,
+  "entries": [
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "12b71fc1662f91a2",
+      "sql": "\nSELECT id, key, name, created, user_id FROM bookmarks_apitoken\nWHERE user_id = $1 ORDER BY created DESC, id DESC\n",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "all",
+      "row_type": "ApiTokenRow",
+      "columns": [
+        "id",
+        "key",
+        "name",
+        "created",
+        "user_id"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "2e78d8d644a02c94",
+      "sql": "\nINSERT INTO bookmarks_apitoken (key, name, created, user_id)\nVALUES ($1, $2, $3, $4)\nRETURNING id, key, name, created, user_id\n",
+      "user_parameter_count": 4,
+      "expanded_parameter_count": 4,
+      "fetch_mode": "one",
+      "row_type": "ApiTokenRow",
+      "columns": [
+        "id",
+        "key",
+        "name",
+        "created",
+        "user_id"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "899584d03317af74",
+      "sql": "DELETE FROM bookmarks_apitoken WHERE id = $1 AND user_id = $2",
+      "user_parameter_count": 2,
+      "expanded_parameter_count": 2,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "98f472f53a28d815",
+      "sql": "SELECT key FROM bookmarks_feedtoken WHERE user_id = $1",
+      "user_parameter_count": 1,
+      "expanded_parameter_count": 1,
+      "fetch_mode": "optional",
+      "row_type": null,
+      "columns": [
+        "key"
+      ]
+    },
+    {
+      "driver": "postgres",
+      "migrations": "./migrations",
+      "schema_hash": "c7d14dacea7d65fb",
+      "sql_hash": "9ab531e2f3cc45a6",
+      "sql": "\nINSERT INTO bookmarks_feedtoken (key, created, user_id) VALUES ($1, $2, $3)\nON CONFLICT (user_id) DO NOTHING\n",
+      "user_parameter_count": 3,
+      "expanded_parameter_count": 3,
+      "fetch_mode": "execute",
+      "row_type": null,
+      "columns": []
+    }
+  ]
+}

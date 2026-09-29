@@ -1,12 +1,12 @@
 import 'package:dust_dart/db.dart';
 
 import '../compat/form_data.dart';
-import '../db/rows.dart';
-import '../db/settings_repo.dart';
-import '../db/users_repo.dart';
-import '../pages/cleaning.dart';
-import '../pages/widgets.dart';
-import '../services/errors.dart';
+import '../db/or_throw.dart';
+import '../db/rows/rows.dart';
+import '../db/repos/settings_repo.dart';
+import '../db/repos/users_repo.dart';
+import '../pages/support/cleaning.dart';
+import '../pages/support/widgets.dart';
 import 'profile_widgets.dart';
 
 /// What `settings-global.html` reads: the global settings' widgets, for a

@@ -4,7 +4,7 @@ library;
 
 import 'package:dust_server/server.dart';
 
-import '../pages/sign_in.dart';
+import '../pages/session/sign_in.dart';
 import 'landing.dart';
 import 'manifest.dart';
 import 'site_files.dart';

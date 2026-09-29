@@ -7,14 +7,17 @@ indistinguishable from linkding: same URLs, same pages down to the pixel,
 same REST API answers, same database schema, so linkding's browser
 extension, mobile apps and API clients should work against it unchanged.
 
-The goal is linkding's behaviour, not a framework. The server is plain Dart:
-each database access is a fixed SQL statement checked by Dust against the
-real schema (no ORM, no query builder), and each page is a Dart function
-that writes the HTML linkding's Django templates write. Where linkding's
-behaviour comes from Python or Django (URL parsing, form validation, the
-Markdown renderer, the RSS writer, password validators, the Netscape
-importer), that piece is ported and tested against output recorded from the
-real thing.
+The goal is linkding's behaviour, not its code. The server is built the way
+[Dust](https://pub.dev/packages/dust_dart) builds things, and only its
+outcome has to match linkding's: pages are `dust_server` handlers behind
+layers and extractors that render Mustache templates, each database access is
+a fixed SQL statement checked by Dust against the real schema (no ORM, no
+query builder), and the code follows Dust's layout rules (split by feature, a
+barrel per folder, no hand-written file over 180 lines, `test/` mirroring
+`lib/src`). Where linkding's behaviour comes from Python or Django (URL
+parsing, form validation, the Markdown renderer, the RSS writer, password
+validators, the Netscape importer), that piece is ported and tested against
+output recorded from the real thing.
 
 ## How close it is
 
@@ -48,18 +51,52 @@ Deliberate differences:
 packages/
   linkding_shared/   models, the typed API client and the search query
                      language, shared by the server and the browser
-  linkding_server/   the server: API, pages, feeds, migrations
-    lib/src/api/       the REST API (Django REST Framework's answers)
-    lib/src/web/       the pages (linkding's templates, as Dart functions)
-    lib/src/db/        one file of fixed SQL statements per table group
-    lib/src/compat/    ports of the Python and Django pieces linkding uses
-    lib/src/services/  bookmarks, search, assets, import/export, metadata
-    migrations/        linkding's schema, plus the clone's session tables
-    web/static/        linkding's CSS, icons and images
-    tool/              parity tools (see below)
+  linkding_server/   the server
+    lib/src/
+      app/            buildApp: the routers, layers and state, composed
+      pages/          what every page shares: the visitor and CSRF layers
+                      (session/), error pages (errors/), rendering (support/)
+      accounts/       sign in, password change, sessions, password rules
+      bookmarks/      lists/, details/, forms/ and service/ (saving, tagging)
+      bundles/        the bundle list and its editor with a live preview
+      tags/           the tags page, its dialogs and the merge
+      assets/         serving a bookmark's files, reader mode, storing them
+      settings/       general settings, integrations, import and export
+      feeds/ site/    RSS feeds; the manifest, OpenSearch, custom CSS, root
+      search/         the query string's filters and the search itself
+      netscape/       importing and exporting the Netscape bookmarks file
+      notes/          the Markdown renderer for bookmark notes
+      metadata/       loading a website's title and description
+      api/            the REST API, one folder per resource
+      core/ compat/   linkding's own rules; ports of Python and Django pieces
+      db/             rows/ (one file per table group), repos/ (one DAO per
+                      area, fixed SQL), the database and its migrations
+    web/templates/    the Mustache templates; partials are flat-named
+    migrations/       linkding's schema, plus the clone's session tables
+    web/static/       linkding's CSS, icons and images
+    test/             mirrors lib/src
+    tool/             parity tools (see below)
   linkding_web/      linkding's browser code, in Dart (see below)
 tool/                build and parity scripts, fixture generators
 ```
+
+Each folder carries a barrel named after it (`bookmarks/bookmarks.dart`), and
+`tool/check_loc.sh` fails the run when a hand-written Dart file passes 180
+lines.
+
+### How a request is handled
+
+`buildApp` composes a `Router` the way `dust_server` intends. Page routes are
+merged from each feature's `Router` behind three route layers: `VisitorLayer`
+(who is asking, their preferences and CSRF secret, stored as an `Extension`),
+`CsrfProtection` and `PageErrors` (turns `Rejection`s into Django's error
+pages and the sign-in redirect). Features that need a signed-in user add
+`routeLayer(fromExtractor(const RequireSignIn()))`. Handlers are plain
+functions of the `Request`; the database, the services and the template
+engine are read with `request.state<T>()`, forms with the `PostedForm`
+extractor. The API runs each endpoint behind `apiView`, which authenticates
+the caller and turns an `ApiException` (an `IntoResponse`) into DRF's error
+bodies.
 
 ## Running it
 
@@ -120,9 +157,9 @@ databases (`linkding_ref`, `linkding_clone`, as the PostgreSQL user in
 
 (all in `packages/linkding_server/tool/`).
 
-Unit tests: `dart test` in `packages/linkding_server` (1,276 tests, most of
+Unit tests: `dart test` in `packages/linkding_server` (1,256 tests, most of
 them fixtures recorded from linkding's Python code by the scripts in
-`tool/`) and `packages/linkding_shared` (1,909).
+`tool/`) and `packages/linkding_shared` (1,929).
 
 ## Dust
 
@@ -140,7 +177,9 @@ Things found along the way, as of Dust 0.2.0:
 
 - A DAO method cannot return a list of plain values
   (`Future<Result<List<int>, SqlxError>>`); a one-column result needs a
-  one-field row type (`IdRow` in `rows.dart`).
+  one-field row type (`IdRow` in `db/rows/bookmark_rows.dart`).
+- A DAO resolves the row types it returns from the files it imports, not
+  through a barrel, so each repo imports its own row file.
 - A route pattern in `dust_server` never matches a parameter pattern that
   contains `/`, even inside a character class; the API writes it as
   `\x2f`.

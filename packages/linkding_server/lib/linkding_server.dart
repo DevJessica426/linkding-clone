@@ -2,16 +2,17 @@
 /// PostgreSQL schema.
 library;
 
-import 'src/auth/sessions.dart';
+import 'src/accounts/sessions.dart';
 import 'src/db/database.dart';
-import 'src/db/users_repo.dart';
-import 'src/services/errors.dart';
+import 'src/db/or_throw.dart';
+import 'src/db/repos/tokens_repo.dart';
+import 'src/db/repos/users_repo.dart';
 
 export 'src/app/app.dart';
 export 'src/config.dart';
 export 'src/db/database.dart';
-export 'src/services/http_client.dart' show Allowlist, GuardedHttpClient;
-export 'src/services/website_loader.dart';
+export 'src/metadata/http_client.dart' show Allowlist, GuardedHttpClient;
+export 'src/metadata/website_loader.dart';
 export 'src/startup.dart';
 
 /// Creates an API token for [username] and returns its key.
@@ -23,7 +24,7 @@ Future<String> createApiToken(
   final users = UsersRepo(database.connection);
   final user = (await users.byUsername(username)).orThrow;
   if (user == null) throw StateError('no user named $username');
-  final token = (await users.insertApiToken(
+  final token = (await TokensRepo(database.connection).insertApiToken(
     newTokenKey(),
     name,
     DateTime.now().toUtc(),

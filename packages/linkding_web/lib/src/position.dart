@@ -23,6 +23,13 @@ final class PositionController {
     this.autoWidth = false,
   });
 
+  /// The dropdown of an autocomplete: as wide as its field, below it.
+  PositionController.menu(this.anchor, this.overlay)
+    : arrow = null,
+      placement = 'bottom-start',
+      offset = null,
+      autoWidth = true;
+
   final web.HTMLElement anchor;
   final web.HTMLElement overlay;
   final web.HTMLElement? arrow;

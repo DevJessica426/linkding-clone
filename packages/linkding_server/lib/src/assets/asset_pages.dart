@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:dust_server/server.dart';
 
-import '../bookmarks/bookmark_access.dart';
-import '../db/assets_repo.dart';
+import '../bookmarks/service/bookmark_access.dart';
+import '../db/repos/assets_repo.dart';
 import '../db/database.dart';
-import '../db/rows.dart';
-import '../pages/render.dart';
-import '../pages/visitor.dart';
-import '../services/assets.dart';
-import '../services/errors.dart';
+import '../db/or_throw.dart';
+import '../db/rows/rows.dart';
+import '../pages/support/render.dart';
+import '../pages/session/visitor.dart';
+import 'asset_service.dart';
 
 /// linkding's `views/assets.py`: a bookmark's file, and a snapshot in
 /// reader mode, for anyone who may see the bookmark.

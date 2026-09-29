@@ -1,5 +1,5 @@
-import '../pages/html.dart';
-import '../pages/widgets.dart';
+import '../pages/support/html.dart';
+import '../pages/support/widgets.dart';
 import 'bundle_fields.dart';
 
 const _text = {

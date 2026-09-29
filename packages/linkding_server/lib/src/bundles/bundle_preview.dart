@@ -2,11 +2,11 @@ import 'package:dust_server/server.dart';
 
 import '../bookmarks/bookmarks.dart';
 import '../db/database.dart';
-import '../db/rows.dart';
-import '../pages/paginator.dart';
-import '../pages/query_params.dart';
-import '../pages/visitor.dart';
-import '../services/search.dart';
+import '../db/rows/rows.dart';
+import '../pages/support/paginator.dart';
+import '../pages/support/query_params.dart';
+import '../pages/session/visitor.dart';
+import '../search/search.dart';
 import 'bundle_fields.dart';
 
 /// `/bundles/preview`: the preview frame for the fields in the query.

@@ -1,7 +1,7 @@
 import 'package:dust_server/server.dart';
 
-import '../pages/html.dart';
-import '../pages/visitor.dart';
+import '../pages/support/html.dart';
+import '../pages/session/visitor.dart';
 
 /// `/opensearch.xml`: linkding's search, for the browser's address bar.
 Future<Response> opensearch(Request request) async {

@@ -1,6 +1,6 @@
 import '../compat/django.dart';
 import '../compat/xml_writer.dart';
-import '../services/search.dart';
+import '../search/search.dart';
 import 'feed_items.dart';
 
 /// `latest_post_date`: the newest item, or now for an empty feed.

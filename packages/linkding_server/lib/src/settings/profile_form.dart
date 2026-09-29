@@ -1,6 +1,6 @@
 import '../compat/form_data.dart';
-import '../db/rows.dart';
-import '../pages/cleaning.dart';
+import '../db/rows/rows.dart';
+import '../pages/support/cleaning.dart';
 
 /// The choice fields of linkding's `UserProfileForm`, with their choices.
 const profileChoices = {

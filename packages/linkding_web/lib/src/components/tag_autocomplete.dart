@@ -4,11 +4,13 @@ import 'dart:js_interop';
 import 'package:linkding_shared/linkding_shared.dart';
 import 'package:web/web.dart' as web;
 
-import '../dom.dart';
 import '../element.dart';
 import '../input.dart';
 import '../position.dart';
 import '../tag_cache.dart';
+import 'autocomplete/menu_keys.dart';
+import 'autocomplete/menu_links.dart';
+import 'autocomplete/tag_markup.dart';
 
 /// `<ld-tag-autocomplete>`: the tags field of the bookmark, bundle and
 /// bulk-edit forms, completing the word at the caret from the user's tags.
@@ -44,73 +46,38 @@ final class TagAutocomplete extends RenderedElement {
 
   @override
   void render() {
-    host.innerHTML =
-        '''
-      <div class="form-autocomplete ">
-        <!-- autocomplete input container -->
-        <div
-          class="form-autocomplete-input form-input "
-        >
-          <!-- autocomplete real input box -->
-          <input
-            type="text"
-            autocomplete="off"
-            autocapitalize="off"
-          />
-        </div>
-
-        <!-- autocomplete suggestion list -->
-        <ul
-          class="menu "
-        >
-          <!-- menu list items -->
-        </ul>
-      </div>
-    '''
-            .toJS;
+    host.innerHTML = tagAutocompleteTemplate.toJS;
     _container = host.querySelector('.form-autocomplete') as web.HTMLElement;
     _inputBox =
         host.querySelector('.form-autocomplete-input') as web.HTMLElement;
     _menu = host.querySelector('.menu') as web.HTMLElement;
     final input = host.querySelector('input')! as web.HTMLInputElement;
     _input = input;
-    Listener(input, 'input', (event) => _onInput(event));
-    Listener(input, 'keydown', _onKeyDown);
-    Listener(input, 'focus', (_) {
-      _isFocus = true;
-      _update();
-    });
-    Listener(input, 'blur', (_) {
-      _isFocus = false;
-      _close();
-    });
+    bindAutocompleteInput(
+      input,
+      onInput: _onInput,
+      onKeyDown: _onKeyDown,
+      onFocus: () {
+        _isFocus = true;
+        _update();
+      },
+      onBlur: () {
+        _isFocus = false;
+        _close();
+      },
+    );
     _update();
   }
 
   @override
   void firstUpdated() {
-    _position = PositionController(
-      anchor: _input!,
-      overlay: _menu!,
-      autoWidth: true,
-      placement: 'bottom-start',
-    );
+    _position = PositionController.menu(_input!, _menu!);
   }
 
   @override
   void disconnected() {
     super.disconnected();
     _close();
-  }
-
-  /// Sets [name] to [value], or removes it for an empty value (Lit's
-  /// `nothing`).
-  static void _setOrRemove(web.Element element, String name, String value) {
-    if (value.isEmpty) {
-      element.removeAttribute(name);
-    } else {
-      element.setAttribute(name, value);
-    }
   }
 
   void _update() {
@@ -120,17 +87,7 @@ final class TagAutocomplete extends RenderedElement {
         'form-autocomplete ${attribute('variant') == 'small' ? 'small' : ''}';
     _inputBox!.className =
         'form-autocomplete-input form-input ${_isFocus ? 'is-focused' : ''}';
-    _setOrRemove(input, 'id', attribute('input-id'));
-    _setOrRemove(input, 'name', attribute('input-name'));
-    final placeholder = attribute('input-placeholder');
-    input
-      ..setAttribute('placeholder', placeholder.isEmpty ? ' ' : placeholder)
-      ..setAttribute('class', 'form-input ${attribute('input-class')}');
-    _setOrRemove(
-      input,
-      'aria-describedby',
-      attribute('input-aria-describedby'),
-    );
+    syncTagInput(input, attribute);
     final value = attribute('input-value');
     if (value != _committedValue) {
       _committedValue = value;
@@ -139,32 +96,9 @@ final class TagAutocomplete extends RenderedElement {
 
     final menu = _menu!
       ..className = 'menu ${_isOpen && _suggestions.isNotEmpty ? 'open' : ''}';
-    final items = [
-      for (final (i, tag) in _suggestions.indexed)
-        '''
-              <li
-                class="menu-item ${_selectedIndex == i ? 'selected' : ''}"
-              >
-                <a
-                  href="#"
-                >
-                  ${escapeHtml(tag.name)}
-                </a>
-              </li>
-            ''',
-    ];
     // The template's own text and comment around the items.
-    menu.innerHTML =
-        '\n          <!-- menu list items -->\n          ${items.join()}\n        '
-            .toJS;
-    final links = queryAll(menu, 'a');
-    for (var i = 0; i < links.length; i++) {
-      final tag = _suggestions[i];
-      Listener(links[i], 'mousedown', (event) {
-        event.preventDefault();
-        _complete(tag);
-      });
-    }
+    menu.innerHTML = tagMenuMarkup(_suggestions, _selectedIndex).toJS;
+    bindMenuLinks(menu, _suggestions, _complete);
   }
 
   Future<void> _onInput(web.Event event) async {
@@ -186,23 +120,19 @@ final class TagAutocomplete extends RenderedElement {
   }
 
   void _onKeyDown(web.Event event) {
-    final key = (event as web.KeyboardEvent).keyCode;
-    if (_isOpen && (key == 13 || key == 9)) {
-      _complete(_suggestions[_selectedIndex]);
-      event.preventDefault();
+    switch (menuKey(event)) {
+      case MenuKey.accept when _isOpen:
+        _complete(_suggestions[_selectedIndex]);
+      case MenuKey.close:
+        _close();
+      case MenuKey.previous:
+        _updateSelection(-1);
+      case MenuKey.next:
+        _updateSelection(1);
+      case _:
+        return;
     }
-    if (key == 27) {
-      _close();
-      event.preventDefault();
-    }
-    if (key == 38) {
-      _updateSelection(-1);
-      event.preventDefault();
-    }
-    if (key == 40) {
-      _updateSelection(1);
-      event.preventDefault();
-    }
+    event.preventDefault();
   }
 
   void _open() {
@@ -221,12 +151,7 @@ final class TagAutocomplete extends RenderedElement {
   }
 
   void _complete(Tag suggestion) {
-    final input = _input!;
-    final bounds = currentWordBounds(input);
-    final value = input.value;
-    input.value =
-        '${value.substring(0, bounds.start)}${suggestion.name} '
-        '${value.substring(bounds.end)}';
+    replaceCurrentWord(_input!, '${suggestion.name} ');
     // For the forms that watch the field, such as the bundle preview.
     host.dispatchEvent(
       web.CustomEvent('input', web.CustomEventInit(bubbles: true)),
@@ -241,11 +166,6 @@ final class TagAutocomplete extends RenderedElement {
     if (next >= length) next = 0;
     _selectedIndex = next;
     _update();
-
-    // Keep the selected item in view.
-    Timer(Duration.zero, () {
-      final selected = _menu?.querySelector('li.selected');
-      selected?.scrollIntoView(web.ScrollIntoViewOptions(block: 'center'));
-    });
+    scrollSelectedIntoView(_menu);
   }
 }
